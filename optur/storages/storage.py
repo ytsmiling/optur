@@ -123,7 +123,7 @@ class Storage(StorageClient):
     This class is permitted to have `StorageBackend`, but this introduces
     several restrictions to this class.
     First, this class must not be forked. This is because some `StorageBackend`s might
-    not be picklable.
+    not be picklable. This also helps avoiding wasting resources like connections to DB.
     Second, this class must not be used from multiple thread concurrently. This is because
     some `StorageBackend` might not be thread-safe. It is allowed to share the same instance
     with multiple threads, but its user's responsibility that ensures no concurrent access.

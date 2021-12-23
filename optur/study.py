@@ -1,5 +1,6 @@
 import itertools
 from collections.abc import Sequence as SequenceType
+from concurrent.futures import ThreadPoolExecutor
 from typing import Callable, Dict, List, Optional, Sequence, Tuple, Type, Union
 
 from google.protobuf.timestamp_pb2 import Timestamp
@@ -38,8 +39,20 @@ class _Study:
         catch: Tuple[Type[Exception], ...] = (),
         callbacks: Optional[List[Callable[[Trial], None]]] = None,
     ) -> None:
-        pass
+        if n_jobs > 1:
+            # Storage instance cannot be shared by multiple threads
+            # or processes. See :class:`~optur.storage.Storage`'s
+            # classdoc for more details.
+            clients = [self._storage.create_client() for _ in range(n_jobs)]
+        else:
+            # Avoid using storage's clients to reduce runtime overhead.
+            # TODO(tsuzuku): Benchmark.
+            clients = [self._storage]
+        with ThreadPoolExecutor(max_workers=n_jobs) as executor:
+            # TODO(tsuzuku): Use correct argument.s
+            executor.map(self._run_trials, [() for _ in clients], timeout=timeout)
 
+    # TODO(tsuzuku): Rewrite this function as a static method to avoid pickling _Study.
     def _run_trials(
         self,
         objective: ObjectiveFuncType,
@@ -69,6 +82,7 @@ class _Study:
                 callbacks=callbacks,
             )
 
+    # TODO(tsuzuku): Rewrite this function as a static method to avoid pickling _Study.
     def _run_trial(
         self,
         objective: ObjectiveFuncType,
