@@ -1,0 +1,203 @@
+syntax = "proto3";
+
+package optur;
+
+import "google/protobuf/timestamp.proto";
+
+
+message StudyInfo {
+    // UUID of study.
+    string study_id = 1;
+    // User-defined name of the study.
+    string study_name = 2;
+    // Attributes of objective function's targets.
+    // This corresponds `StudyDirection` of optuna, but has
+    // more richer information like targets' names.
+    // The order of targets matters like optuna.
+    repeated Target targets = 3;
+    // User-defined attributes.
+    map<string, string> user_attrs = 4;
+    // System-defined attributes.
+    map<string, string> system_attrs = 5;
+    // Create time of the study since epoch.
+    google.protobuf.Timestamp create_time = 6;
+    // Last update time of the study since epoch.
+    google.protobuf.Timestamp last_update_time = 7;
+}
+
+// Attributes of targets of objective functions.
+message Target {
+    // An enum of target's directions.
+    enum Direction {
+        UNKNOWN = 0;
+        MAXIMIZE = 1;
+        MINIMIZE = 2;
+    };
+
+    // Name of the target. Target name is always optional.
+    string name = 1;
+    // Direction of the target.
+    Direction direction = 2;
+}
+
+// A trial represents one observation in a study.
+// Unlike optuna, optur's trials do not have a `number` field.
+// This is because trials need to be synchronized to correctly determine trial numbers,
+// which is not always possible.
+message Trial {
+    // UUID of the trial. This ID should be unique across studies.
+    string trial_id = 1;
+    // UUID of the study to which the trial is associated.
+    string study_id = 2;
+
+    // An enum of state of trials.
+    enum State {
+        UNKNOWN = 0;
+        CREATED = 1;
+        WAITING = 2;
+        RUNNING = 3;
+        COMPLETED = 4;
+        FAILED = 5;
+        PRUNED = 6;
+        // Some objective values are skipped, but trial finished without errors.
+        PARTIALLY_COMPLETED = 7;
+        // Some objective values are nan, infinity, infeasible, or unknown,
+        // but the trial finished without errors.
+        PARTIALLY_FAILED = 8;
+    };
+
+    // Last-known status of the trial.
+    State last_known_state = 3;
+    // User-defined attributes.
+    map<string, string> user_attrs = 4;
+    // System-defined attributes.
+    map<string, string> system_attrs = 5;
+    // Parameters used to evaluate the objective function.
+    // A mapping from parameter name to parameter.
+    map<string, Parameter> parameters = 6;
+    // The return values of the obejctive function.
+    repeated ObjectiveValue values = 7;
+    // Intermediate values in optuna.
+    repeated Report reports = 8;
+    // An ID to distinguish who created the trial.
+    // This ID is used to avoid contention during distributed search.
+    // For example, enqueued trials can be used exclusively from the same worker.
+    // "Worker" can be finer-grained notion than processes or threads.
+    // For example, in HyperBand, several samplers are instantiated in a same process,
+    // and all of them are treated as different workers.
+    WorkerID worker_id = 9;
+    // Create time of the trial since epoch.
+    google.protobuf.Timestamp create_time = 10;
+    // Last update time of the trial since epoch.
+    google.protobuf.Timestamp last_update_time = 11;
+    // Distributions used to suggest the parameters.
+    // Ideally, we want to keep distributions per study, not per trial.
+    // However, it's difficult for two reasons.
+    // 1. We know that users want to change distributions dynamically in a study.
+    // 2. Storing distributions per study requires synchronization among workers,
+    //    which is not permitted in optur's computation model.
+    map<string, Distribution> distributions = 12;
+}
+
+// An ID to distinguish workers.
+// "Worker" can be finer-grained notion than processes or threads.
+// For example, in HyperBand, several samplers are instantiated in a same process,
+// and all of them are treated as different workers.
+message WorkerID {
+    // User-defined UUID of the worker.
+    // This ID corresponds to an unique `Study` instance.
+    // There should not be more than one `Study` instance with the same `client_id`.
+    // Users must ensure the uniqueness condition, or optur can cause undefined behaviors.
+    // In the worst case, data in storages can be broken in an unrecoverable way.
+    string client_id = 1;
+    // An ID of a thread. This value must not be unique across `client_id`s.
+    // Typically, this value will be automatically set by `Study` instances.
+    // This value must be unique among processes/threads with the same `client_id`.
+    // Zero means not set.
+    int64 thread_id = 2;
+    // Bucket ID of successive halving algorithms like hyperband.
+    // Zero means not set.
+    int64 bucket_id = 3;
+}
+
+// Data registered by `trial.report()`.
+message Report {
+    // Timestamp of the report event.
+    google.protobuf.Timestamp event_time = 1;
+    // Global step of the report event.
+    // This value can be non-unique, but behavior on step conflicts is implementation dependent.
+    int64 step = 2;
+    // Intermediate values of the objective function.
+    repeated ObjectiveValue values = 3;
+}
+
+// One of values of the objective function.
+message ObjectiveValue {
+    enum Status {
+        UNKNOWN = 0;
+        VALID = 1;
+        // Evaluation of the objective value was skipped.
+        SKIPPED = 2;
+        // Evaluation of the objective value failed.
+        INFEASIBLE = 3;
+        // In some storage backends or serialization formats,
+        // we cannot store nan or infinity values.
+        // Theoretically, we can leave the error handlings to them.
+        // However, we distinguish them explicitly because such error handlings are
+        // frequently overlooked.
+        NAN = 4;
+        INF = 5;
+        NEGATIVE_INF = 6;
+    }
+
+    // Value of the objective.
+    float value = 1;
+    // Status of the value.
+    Status status = 2;
+}
+
+message Parameter {
+    // A value of the parameter.
+    ParameterValue value = 1;
+}
+
+// A value of a parameter.
+message ParameterValue {
+    oneof value {
+        int64 int_value = 1;
+        double double_value = 2;
+        string string_value = 3;
+    }
+}
+
+message Distribution {
+    message FloatDistribution {
+        float low = 1;
+        float high = 2;
+        bool log_scale = 3;
+    }
+
+    message IntDistribution {
+        int64 low = 1;
+        int64 high = 2;
+        bool log_scale = 3;
+    }
+
+    message CategoricalDistribution {
+        repeated ParameterValue choices = 1;
+    }
+
+    oneof distribution {
+        FloatDistribution float_distribution = 1;
+        IntDistribution int_distribution = 2;
+        CategoricalDistribution categorical_distribution = 3;
+    }
+    // TODO(tsuzuku): Support prior distribution.
+}
+
+// Serialized search space.
+message SearchSpace {
+    // A mapping from parameter-name to distribution.
+    map<string, Distribution> distributions = 1;
+    // TODO(tsuzuku): Support conditional search spaces.
+}
