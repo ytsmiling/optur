@@ -1,13 +1,23 @@
 from typing import Dict, Sequence
 
+from google.protobuf.timestamp_pb2 import Timestamp
+
 from optur.proto.sampler_pb2 import SamplerConfig
 from optur.proto.study_pb2 import Distribution, ParameterValue
 from optur.proto.study_pb2 import Trial as TrialProto
 
 
-# TODO(tsuzuku) Sampler should manage it's timestamp by its own, or timestamp
-# management can be error-prone.
 class Sampler:
+    def __init__(self) -> None:
+        self._last_update_time = Timestamp(seconds=0, nanos=0)
+
+    @property
+    def last_update_time(self) -> Timestamp:
+        return self._last_update_time
+
+    def update_timestamp(self, timestamp: Timestamp) -> None:
+        self._last_update_time = timestamp
+
     def to_sampler_config(self) -> SamplerConfig:
         pass
 

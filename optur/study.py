@@ -116,15 +116,15 @@ def _ask(
     sampler: Sampler,
     storage: StorageClient,
     worker_id: WorkerID,
-    last_updated_time: Timestamp,
-) -> Tuple[Trial, Timestamp]:
+) -> Trial:
     # Sync sampler and storage.
     new_timestamp = storage.get_current_timestamp()
     trials = storage.get_trials(
         study_id=study_id,
-        timestamp=last_updated_time,
+        timestamp=sampler.last_update_time,
     )
     sampler.sync(trials)
+    sampler.update_timestamp(new_timestamp)
     # Check waiting trials.
     initial_trial: Optional[TrialProto] = None
     for trial in trials:
@@ -138,4 +138,4 @@ def _ask(
     # Call joint_sample of sampler
     ret = Trial(initial_trial)
     ret.update_parameters(sampler.joint_sample(initial_trial))
-    return ret, new_timestamp
+    return ret
