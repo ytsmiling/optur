@@ -103,6 +103,8 @@ message Trial {
 // "Worker" can be finer-grained notion than processes or threads.
 // For example, in HyperBand, several samplers are instantiated in a same process,
 // and all of them are treated as different workers.
+// TODO(tsuzuku): It turned out that `bucket_id` is not used.
+// TODO(tsuzuku): It turned out that who to collect WAITING trials is difficult when `bucket_id` is present.
 message WorkerID {
     // User-defined UUID of the worker.
     // This ID corresponds to an unique `Study` instance.

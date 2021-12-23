@@ -1,5 +1,5 @@
 import abc
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 from google.protobuf.timestamp_pb2 import Timestamp
 
@@ -47,7 +47,7 @@ class StorageClient(abc.ABCMeta):
     @abc.abstractclassmethod
     def get_trials(
         self, study_id: Optional[str] = None, timestamp: Optional[Timestamp] = None
-    ) -> Dict[str, TrialProto]:
+    ) -> List[TrialProto]:
         """Get trials from the storage.
 
         Studies updated on or after the timestamp must be fetched.
@@ -67,7 +67,7 @@ class StorageClient(abc.ABCMeta):
                 Time from epoch.
 
         Returns:
-            A mapping from trial_id to :class:`~optur.proto.study_pb2.Trial`.
+            A list of :class:`~optur.proto.study_pb2.Trial`.
         """
         pass
 

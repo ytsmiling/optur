@@ -5,8 +5,9 @@ from google.protobuf.timestamp_pb2 import Timestamp
 from optur.proto.sampler_pb2 import SamplerConfig
 from optur.proto.study_pb2 import ObjectiveValue, StudyInfo
 from optur.proto.study_pb2 import Trial as TrialProto
+from optur.proto.study_pb2 import WorkerID
 from optur.samplers import Sampler
-from optur.storages import Storage
+from optur.storages import Storage, StorageClient
 from optur.trial import Trial
 
 ObjectiveFuncType = Callable[[Trial], Union[float, Sequence[float]]]
@@ -108,3 +109,33 @@ class Study(_Study):
 
     def enqueue_trial(self, trial: TrialProto) -> None:
         pass
+
+
+def _ask(
+    study_id: str,
+    sampler: Sampler,
+    storage: StorageClient,
+    worker_id: WorkerID,
+    last_updated_time: Timestamp,
+) -> Tuple[Trial, Timestamp]:
+    # Sync sampler and storage.
+    new_timestamp = storage.get_current_timestamp()
+    trials = storage.get_trials(
+        study_id=study_id,
+        timestamp=last_updated_time,
+    )
+    sampler.sync(trials)
+    # Check waiting trials.
+    initial_trial: Optional[TrialProto] = None
+    for trial in trials:
+        if trial.last_known_state == TrialProto.State.WAITING and trial.worker_id == worker_id:
+            initial_trial = trial
+            break
+    if initial_trial is None:
+        # TODO(tsuzuku): Create trial object in storage.
+        pass
+    assert initial_trial is not None
+    # Call joint_sample of sampler
+    ret = Trial(initial_trial)
+    ret.update_parameters(sampler.joint_sample(initial_trial))
+    return ret, new_timestamp

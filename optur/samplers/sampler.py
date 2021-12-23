@@ -5,6 +5,8 @@ from optur.proto.study_pb2 import Distribution, ParameterValue
 from optur.proto.study_pb2 import Trial as TrialProto
 
 
+# TODO(tsuzuku) Sampler should manage it's timestamp by its own, or timestamp
+# management can be error-prone.
 class Sampler:
     def to_sampler_config(self) -> SamplerConfig:
         pass
