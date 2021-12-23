@@ -50,74 +50,7 @@ class _Study:
             clients = [self._storage]
         with ThreadPoolExecutor(max_workers=n_jobs) as executor:
             # TODO(tsuzuku): Use correct argument.s
-            executor.map(self._run_trials, [() for _ in clients], timeout=timeout)
-
-    # TODO(tsuzuku): Rewrite this function as a static method to avoid pickling _Study.
-    def _run_trials(
-        self,
-        objective: ObjectiveFuncType,
-        worker_id: WorkerID,
-        storage_client: StorageClient,
-        n_trials: Optional[int],
-        catch: Tuple[Type[Exception], ...],
-        callbacks: Optional[List[Callable[[Trial], None]]],
-    ) -> None:
-        # We need to create sampler instances per thread because
-        # they are neither thread-safe nor process-safe.
-        # Additionally, if we share sampler instances among workers,
-        # we have risk that samplers' caches are updated during
-        # trials' lifetime.
-        # Unlike optuna, it is less likely that the update breaks
-        # sampler algorithms in optur, but still, we want to ensure that samplers
-        # see the same cache in all `joint_sample` and `sample` calls for the same trial.
-        sampler = create_sampler(sampler_config=self._sampler_config)
-        trial_counter = itertools.count() if n_trials is None else range(n_trials)
-        for _ in trial_counter:
-            self._run_trial(
-                objective=objective,
-                sampler=sampler,
-                storage_client=storage_client,
-                worker_id=worker_id,
-                catch=catch,
-                callbacks=callbacks,
-            )
-
-    # TODO(tsuzuku): Rewrite this function as a static method to avoid pickling _Study.
-    def _run_trial(
-        self,
-        objective: ObjectiveFuncType,
-        sampler: Sampler,
-        storage_client: StorageClient,
-        worker_id: WorkerID,
-        catch: Tuple[Type[Exception], ...],
-        callbacks: Optional[List[Callable[[Trial], None]]],
-    ) -> None:
-        trial = _ask(
-            study_id=self._study_info.study_id,
-            sampler=sampler,
-            storage=storage_client,
-            worker_id=worker_id,
-        )
-        try:
-            values = objective(trial)
-        except PrunedException:
-            trial.proto.last_known_state = TrialProto.State.PRUNED
-        except catch:
-            trial.proto.last_known_state = TrialProto.State.FAILED
-        else:
-            # TODO(tsuzuku): Check trial's state in more detail.
-            trial.proto.last_known_state = TrialProto.State.COMPLETED
-            if isinstance(values, SequenceType):
-                del trial.proto.values[:]
-                trial.proto.values.extend([ObjectiveValue(value=value) for value in values])
-            else:
-                del trial.proto.values[:]
-                # TODO(tsuzuku): Set values' status.
-                trial.proto.values.append(ObjectiveValue(value=float(values)))
-        if callbacks:
-            for callback in callbacks:
-                callback(trial)
-        trial.flush()
+            executor.map(_run_trials, [() for _ in clients], timeout=timeout)
 
 
 class Study(_Study):
@@ -193,3 +126,72 @@ def _ask(
     ret = Trial(trial_proto=initial_trial, storage=storage)
     ret.update_parameters(sampler.joint_sample(initial_trial))
     return ret
+
+
+def _run_trials(
+    objective: ObjectiveFuncType,
+    study_id: str,
+    sampler_config: SamplerConfig,
+    worker_id: WorkerID,
+    storage_client: StorageClient,
+    n_trials: Optional[int],
+    catch: Tuple[Type[Exception], ...],
+    callbacks: Optional[List[Callable[[Trial], None]]],
+) -> None:
+    # We need to create sampler instances per thread because
+    # they are neither thread-safe nor process-safe.
+    # Additionally, if we share sampler instances among workers,
+    # we have risk that samplers' caches are updated during
+    # trials' lifetime.
+    # Unlike optuna, it is less likely that the update breaks
+    # sampler algorithms in optur, but still, we want to ensure that samplers
+    # see the same cache in all `joint_sample` and `sample` calls for the same trial.
+    sampler = create_sampler(sampler_config=sampler_config)
+    trial_counter = itertools.count() if n_trials is None else range(n_trials)
+    for _ in trial_counter:
+        _run_trial(
+            study_id=study_id,
+            objective=objective,
+            sampler=sampler,
+            storage_client=storage_client,
+            worker_id=worker_id,
+            catch=catch,
+            callbacks=callbacks,
+        )
+
+
+def _run_trial(
+    objective: ObjectiveFuncType,
+    study_id: str,
+    sampler: Sampler,
+    storage_client: StorageClient,
+    worker_id: WorkerID,
+    catch: Tuple[Type[Exception], ...],
+    callbacks: Optional[List[Callable[[Trial], None]]],
+) -> None:
+    trial = _ask(
+        study_id=study_id,
+        sampler=sampler,
+        storage=storage_client,
+        worker_id=worker_id,
+    )
+    try:
+        values = objective(trial)
+    except PrunedException:
+        trial.proto.last_known_state = TrialProto.State.PRUNED
+    except catch:
+        trial.proto.last_known_state = TrialProto.State.FAILED
+    else:
+        # TODO(tsuzuku): Check trial's state in more detail.
+        trial.proto.last_known_state = TrialProto.State.COMPLETED
+        if isinstance(values, SequenceType):
+            del trial.proto.values[:]
+            trial.proto.values.extend([ObjectiveValue(value=value) for value in values])
+        else:
+            del trial.proto.values[:]
+            # TODO(tsuzuku): Set values' status.
+            trial.proto.values.append(ObjectiveValue(value=float(values)))
+    if callbacks:
+        for callback in callbacks:
+            callback(trial)
+    trial.flush()
