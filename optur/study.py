@@ -49,6 +49,14 @@ class _Study:
         catch: Tuple[Type[Exception], ...],
         callbacks: Optional[List[Callable[[Trial], None]]],
     ) -> None:
+        # We need to create sampler instances per thread because
+        # they are neither thread-safe nor process-safe.
+        # Additionally, if we share sampler instances among workers,
+        # we have risk that samplers' caches are updated during
+        # trials' lifetime.
+        # Unlike optuna, it is less likely that the update breaks
+        # sampler algorithms in optur, but still, we want to ensure that samplers
+        # see the same cache in all `joint_sample` and `sample` calls for the same trial.
         sampler = create_sampler(sampler_config=self._sampler_config)
         trial_counter = itertools.count() if n_trials is None else range(n_trials)
         for _ in trial_counter:
