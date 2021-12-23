@@ -8,7 +8,7 @@ from optur.samplers import Sampler
 from optur.storages import Storage
 from optur.trial import Trial
 
-ObjectiveFuncType = Callable[[None], Union[float, Sequence[float]]]
+ObjectiveFuncType = Callable[[Trial], Union[float, Sequence[float]]]
 
 
 class _Study:
@@ -30,7 +30,7 @@ class _Study:
         timeout: Optional[float] = None,
         n_jobs: int = 1,
         catch: Tuple[Type[Exception], ...] = (),
-        callbacks: Optional[List[Callable]] = None,
+        callbacks: Optional[List[Callable[[Trial], None]]] = None,
     ) -> None:
         pass
 
