@@ -1,7 +1,9 @@
+from collections.abc import Sequence as SequenceType
 from typing import Callable, Dict, List, Optional, Sequence, Tuple, Type, Union
 
 from google.protobuf.timestamp_pb2 import Timestamp
 
+from optur.errors import PrunedException
 from optur.proto.sampler_pb2 import SamplerConfig
 from optur.proto.study_pb2 import ObjectiveValue, StudyInfo
 from optur.proto.study_pb2 import Trial as TrialProto
@@ -55,15 +57,36 @@ class _Study:
         objective: ObjectiveFuncType,
         sampler: Sampler,
         storage_client: Storage,
-        client_id: str,
-        last_update_time: Timestamp,
+        worker_id: WorkerID,
         catch: Tuple[Type[Exception], ...],
         callbacks: Optional[List[Callable[[Trial], None]]] = None,
     ) -> None:
-        # Ask.
-        # Objective.
-        # Tell.
-        pass
+        trial = _ask(
+            study_id=self._study_info.study_id,
+            sampler=sampler,
+            storage=storage_client,
+            worker_id=worker_id,
+        )
+        try:
+            values = objective(trial)
+        except PrunedException:
+            trial.proto.last_known_state = TrialProto.State.PRUNED
+        except catch:
+            trial.proto.last_known_state = TrialProto.State.FAILED
+        else:
+            # TODO(tsuzuku): Check trial's state in more detail.
+            trial.proto.last_known_state = TrialProto.State.COMPLETED
+            if isinstance(values, SequenceType):
+                del trial.proto.values[:]
+                trial.proto.values.extend([ObjectiveValue(value=value) for value in values])
+            else:
+                del trial.proto.values[:]
+                # TODO(tsuzuku): Set values' status.
+                trial.proto.values.append(ObjectiveValue(value=float(values)))
+        if callbacks:
+            for callback in callbacks:
+                callback(trial)
+        trial.flush()
 
 
 class Study(_Study):
@@ -136,6 +159,6 @@ def _ask(
         pass
     assert initial_trial is not None
     # Call joint_sample of sampler
-    ret = Trial(initial_trial)
+    ret = Trial(trial_proto=initial_trial, storage=storage)
     ret.update_parameters(sampler.joint_sample(initial_trial))
     return ret
