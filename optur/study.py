@@ -2,7 +2,8 @@ from typing import Callable, Dict, List, Optional, Sequence, Tuple, Type, Union
 
 from google.protobuf.timestamp_pb2 import Timestamp
 
-from optur.proto.study_pb2 import ObjectiveValue
+from optur.proto.sampler_pb2 import SamplerConfig
+from optur.proto.study_pb2 import ObjectiveValue, StudyInfo
 from optur.proto.study_pb2 import Trial as TrialProto
 from optur.samplers import Sampler
 from optur.storages import Storage
@@ -12,14 +13,15 @@ ObjectiveFuncType = Callable[[Trial], Union[float, Sequence[float]]]
 
 
 class _Study:
-    def _ask(
+    def __init__(
         self,
-        sampler: Sampler,
+        study_info: StudyInfo,
+        sampler_config: SamplerConfig,
         storage: Storage,
-        client_id: str,
-        last_updated_time: Timestamp,
-    ) -> Tuple[Trial, Timestamp]:
-        pass
+    ) -> None:
+        self._study_info = study_info
+        self._sampler_config = sampler_config
+        self._storage = storage
 
     def optimize(
         self,
@@ -64,6 +66,27 @@ class _Study:
 
 
 class Study(_Study):
+    def __init__(
+        self,
+        study_info: StudyInfo,
+        storage: Storage,
+        sampler: Sampler,
+        client_id: Optional[str] = None,
+    ) -> None:
+        super().__init__(
+            study_info=study_info,
+            storage=storage,
+            sampler_config=sampler.to_sampler_config(),
+        )
+        self._storage = storage
+        # The following three (sampler, client_id, last_update_time) should not be shared by
+        # multiple threads or processes.
+        # Thus, they are re-instantiated in Study.optimize() function.
+        # These three are instantated here for study.ask() and study.tell() APIs.
+        self._sampler = sampler
+        self._client_id = client_id
+        self._last_update_time = Timestamp(seconds=0, nanos=0)
+
     def ask(self) -> Trial:
         pass
 
