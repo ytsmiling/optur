@@ -1,3 +1,4 @@
+import itertools
 from collections.abc import Sequence as SequenceType
 from typing import Callable, Dict, List, Optional, Sequence, Tuple, Type, Union
 
@@ -8,7 +9,7 @@ from optur.proto.sampler_pb2 import SamplerConfig
 from optur.proto.study_pb2 import ObjectiveValue, StudyInfo
 from optur.proto.study_pb2 import Trial as TrialProto
 from optur.proto.study_pb2 import WorkerID
-from optur.samplers import Sampler
+from optur.samplers import Sampler, create_sampler
 from optur.storages import Storage, StorageClient
 from optur.trial import Trial
 
@@ -42,15 +43,23 @@ class _Study:
     def _run_trials(
         self,
         objective: ObjectiveFuncType,
-        client_id: str,
+        worker_id: WorkerID,
         storage_client: Storage,
-        n_trials: Optional[int] = None,
-        catch: Tuple[Type[Exception], ...] = (),
-        callbacks: Optional[List[Callable[[Trial], None]]] = None,
+        n_trials: Optional[int],
+        catch: Tuple[Type[Exception], ...],
+        callbacks: Optional[List[Callable[[Trial], None]]],
     ) -> None:
-        # Instantiate sampler.
-        # Run _run_trial sequentially.
-        pass
+        sampler = create_sampler(sampler_config=self._sampler_config)
+        trial_counter = itertools.count() if n_trials is None else range(n_trials)
+        for _ in trial_counter:
+            self._run_trial(
+                objective=objective,
+                sampler=sampler,
+                storage_client=storage_client,
+                worker_id=worker_id,
+                catch=catch,
+                callbacks=callbacks,
+            )
 
     def _run_trial(
         self,
@@ -59,7 +68,7 @@ class _Study:
         storage_client: Storage,
         worker_id: WorkerID,
         catch: Tuple[Type[Exception], ...],
-        callbacks: Optional[List[Callable[[Trial], None]]] = None,
+        callbacks: Optional[List[Callable[[Trial], None]]],
     ) -> None:
         trial = _ask(
             study_id=self._study_info.study_id,
