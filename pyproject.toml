@@ -1,0 +1,28 @@
+[tool.black]
+line-length = 99
+exclude = ''' 
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+src_paths = ["optur"]
+
+[tool.mypy]
+python_version = "3.8"
+strict = true
+
+[tool.flake8]
+max-line-length = 99
+exclude = "optur/proto"
