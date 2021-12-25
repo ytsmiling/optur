@@ -6,106 +6,119 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from google.protobuf import reflection as _reflection
 from google.protobuf import symbol_database as _symbol_database
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-
-
 DESCRIPTOR = _descriptor.FileDescriptor(
-  name='optur/proto/sampler.proto',
-  package='optur',
-  syntax='proto3',
-  serialized_options=None,
-  create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x19optur/proto/sampler.proto\x12\x05optur\"H\n\rSamplerConfig\x12,\n\x06random\x18\x01 \x01(\x0b\x32\x1a.optur.RandomSamplerConfigH\x00\x42\t\n\x07sampler\"\x15\n\x13RandomSamplerConfigb\x06proto3'
+    name="optur/proto/sampler.proto",
+    package="optur",
+    syntax="proto3",
+    serialized_options=None,
+    create_key=_descriptor._internal_create_key,
+    serialized_pb=b'\n\x19optur/proto/sampler.proto\x12\x05optur"H\n\rSamplerConfig\x12,\n\x06random\x18\x01 \x01(\x0b\x32\x1a.optur.RandomSamplerConfigH\x00\x42\t\n\x07sampler"\x15\n\x13RandomSamplerConfigb\x06proto3',
 )
 
 
-
-
 _SAMPLERCONFIG = _descriptor.Descriptor(
-  name='SamplerConfig',
-  full_name='optur.SamplerConfig',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-    _descriptor.FieldDescriptor(
-      name='random', full_name='optur.SamplerConfig.random', index=0,
-      number=1, type=11, cpp_type=10, label=1,
-      has_default_value=False, default_value=None,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-    _descriptor.OneofDescriptor(
-      name='sampler', full_name='optur.SamplerConfig.sampler',
-      index=0, containing_type=None,
-      create_key=_descriptor._internal_create_key,
-    fields=[]),
-  ],
-  serialized_start=36,
-  serialized_end=108,
+    name="SamplerConfig",
+    full_name="optur.SamplerConfig",
+    filename=None,
+    file=DESCRIPTOR,
+    containing_type=None,
+    create_key=_descriptor._internal_create_key,
+    fields=[
+        _descriptor.FieldDescriptor(
+            name="random",
+            full_name="optur.SamplerConfig.random",
+            index=0,
+            number=1,
+            type=11,
+            cpp_type=10,
+            label=1,
+            has_default_value=False,
+            default_value=None,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+    ],
+    extensions=[],
+    nested_types=[],
+    enum_types=[],
+    serialized_options=None,
+    is_extendable=False,
+    syntax="proto3",
+    extension_ranges=[],
+    oneofs=[
+        _descriptor.OneofDescriptor(
+            name="sampler",
+            full_name="optur.SamplerConfig.sampler",
+            index=0,
+            containing_type=None,
+            create_key=_descriptor._internal_create_key,
+            fields=[],
+        ),
+    ],
+    serialized_start=36,
+    serialized_end=108,
 )
 
 
 _RANDOMSAMPLERCONFIG = _descriptor.Descriptor(
-  name='RandomSamplerConfig',
-  full_name='optur.RandomSamplerConfig',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  create_key=_descriptor._internal_create_key,
-  fields=[
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  serialized_options=None,
-  is_extendable=False,
-  syntax='proto3',
-  extension_ranges=[],
-  oneofs=[
-  ],
-  serialized_start=110,
-  serialized_end=131,
+    name="RandomSamplerConfig",
+    full_name="optur.RandomSamplerConfig",
+    filename=None,
+    file=DESCRIPTOR,
+    containing_type=None,
+    create_key=_descriptor._internal_create_key,
+    fields=[],
+    extensions=[],
+    nested_types=[],
+    enum_types=[],
+    serialized_options=None,
+    is_extendable=False,
+    syntax="proto3",
+    extension_ranges=[],
+    oneofs=[],
+    serialized_start=110,
+    serialized_end=131,
 )
 
-_SAMPLERCONFIG.fields_by_name['random'].message_type = _RANDOMSAMPLERCONFIG
-_SAMPLERCONFIG.oneofs_by_name['sampler'].fields.append(
-  _SAMPLERCONFIG.fields_by_name['random'])
-_SAMPLERCONFIG.fields_by_name['random'].containing_oneof = _SAMPLERCONFIG.oneofs_by_name['sampler']
-DESCRIPTOR.message_types_by_name['SamplerConfig'] = _SAMPLERCONFIG
-DESCRIPTOR.message_types_by_name['RandomSamplerConfig'] = _RANDOMSAMPLERCONFIG
+_SAMPLERCONFIG.fields_by_name["random"].message_type = _RANDOMSAMPLERCONFIG
+_SAMPLERCONFIG.oneofs_by_name["sampler"].fields.append(_SAMPLERCONFIG.fields_by_name["random"])
+_SAMPLERCONFIG.fields_by_name["random"].containing_oneof = _SAMPLERCONFIG.oneofs_by_name["sampler"]
+DESCRIPTOR.message_types_by_name["SamplerConfig"] = _SAMPLERCONFIG
+DESCRIPTOR.message_types_by_name["RandomSamplerConfig"] = _RANDOMSAMPLERCONFIG
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-SamplerConfig = _reflection.GeneratedProtocolMessageType('SamplerConfig', (_message.Message,), {
-  'DESCRIPTOR' : _SAMPLERCONFIG,
-  '__module__' : 'optur.proto.sampler_pb2'
-  # @@protoc_insertion_point(class_scope:optur.SamplerConfig)
-  })
+SamplerConfig = _reflection.GeneratedProtocolMessageType(
+    "SamplerConfig",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _SAMPLERCONFIG,
+        "__module__": "optur.proto.sampler_pb2"
+        # @@protoc_insertion_point(class_scope:optur.SamplerConfig)
+    },
+)
 _sym_db.RegisterMessage(SamplerConfig)
 
-RandomSamplerConfig = _reflection.GeneratedProtocolMessageType('RandomSamplerConfig', (_message.Message,), {
-  'DESCRIPTOR' : _RANDOMSAMPLERCONFIG,
-  '__module__' : 'optur.proto.sampler_pb2'
-  # @@protoc_insertion_point(class_scope:optur.RandomSamplerConfig)
-  })
+RandomSamplerConfig = _reflection.GeneratedProtocolMessageType(
+    "RandomSamplerConfig",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _RANDOMSAMPLERCONFIG,
+        "__module__": "optur.proto.sampler_pb2"
+        # @@protoc_insertion_point(class_scope:optur.RandomSamplerConfig)
+    },
+)
 _sym_db.RegisterMessage(RandomSamplerConfig)
 
 
