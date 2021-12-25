@@ -2,4 +2,11 @@ syntax = "proto3";
 
 package optur;
 
-message SamplerConfig {}
+message SamplerConfig {
+    oneof sampler {
+        RandomSamplerConfig random = 1;
+    }
+}
+
+
+message RandomSamplerConfig {}

@@ -1,9 +1,9 @@
-from typing import Dict, Sequence
+from typing import Dict, Optional, Sequence
 
 from google.protobuf.timestamp_pb2 import Timestamp
 
 from optur.proto.sampler_pb2 import SamplerConfig
-from optur.proto.study_pb2 import Distribution, ParameterValue
+from optur.proto.study_pb2 import Distribution, ParameterValue, SearchSpace
 from optur.proto.study_pb2 import Trial as TrialProto
 
 
@@ -32,20 +32,24 @@ class Sampler:
         """
         pass
 
-    def joint_sample(self, trial: TrialProto) -> Dict[str, ParameterValue]:
+    def joint_sample(
+        self,
+        fixed_parameters: Optional[Dict[str, ParameterValue]] = None,
+        search_space: Optional[SearchSpace] = None,
+    ) -> Dict[str, ParameterValue]:
         """Perform joint-sampling for the trial.
 
         This method is expected to be called just after the trial starts running.
-        This method accepts `trial` object because the trial object has non-empty parameters
+        This method accepts ``fixed_parameters`` because the trial object has non-empty parameters
         field if it was created by `add_trials` or `enqueue_trials`, and this can affects
-        the result of the sampling.
+        the result of the joint sampling.
 
         It is up to trials whether they use the result of the joint-sampling or not.
         """
         pass
 
     def sample(self, distribution: Distribution) -> ParameterValue:
-        """Sample parameters.
+        """Sample a parameter.
 
         This method will be called when ``trial.suggest_xxx` methods are called.
         """

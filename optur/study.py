@@ -124,7 +124,8 @@ def _ask(
     assert initial_trial is not None
     # Call joint_sample of sampler
     ret = Trial(trial_proto=initial_trial, storage=storage)
-    ret.update_parameters(sampler.joint_sample(initial_trial))
+    # TODO(tsuzuku): Pass fixed_parameters and search_space.
+    ret.update_parameters(sampler.joint_sample())
     return ret
 
 
