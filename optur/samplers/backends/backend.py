@@ -20,16 +20,32 @@ class SamplerBackend(abc.ABC):
     ) -> Dict[str, ParameterValue]:
         """Perform joint-sampling for the trial.
 
+        When ``fixed_parameters`` is not :obj:`None`, the return value must includes them.
+
         When ``search_space`` is not :obj:`None`, this method uses the ``search_space``
         for the joint-sampling.
         When ``search_space`` is :obj:`None`, this method infers the search space from
         past trials. This process is called `intersection_searchspace` in optuna, but
         optur does not necessarily infer the same search space with optuna.
+
+        This method might use an internal cache, but this method never updates internal
+        states including the cache.
         """
-        # TODO(tsuzuku) Add default implementation.
-        pass
+
+        # Default implementation for samplers that cannot take inter-parameter
+        # correlations in to account.
+        ret = fixed_parameters.copy() if fixed_parameters is not None else {}
+        if search_space:
+            for key, distribution in search_space.distributions.items():
+                if not fixed_parameters or key not in fixed_parameters:
+                    ret[key] = self.sample(distribution=distribution)
+        return ret
 
     @abc.abstractclassmethod
     def sample(self, distribution: Distribution) -> ParameterValue:
-        """Sample a parameter."""
+        """Sample a parameter.
+
+        This method might use an internal cache, but this method never updates internal
+        states including the cache.
+        """
         pass
