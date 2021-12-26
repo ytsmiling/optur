@@ -1,5 +1,5 @@
 from optur.proto.sampler_pb2 import RandomSamplerConfig
-from optur.proto.study_pb2 import Distribution, ParameterValue
+from optur.proto.study_pb2 import Distribution, ParameterValue, SearchSpace
 from optur.samplers.backends.random import RandomSamplerBackend
 
 FD = Distribution.FloatDistribution
@@ -50,3 +50,46 @@ def test_random_sampler_backend_respects_categorical_distribution_choices() -> N
 
 
 # TODO(tsuzuku): Check empty categorical distribution handling.
+
+
+def test_random_sampler_joint_sample_respects_fixed_parameters() -> None:
+    sampler = RandomSamplerBackend(RandomSamplerConfig())
+    fixed_parameters = {
+        "foo": ParameterValue(int_value=3),
+        "bar": ParameterValue(double_value=2.4),
+    }
+    parameters = sampler.joint_sample(fixed_parameters=fixed_parameters, search_space=None)
+    assert set(parameters.keys()) == {"foo", "bar"}
+    assert all(parameters[key] == fixed_parameters[key] for key in {"foo", "bar"})
+
+
+def test_random_sampler_joint_sample_respects_search_space() -> None:
+    sampler = RandomSamplerBackend(RandomSamplerConfig())
+    search_space = SearchSpace(
+        distributions={
+            "foo": Distribution(int_distribution=ID(low=10, high=100)),
+            "bar": Distribution(float_distribution=FD(low=10, high=100)),
+        }
+    )
+    parameters = sampler.joint_sample(fixed_parameters=None, search_space=search_space)
+    assert set(parameters.keys()) == {"foo", "bar"}
+    # TODO(tsuzuku): Check that search space includes the parameters.
+
+
+def test_random_sampler_joint_sample_prioritizes_fixed_parameters() -> None:
+    sampler = RandomSamplerBackend(RandomSamplerConfig())
+    fixed_parameters = {
+        "foo": ParameterValue(int_value=3),
+        "bar": ParameterValue(double_value=2.4),
+    }
+    search_space = SearchSpace(
+        distributions={
+            "foo": Distribution(int_distribution=ID(low=10, high=100)),
+            "bar": Distribution(float_distribution=FD(low=10, high=100)),
+            "baz": Distribution(float_distribution=FD(low=10, high=100)),
+        }
+    )
+    parameters = sampler.joint_sample(fixed_parameters=fixed_parameters, search_space=search_space)
+    assert set(parameters.keys()) == {"foo", "bar", "baz"}
+    assert all(parameters[key] == fixed_parameters[key] for key in {"foo", "bar"})
+    # TODO(tsuzuku): Check that parameters["baz"] is included by the search space.
