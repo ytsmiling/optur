@@ -17,4 +17,4 @@ jobs:
           python -m pip install -U pip
           pip install --progress-bar off -U pytest protobuf
       - name: test
-        run: pytest .
+        run: PYTHONPATH=. pytest .
