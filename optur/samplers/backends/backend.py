@@ -5,7 +5,7 @@ from optur.proto.study_pb2 import Distribution, ParameterValue, SearchSpace
 from optur.proto.study_pb2 import Trial as TrialProto
 
 
-class SamplerBackend(abc.ABCMeta):
+class SamplerBackend(abc.ABC):
     def sync(self, trials: Sequence[TrialProto]) -> None:
         """Update sampler-specific cache with the trials.
 
