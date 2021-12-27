@@ -1,22 +1,16 @@
+import abc
 from typing import Dict, Optional, Sequence
 
 from google.protobuf.timestamp_pb2 import Timestamp
 
-from optur.errors import UnInitializedError
 from optur.proto.sampler_pb2 import SamplerConfig
 from optur.proto.study_pb2 import Distribution, ParameterValue, SearchSpace
 from optur.proto.study_pb2 import Trial as TrialProto
-from optur.samplers.backends.backend import SamplerBackend
 
 
-class Sampler:
+class Sampler(abc.ABC):
     def __init__(self, sampler_config: SamplerConfig) -> None:
-        self._last_update_time = Timestamp(seconds=0, nanos=0)
         self._sampler_config = sampler_config
-        self._backend: Optional[SamplerBackend] = None
-
-    def init(self) -> None:
-        pass
 
     @property
     def last_update_time(self) -> Timestamp:
@@ -29,18 +23,8 @@ class Sampler:
         return self._sampler_config
 
     def sync(self, trials: Sequence[TrialProto]) -> None:
-        """Update sampler-specific cache with the trials.
-
-        Some trials might have already appeared in prior `sync` call.
-        When trials appear multiple times with some finished state, whether
-        samplers update their cache or not is sampler-dependent.
-        When a trial appears for the first time after it finishes, the cache
-        will be updated even if the trial haas appeared multiple times before the trial finishes.
-        """
-
-        if self._backend is None:
-            raise UnInitializedError("Sampler is not initialized. Hint: call `Sampler.init()`.")
-        self._backend.sync(trials=trials)
+        """Update sampler-specific cache with the trials."""
+        pass
 
     def joint_sample(
         self,
@@ -49,26 +33,41 @@ class Sampler:
     ) -> Dict[str, ParameterValue]:
         """Perform joint-sampling for the trial.
 
+        When ``fixed_parameters`` is not :obj:`None`, the return value must includes them.
+
+        When ``search_space`` is not :obj:`None`, this method uses the ``search_space``
+        for the joint-sampling.
+        When ``search_space`` is :obj:`None`, this method infers the search space from
+        past trials. This process is called `intersection_searchspace` in optuna, but
+        optur does not necessarily infer the same search space with optuna.
+
         This method is expected to be called just after the trial starts running.
         This method accepts ``fixed_parameters`` because the trial object has non-empty parameters
         field if it was created by `add_trials` or `enqueue_trials`, and this can affects
         the result of the joint sampling.
 
+        This method might use an internal cache, but this method never updates internal
+        states including the cache.
+
         It is up to trials whether they use the result of the joint-sampling or not.
         """
 
-        if self._backend is None:
-            raise UnInitializedError("Sampler is not initialized. Hint: call `Sampler.init()`.")
-        return self._backend.joint_sample(
-            fixed_parameters=fixed_parameters, search_space=search_space
-        )
+        # Default implementation for samplers that cannot take inter-parameter
+        # correlations in to account.
+        ret = fixed_parameters.copy() if fixed_parameters is not None else {}
+        if search_space:
+            for key, distribution in search_space.distributions.items():
+                if not fixed_parameters or key not in fixed_parameters:
+                    ret[key] = self.sample(distribution=distribution)
+        return ret
 
+    @abc.abstractclassmethod
     def sample(self, distribution: Distribution) -> ParameterValue:
         """Sample a parameter.
 
         This method will be called when ``trial.suggest_xxx` methods are called.
-        """
 
-        if self._backend is None:
-            raise UnInitializedError("Sampler is not initialized. Hint: call `Sampler.init()`.")
-        return self._backend.sample(distribution=distribution)
+        This method might use an internal cache, but this method never updates internal
+        states including the cache.
+        """
+        pass

@@ -1,13 +1,13 @@
 import random
 
-from optur.proto.sampler_pb2 import RandomSamplerConfig
+from optur.proto.sampler_pb2 import RandomSamplerConfig, SamplerConfig
 from optur.proto.study_pb2 import Distribution, ParameterValue
-from optur.samplers.backends.backend import SamplerBackend
+from optur.samplers.sampler import Sampler
 
 
-class RandomSamplerBackend(SamplerBackend):
+class RandomSampler(Sampler):
     def __init__(self, config: RandomSamplerConfig) -> None:
-        super().__init__()
+        super().__init__(SamplerConfig(random=config))
         self._config = config
 
     def sample(self, distribution: Distribution) -> ParameterValue:
