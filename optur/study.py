@@ -105,6 +105,14 @@ def _ask(
     storage: StorageClient,
     worker_id: WorkerID,
 ) -> Trial:
+    """Ask method.
+
+    This method must do the following.
+    * sync the sampler with the storage.
+    * sync the waiting trial queue with the storage.
+    * write the new or fetched trial to the storage (if required).
+    * call joint_sample of the sampler and set to the trial.
+    """
     # Sync sampler and storage.
     new_timestamp = storage.get_current_timestamp()
     trials = storage.get_trials(
