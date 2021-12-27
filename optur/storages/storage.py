@@ -5,9 +5,10 @@ from google.protobuf.timestamp_pb2 import Timestamp
 
 from optur.proto.study_pb2 import StudyInfo
 from optur.proto.study_pb2 import Trial as TrialProto
+from optur.storages.backends.backend import StorageBackend
 
 
-class StorageClient(abc.ABCMeta):
+class StorageClient(abc.ABC):
     @abc.abstractclassmethod
     def get_current_timestamp(self) -> Timestamp:
         """Get current server-timestamp.
@@ -133,5 +134,29 @@ class Storage(StorageClient):
     via this class.
     """
 
+    def __init__(self, backend: StorageBackend) -> None:
+        super().__init__()
+        self._backend = backend
+
+    def get_current_timestamp(self) -> Timestamp:
+        return self._backend.get_current_timestamp()
+
+    def get_studies(self, timestamp: Optional[Timestamp] = None) -> List[StudyInfo]:
+        return self._backend.get_studies(timestamp=timestamp)
+
+    def get_trials(
+        self, study_id: Optional[str] = None, timestamp: Optional[Timestamp] = None
+    ) -> List[TrialProto]:
+        return self._backend.get_trials(study_id=study_id, timestamp=timestamp)
+
+    def get_trial(self, trial_id: str, study_id: Optional[str] = None) -> TrialProto:
+        return self._backend.get_trial(trial_id=trial_id, study_id=study_id)
+
+    def write_study(self, study: StudyInfo) -> None:
+        return self._backend.write_study(study=study)
+
+    def write_trial(self, trial: TrialProto) -> None:
+        return self._backend.write_trial(trial=trial)
+
     def create_client(self) -> StorageClient:
-        pass
+        raise NotImplementedError()
