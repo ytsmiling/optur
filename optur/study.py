@@ -210,3 +210,27 @@ def _value_to_objective_value(value: float) -> ObjectiveValue:
             return ObjectiveValue(status=ObjectiveValue.Status.NEGATIVE_INF, value=value)
     else:
         return ObjectiveValue(status=ObjectiveValue.Status.VALID, value=value)
+
+
+# Return ``Trial.State``.
+def _infer_trial_state_from_objective_values(values: Sequence[ObjectiveValue]) -> int:
+    if all(value.status == ObjectiveValue.Status.VALID for value in values):
+        return TrialProto.State.COMPLETED
+    if any(value.status == ObjectiveValue.Status.UNKNOWN for value in values):
+        return TrialProto.State.UNKNOWN
+    if any(
+        value.status
+        in (
+            ObjectiveValue.Status.NAN,
+            ObjectiveValue.INF,
+            ObjectiveValue.NEGATIVE_INF,
+            ObjectiveValue.INFEASIBLE,
+        )
+        for value in values
+    ):
+        return TrialProto.State.PARTIALLY_FAILED
+    if all(
+        value.status in (ObjectiveValue.Status.VALID, ObjectiveValue.SKIPPED) for value in values
+    ):
+        return TrialProto.State.PARTIALLY_FAILED
+    return TrialProto.State.FAILED
