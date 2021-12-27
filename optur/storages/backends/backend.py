@@ -7,6 +7,8 @@ from optur.proto.study_pb2 import StudyInfo
 from optur.proto.study_pb2 import Trial as TrialProto
 
 
+# Storage backends are not required to be thread-safe.
+# Storage backends are not required to be process-safe.
 class StorageBackend(abc.ABC):
     @abc.abstractclassmethod
     def get_current_timestamp(self) -> Timestamp:
