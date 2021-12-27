@@ -2,6 +2,7 @@
 OK = 0
 ALREADY_EXISTS = 1
 NOT_FOUND = 2
+UNINITIALIZED = 3
 
 
 class PrunedException(Exception):
@@ -23,3 +24,8 @@ class AlreadyExistsError(StatusError):
 class NotFoundError(StatusError):
     def __init__(self, message: str) -> None:
         super().__init__(message, NOT_FOUND)
+
+
+class UnInitializedError(StatusError):
+    def __init__(self, message: str) -> None:
+        super().__init__(message, UNINITIALIZED)
