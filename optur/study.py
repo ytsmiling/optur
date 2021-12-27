@@ -99,6 +99,32 @@ class Study(_Study):
         pass
 
 
+class _TrialQueue:
+    """Trial queue for managing WAITING trials."""
+    def __init__(self, states: "Sequence[TrialProto.StateValue]") -> None:
+        self._trials: Dict[str, TrialProto] = {}
+        self._timestamp: Optional[Timestamp] = None
+        self._states = states
+
+    @property
+    def last_update_time(self) -> Optional[Timestamp]:
+        return self._timestamp
+
+    def update_timestamp(self, timestamp: Optional[Timestamp]) -> None:
+        self._timestamp = timestamp
+
+    def sync(self, trials: Sequence[TrialProto]) -> None:
+        for trial in trials:
+            if trial.trial_id in self._trials:
+                if trial.last_known_state in self._states:
+                    self._trials[trial.trial_id] = trial
+                else:
+                    del self._trials[trial.trial_id]
+            else:
+                if trial.last_known_state in self._states:
+                    self._trials[trial.trial_id] = trial
+
+
 def _ask(
     study_id: str,
     sampler: Sampler,
