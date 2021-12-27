@@ -153,7 +153,7 @@ message ObjectiveValue {
     }
 
     // Value of the objective.
-    float value = 1;
+    double value = 1;
     // Status of the value.
     Status status = 2;
 }

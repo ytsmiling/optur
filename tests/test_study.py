@@ -1,6 +1,11 @@
+import math
+
 from optur.proto.study_pb2 import ObjectiveValue
 from optur.proto.study_pb2 import Trial as TrialProto
-from optur.study import _infer_trial_state_from_objective_values
+from optur.study import (
+    _infer_trial_state_from_objective_values,
+    _value_to_objective_value,
+)
 
 
 def test_infer_trial_state_from_no_objective_values() -> None:
@@ -129,3 +134,17 @@ def test_infer_trial_state_from_infeasible_objective_values() -> None:
         )
         == TrialProto.State.PARTIALLY_FAILED
     )
+
+
+def test_nan_to_objective_value() -> None:
+    assert _value_to_objective_value(math.nan).status == ObjectiveValue.Status.NAN
+
+
+def test_inf_to_objective_value() -> None:
+    assert _value_to_objective_value(math.inf).status == ObjectiveValue.Status.INF
+    assert _value_to_objective_value(-math.inf).status == ObjectiveValue.Status.NEGATIVE_INF
+
+
+def test_valid_value_to_objective_value() -> None:
+    assert _value_to_objective_value(0.1).status == ObjectiveValue.Status.VALID
+    assert math.isclose(_value_to_objective_value(0.2).value, 0.2)
