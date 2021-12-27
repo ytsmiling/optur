@@ -137,6 +137,7 @@ def _ask(
     study_id: str,
     sampler: Sampler,
     storage: StorageClient,
+    trial_queue: _TrialQueue,
     worker_id: WorkerID,
 ) -> Trial:
     """Ask method.
@@ -147,24 +148,22 @@ def _ask(
     * write the new or fetched trial to the storage (if required).
     * call joint_sample of the sampler and set to the trial.
     """
-    # Sync sampler and storage.
+    # Sync trial_queue and storage.
+    queue_timestamp = trial_queue.last_update_time
     new_timestamp = storage.get_current_timestamp()
-    trials = storage.get_trials(
-        study_id=study_id,
-        timestamp=sampler.last_update_time,
-    )
+    trials = storage.get_trials(study_id=study_id, timestamp=queue_timestamp)
+    trial_queue.sync(trials)
+    trial_queue.update_timestamp(new_timestamp)
+    # TODO(tsuzuku): # Get waiting trial.
+    initial_trial: Optional[TrialProto] = None
+    assert initial_trial is not None
+    # Sync sampler and storage.
+    sampler_timestamp = sampler.last_update_time
+    if queue_timestamp != sampler_timestamp:
+        new_timestamp = storage.get_current_timestamp()
+        trials = storage.get_trials(study_id=study_id, timestamp=sampler_timestamp)
     sampler.sync(trials)
     sampler.update_timestamp(new_timestamp)
-    # Check waiting trials.
-    initial_trial: Optional[TrialProto] = None
-    for trial in trials:
-        if trial.last_known_state == TrialProto.State.WAITING and trial.worker_id == worker_id:
-            initial_trial = trial
-            break
-    if initial_trial is None:
-        # TODO(tsuzuku): Create trial object in storage.
-        pass
-    assert initial_trial is not None
     # Call joint_sample of sampler
     ret = Trial(trial_proto=initial_trial, storage=storage)
     # TODO(tsuzuku): Pass fixed_parameters and search_space.
@@ -191,6 +190,10 @@ def _run_trials(
     # sampler algorithms in optur, but still, we want to ensure that samplers
     # see the same cache in all `joint_sample` and `sample` calls for the same trial.
     sampler = create_sampler(sampler_config=sampler_config)
+    # Unlike samplers, we are free to share _TrialQueue between processes or threads.
+    # We're creating the queue here because the current implementation of `_TrialQueue`
+    # is not process/thread-safe.
+    trial_queue = _TrialQueue([TrialProto.State.WAITING])
     trial_counter = itertools.count() if n_trials is None else range(n_trials)
     for _ in trial_counter:
         _run_trial(
@@ -201,6 +204,7 @@ def _run_trials(
             worker_id=worker_id,
             catch=catch,
             callbacks=callbacks,
+            trial_queue=trial_queue,
         )
 
 
@@ -212,12 +216,14 @@ def _run_trial(
     worker_id: WorkerID,
     catch: Tuple[Type[Exception], ...],
     callbacks: Optional[List[Callable[[Trial], None]]],
+    trial_queue: _TrialQueue,
 ) -> None:
     trial = _ask(
         study_id=study_id,
         sampler=sampler,
         storage=storage_client,
         worker_id=worker_id,
+        trial_queue=trial_queue,
     )
     try:
         values = objective(trial)
