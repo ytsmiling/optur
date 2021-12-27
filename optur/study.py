@@ -154,8 +154,9 @@ def _ask(
     trials = storage.get_trials(study_id=study_id, timestamp=queue_timestamp)
     trial_queue.sync(trials)
     trial_queue.update_timestamp(new_timestamp)
-    # TODO(tsuzuku): # Get waiting trial.
-    initial_trial: Optional[TrialProto] = None
+    # Get waiting trial if exists.
+    initial_trial = trial_queue.get_trial(state=TrialProto.State.WAITING)
+    # TODO(tsuzuku): Create a new trial when ``initial_trial`` is None.
     assert initial_trial is not None
     # Sync sampler and storage.
     sampler_timestamp = sampler.last_update_time
@@ -164,6 +165,7 @@ def _ask(
         trials = storage.get_trials(study_id=study_id, timestamp=sampler_timestamp)
     sampler.sync(trials)
     sampler.update_timestamp(new_timestamp)
+    # TODO(tsuzuku): Persist trial when necessary.
     # Call joint_sample of sampler
     ret = Trial(trial_proto=initial_trial, storage=storage)
     # TODO(tsuzuku): Pass fixed_parameters and search_space.
