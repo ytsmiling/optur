@@ -1,5 +1,6 @@
 import itertools
 import math
+import uuid
 from collections.abc import Sequence as SequenceType
 from concurrent.futures import ThreadPoolExecutor
 from typing import Callable, Dict, List, Optional, Sequence, Tuple, Type, Union
@@ -156,8 +157,14 @@ def _ask(
     trial_queue.update_timestamp(new_timestamp)
     # Get waiting trial if exists.
     initial_trial = trial_queue.get_trial(state=TrialProto.State.WAITING)
-    # TODO(tsuzuku): Create a new trial when ``initial_trial`` is None.
-    assert initial_trial is not None
+    if initial_trial is None:
+        initial_trial = TrialProto(
+            trial_id=uuid.uuid4().hex,
+            create_time=new_timestamp,
+            last_update_time=new_timestamp,
+            last_known_state=TrialProto.State.CREATED,
+            worker_id=worker_id,
+        )
     # Sync sampler and storage.
     sampler_timestamp = sampler.last_update_time
     if queue_timestamp != sampler_timestamp:
