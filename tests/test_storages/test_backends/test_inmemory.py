@@ -1,7 +1,10 @@
 import random
 import uuid
 
-from optur.proto.study_pb2 import StudyInfo, Target
+import pytest  # type: ignore
+
+from optur.errors import NotFoundError
+from optur.proto.study_pb2 import StudyInfo, Target, Trial
 from optur.storages.backends.inmemory import InMemoryStorageBackend
 
 
@@ -66,3 +69,34 @@ def test_incremental_read_study() -> None:
     loaded_studies = [(s.study_id, s.targets) for s in backend.get_studies(timestamp=timestamp)]
     for study in studies[6:]:
         assert (study.study_id, study.targets) in loaded_studies
+
+
+def test_read_write_trial() -> None:
+    backend = InMemoryStorageBackend()
+    study = StudyInfo(study_id=uuid.uuid4().hex)
+    trial = Trial(trial_id=uuid.uuid4().hex, study_id=study.study_id, system_attrs={"foo": "bar"})
+    backend.write_study(study=study)
+    backend.write_trial(trial=trial)
+    loaded_trial = backend.get_trial(trial_id=trial.trial_id)
+    assert dict(loaded_trial.system_attrs.items()) == {"foo": "bar"}
+
+
+def test_write_trial_with_non_existent_study() -> None:
+    backend = InMemoryStorageBackend()
+    study = StudyInfo(study_id=uuid.uuid4().hex)
+    trial = Trial(
+        trial_id=uuid.uuid4().hex, study_id=uuid.uuid4().hex, system_attrs={"foo": "bar"}
+    )
+    backend.write_study(study=study)
+    with pytest.raises(NotFoundError):
+        backend.write_trial(trial=trial)
+
+
+def test_read_non_existent_trial() -> None:
+    backend = InMemoryStorageBackend()
+    study = StudyInfo(study_id=uuid.uuid4().hex)
+    trial = Trial(trial_id=uuid.uuid4().hex, study_id=study.study_id, system_attrs={"foo": "bar"})
+    backend.write_study(study=study)
+    backend.write_trial(trial=trial)
+    with pytest.raises(NotFoundError):
+        backend.get_trial(trial_id=uuid.uuid4().hex)
