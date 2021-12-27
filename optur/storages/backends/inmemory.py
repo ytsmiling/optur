@@ -4,6 +4,7 @@ from typing import Dict, List, NamedTuple, Optional
 
 from google.protobuf.timestamp_pb2 import Timestamp
 
+from optur.errors import NotFoundError
 from optur.proto.study_pb2 import StudyInfo
 from optur.proto.study_pb2 import Trial as TrialProto
 from optur.storages.backends.backend import StorageBackend
@@ -100,7 +101,8 @@ class InMemoryStorageBackend(StorageBackend):
         if study_id is None:
             # TODO(tsuzuku): Support this.
             raise NotImplementedError()
-        # TODO(tsuzuku): Handle KeyError.
+        if study_id not in self._studies:
+            raise NotFoundError(f"Study with study_id: '{study_id}' does not exist.")
         study = self._studies[study_id]
         if timestamp is None:
             left_idx = 0
@@ -125,6 +127,10 @@ class InMemoryStorageBackend(StorageBackend):
             The :class:`~optur.proto.study_pb2.Trial`.
         """
 
+        if trial_id not in self._trials:
+            raise NotFoundError(f"Trial with trial_id: '{trial_id}' does not exist.")
+        if study_id is not None and study_id not in self._studies:
+            raise NotFoundError(f"Study with study_id: '{study_id}' does not exist.")
         return self._trials[trial_id]
 
     def write_study(self, study: StudyInfo) -> None:
@@ -162,7 +168,11 @@ class InMemoryStorageBackend(StorageBackend):
             trial:
                 A :class:`~optur.proto.study_pb2.Trial` to write.
         """
-        # TODO(tsuzuku): Handle `KeyError`.
+        if trial.study_id not in self._studies:
+            raise NotFoundError(
+                f"Study with study_id: '{trial.study_id}' does not exist. "
+                "Trial must have study_id and it must already exists."
+            )
         study = self._studies[trial.study_id]
         new_trial = TrialProto()
         new_trial.CopyFrom(trial)
