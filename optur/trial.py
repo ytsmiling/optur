@@ -9,12 +9,11 @@ class Trial:
     def __init__(self, trial_proto: TrialProto, storage: StorageClient) -> None:
         self._trial_proto = trial_proto
         self._storage = storage
-        self._fixed_parameters = {key: param for key, param in trial_proto.parameters.items()}
         self._suggested_parameters: Dict[str, ParameterValue] = {}
-        self._used_parameters: Dict[str, ParameterValue] = {}
+        self._used_parameters = {key: param for key, param in trial_proto.parameters.items()}
 
-    @property
-    def proto(self) -> TrialProto:
+    def get_proto(self) -> TrialProto:
+        # TODO(tsuzuku): Update the content of the trial proto.
         return self._trial_proto
 
     def suggest_int(self, name: str, low: int, high: int, *, log_scale: bool) -> int:
@@ -45,13 +44,13 @@ class Trial:
     ) -> Union[int, float, str]:
         pass
 
-    def reset_parameter(self, name: str, *, force: bool) -> bool:
+    def clear_parameter(self, name: str, *, force: bool) -> bool:
         pass
 
     def update_parameters(self, parameters: Dict[str, ParameterValue]) -> None:
         pass
 
-    def reset(self, *, hard: bool, reload: bool) -> None:
+    def clear(self, *, hard: bool, reload: bool) -> None:
         pass
 
     def flush(self) -> None:

@@ -237,20 +237,24 @@ def _run_trial(
     try:
         values = objective(trial)
     except PrunedException:
-        trial.proto.last_known_state = TrialProto.State.PRUNED
+        proto = trial.get_proto()
+        proto.last_known_state = TrialProto.State.PRUNED
     except catch:
-        trial.proto.last_known_state = TrialProto.State.FAILED
+        proto = trial.get_proto()
+        proto.last_known_state = TrialProto.State.FAILED
     else:
+        proto = trial.get_proto()
         if isinstance(values, SequenceType):
             objective_values = [_value_to_objective_value(value=float(value)) for value in values]
         else:
             objective_values = [_value_to_objective_value(value=float(values))]
-        del trial.proto.values[:]
-        trial.proto.values.extend(objective_values)
-        trial.proto.last_known_state = _infer_trial_state_from_objective_values(objective_values)
+        del proto.values[:]
+        proto.values.extend(objective_values)
+        proto.last_known_state = _infer_trial_state_from_objective_values(objective_values)
     if callbacks:
         for callback in callbacks:
             callback(trial)
+    # TODO(tsuzuku): Values and states are not synced yet.
     trial.flush()
 
 
