@@ -25,13 +25,16 @@ def _timestamp_to_int(t: Timestamp) -> int:
 
 class _StudyData(NamedTuple):
     study_info: StudyInfo
-    # Large sorted list of finished trials.
-    # These trials are sorted by ``last_update_time``.
+    # Trials sorted by the ``last_update_time``.
+    # There might be a duplication in ``trial_id``.
     # Since ``key`` argument of ``bisect.bisect_left`` is not supported in python<=3.9,
     # this field has type that have total order.
-    sorted_finished_trials: List[_TrialData]
-    # Frequently updated but small.
-    running_trials: List[TrialProto]
+    sorted_trials: List[_TrialData]
+
+    @staticmethod
+    def compaction(sorted_trials: List[_TrialData]) -> List[_TrialData]:
+        """Remove duplicated trials."""
+        return list({trial.trial_id: trial for trial in sorted_trials}.values())
 
 
 # This class is not thread-safe, and it's okay.
@@ -97,19 +100,15 @@ class InMemoryStorageBackend(StorageBackend):
         if study_id is None:
             # TODO(tsuzuku): Support this.
             raise NotImplementedError()
+        # TODO(tsuzuku): Handle KeyError.
         study = self._studies[study_id]
-        finished_trials = study.sorted_finished_trials
-        running_trials = study.running_trials
         if timestamp is None:
-            ret = running_trials.copy()
-            ret.extend((trial.trial for trial in finished_trials))
-            return ret
-        ret = running_trials.copy()
-        left_idx = bisect.bisect_left(
-            finished_trials, (_timestamp_to_int(timestamp) - 1, "", None)
-        )
-        ret.extend((trial.trial for trial in finished_trials[left_idx:]))
-        return ret
+            left_idx = 0
+        else:
+            left_idx = bisect.bisect_left(
+                study.sorted_trials, (_timestamp_to_int(timestamp) - 1, "", None)
+            )
+        return [trial.trial for trial in study.compaction(study.sorted_trials[left_idx:])]
 
     def get_trial(self, trial_id: str, study_id: Optional[str] = None) -> TrialProto:
         """Read a trial from the storage.
@@ -149,8 +148,7 @@ class InMemoryStorageBackend(StorageBackend):
         else:
             self._studies[study.study_id] = _StudyData(
                 study_info=new_study,
-                sorted_finished_trials=[],
-                running_trials=[],
+                sorted_trials=[],
             )
 
     def write_trial(self, trial: TrialProto) -> None:
@@ -169,43 +167,12 @@ class InMemoryStorageBackend(StorageBackend):
         new_trial = TrialProto()
         new_trial.CopyFrom(trial)
         new_trial.last_update_time.CopyFrom(self.get_current_timestamp())
-        old_trial = self._trials.get(trial.trial_id)
         self._trials[trial.trial_id] = new_trial
-        # Delete an existing trial.
-        if old_trial is not None:
-            if old_trial.last_known_state in (TrialProto.State.RUNNING,):
-                # TODO(tsuzuku): Find trial from self._studies[trial.study_id].running_trials.
-                # TODO(tsuzuku): Update in-place if possible.
-                raise NotImplementedError()
-            elif old_trial.last_known_state in (
-                TrialProto.State.COMPLETED,
-                TrialProto.State.PARTIALLY_COMPLETED,
-                TrialProto.State.PARTIALLY_FAILED,
-                TrialProto.State.FAILED,
-                TrialProto.State.PRUNED,
-            ):
-                # TODO(tsuzuku): Find trial from self._studies[trial.study_id].finished_trials.
-                raise NotImplementedError()
-            else:
-                # TODO(tsuzuku): Think about UNKNOWNN, CREATED, and WAITING.
-                raise NotImplementedError()
-        # Add a new trial.
-        if new_trial.last_known_state == TrialProto.State.RUNNING:
-            study.running_trials.append(new_trial)
-        elif new_trial.last_known_state in (
-            TrialProto.State.COMPLETED,
-            TrialProto.State.PARTIALLY_COMPLETED,
-            TrialProto.State.PARTIALLY_FAILED,
-            TrialProto.State.FAILED,
-            TrialProto.State.PRUNED,
-        ):
-            study.sorted_finished_trials.append(
-                _TrialData(
-                    timestamp=_timestamp_to_int(new_trial.last_update_time),
-                    trial_id=new_trial.trial_id,
-                    trial=new_trial,
-                )
+        study.sorted_trials.append(
+            _TrialData(
+                timestamp=_timestamp_to_int(new_trial.last_update_time),
+                trial_id=new_trial.trial_id,
+                trial=new_trial,
             )
-        else:
-            # TODO(tsuzuku): Think about UNKNOWNN, CREATED, and WAITING.
-            raise NotImplementedError()
+        )
+        # TODO(tsuzuku): Perform compaction so that the `sorted_trials` won't be that long.
