@@ -101,6 +101,7 @@ class Study(_Study):
 
 class _TrialQueue:
     """Trial queue for managing WAITING trials."""
+
     def __init__(self, states: "Sequence[TrialProto.StateValue]") -> None:
         self._trials: Dict[str, TrialProto] = {}
         self._timestamp: Optional[Timestamp] = None
@@ -123,6 +124,13 @@ class _TrialQueue:
             else:
                 if trial.last_known_state in self._states:
                     self._trials[trial.trial_id] = trial
+
+    def get_trial(self, state: "TrialProto.StateValue") -> Optional[TrialProto]:
+        for trial in self._trials.values():
+            if trial.last_known_state == state:
+                del self._trials[trial.trial_id]
+                return trial
+        return None
 
 
 def _ask(
