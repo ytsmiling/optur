@@ -1,4 +1,5 @@
 import itertools
+import math
 from collections.abc import Sequence as SequenceType
 from concurrent.futures import ThreadPoolExecutor
 from typing import Callable, Dict, List, Optional, Sequence, Tuple, Type, Union
@@ -187,12 +188,25 @@ def _run_trial(
         trial.proto.last_known_state = TrialProto.State.COMPLETED
         if isinstance(values, SequenceType):
             del trial.proto.values[:]
-            trial.proto.values.extend([ObjectiveValue(value=value) for value in values])
+            trial.proto.values.extend(
+                [_value_to_objective_value(value=float(value)) for value in values]
+            )
         else:
             del trial.proto.values[:]
-            # TODO(tsuzuku): Set values' status.
-            trial.proto.values.append(ObjectiveValue(value=float(values)))
+            trial.proto.values.append(_value_to_objective_value(value=float(values)))
     if callbacks:
         for callback in callbacks:
             callback(trial)
     trial.flush()
+
+
+def _value_to_objective_value(value: float) -> ObjectiveValue:
+    if math.isnan(value):
+        return ObjectiveValue(status=ObjectiveValue.Status.NAN)
+    elif math.isinf(value):
+        if value > 0:
+            return ObjectiveValue(status=ObjectiveValue.Status.INF, value=value)
+        else:
+            return ObjectiveValue(status=ObjectiveValue.Status.NEGATIVE_INF, value=value)
+    else:
+        return ObjectiveValue(status=ObjectiveValue.Status.VALID, value=value)
