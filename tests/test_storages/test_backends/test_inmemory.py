@@ -100,3 +100,43 @@ def test_read_non_existent_trial() -> None:
     backend.write_trial(trial=trial)
     with pytest.raises(NotFoundError):
         backend.get_trial(trial_id=uuid.uuid4().hex)
+
+
+def test_read_trials_without_timestamp() -> None:
+    backend = InMemoryStorageBackend()
+    study1 = StudyInfo(study_id=uuid.uuid4().hex)
+    study2 = StudyInfo(study_id=uuid.uuid4().hex)
+    trials1 = [Trial(trial_id=uuid.uuid4().hex, study_id=study1.study_id) for _ in range(6)]
+    trials2 = [Trial(trial_id=uuid.uuid4().hex, study_id=study2.study_id) for _ in range(7)]
+    backend.write_study(study=study1)
+    backend.write_study(study=study2)
+    for trial in trials1:
+        backend.write_trial(trial=trial)
+    for trial in trials2:
+        backend.write_trial(trial=trial)
+    loaded_trials = backend.get_trials(study_id=study1.study_id)
+    assert len(loaded_trials) == 6
+    assert set(t.trial_id for t in loaded_trials) == set(t.trial_id for t in trials1)
+    loaded_trials = backend.get_trials(study_id=study2.study_id)
+    assert len(loaded_trials) == 7
+    assert set(t.trial_id for t in loaded_trials) == set(t.trial_id for t in trials2)
+
+
+def test_read_trial_with_timestamp() -> None:
+    backend = InMemoryStorageBackend()
+    study1 = StudyInfo(study_id=uuid.uuid4().hex)
+    study2 = StudyInfo(study_id=uuid.uuid4().hex)
+    trials1 = [Trial(trial_id=uuid.uuid4().hex, study_id=study1.study_id) for _ in range(7)]
+    trials2 = [Trial(trial_id=uuid.uuid4().hex, study_id=study2.study_id) for _ in range(6)]
+    backend.write_study(study=study1)
+    backend.write_study(study=study2)
+    for trial in trials1[:2]:
+        backend.write_trial(trial=trial)
+    timestamp = backend.get_current_timestamp()
+    for trial in trials2:
+        backend.write_trial(trial=trial)
+    for trial in trials1[2:]:
+        backend.write_trial(trial=trial)
+    loaded_trials = backend.get_trials(study_id=study1.study_id, timestamp=timestamp)
+    assert len(loaded_trials) == 5
+    assert set(t.trial_id for t in loaded_trials) == set(t.trial_id for t in trials1[2:])
