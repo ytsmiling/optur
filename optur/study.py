@@ -184,16 +184,13 @@ def _run_trial(
     except catch:
         trial.proto.last_known_state = TrialProto.State.FAILED
     else:
-        # TODO(tsuzuku): Check trial's state in more detail.
-        trial.proto.last_known_state = TrialProto.State.COMPLETED
         if isinstance(values, SequenceType):
-            del trial.proto.values[:]
-            trial.proto.values.extend(
-                [_value_to_objective_value(value=float(value)) for value in values]
-            )
+            objective_values = [_value_to_objective_value(value=float(value)) for value in values]
         else:
-            del trial.proto.values[:]
-            trial.proto.values.append(_value_to_objective_value(value=float(values)))
+            objective_values = [_value_to_objective_value(value=float(values))]
+        del trial.proto.values[:]
+        trial.proto.values.extend(objective_values)
+        trial.proto.last_known_state = _infer_trial_state_from_objective_values(objective_values)
     if callbacks:
         for callback in callbacks:
             callback(trial)
@@ -212,8 +209,9 @@ def _value_to_objective_value(value: float) -> ObjectiveValue:
         return ObjectiveValue(status=ObjectiveValue.Status.VALID, value=value)
 
 
-# Return ``Trial.State``.
-def _infer_trial_state_from_objective_values(values: Sequence[ObjectiveValue]) -> int:
+def _infer_trial_state_from_objective_values(
+    values: Sequence[ObjectiveValue],
+) -> TrialProto.StateValue:
     if all(value.status == ObjectiveValue.Status.VALID for value in values):
         return TrialProto.State.COMPLETED
     if any(value.status == ObjectiveValue.Status.UNKNOWN for value in values):
