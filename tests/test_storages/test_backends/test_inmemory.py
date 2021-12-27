@@ -39,3 +39,30 @@ def test_read_all_study() -> None:
     assert [(s.study_id, s.targets) for s in sorted_studies] == [
         (s.study_id, s.targets) for s in sorted_loaded_studies
     ]
+
+
+def test_incremental_read_study() -> None:
+    backend = InMemoryStorageBackend()
+    # TODO(tsuzuku): Create `create_random_study_info` helper.
+    studies = [
+        StudyInfo(
+            study_id=uuid.uuid4().hex,
+            targets=[
+                Target(
+                    name=uuid.uuid4().urn,
+                    direction=random.choice(
+                        seq=[Target.Direction.MAXIMIZE, Target.Direction.MINIMIZE],
+                    ),
+                ),
+            ],
+        )
+        for _ in range(13)
+    ]
+    for study in studies[:6]:
+        backend.write_study(study=study)
+    timestamp = backend.get_current_timestamp()
+    for study in studies[6:]:
+        backend.write_study(study=study)
+    loaded_studies = [(s.study_id, s.targets) for s in backend.get_studies(timestamp=timestamp)]
+    for study in studies[6:]:
+        assert (study.study_id, study.targets) in loaded_studies
