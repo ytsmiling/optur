@@ -1,16 +1,19 @@
 from typing import Sequence
 
 from optur.proto.search_space_pb2 import Distribution, ParameterValue
-from optur.search_space.distribution import are_identical_distributions
+from optur.search_space.distribution import (
+    are_identical_distributions,
+    does_distribution_contain_value,
+)
 
 
-def int_distribution(low: int, high: int, log_scale: bool) -> Distribution:
+def int_distribution(low: int, high: int, log_scale: bool = False) -> Distribution:
     return Distribution(
         int_distribution=Distribution.IntDistribution(low=low, high=high, log_scale=log_scale)
     )
 
 
-def float_distribution(low: float, high: float, log_scale: bool) -> Distribution:
+def float_distribution(low: float, high: float, log_scale: bool = False) -> Distribution:
     return Distribution(
         float_distribution=Distribution.FloatDistribution(low=low, high=high, log_scale=log_scale)
     )
@@ -203,4 +206,192 @@ def test_fixed_distribution_comparison() -> None:
                 ParameterValue(string_value="foo"),
             ]
         ),
+    )
+
+
+def test_int_distribution_contains_check() -> None:
+    assert does_distribution_contain_value(
+        distribution=int_distribution(low=1, high=3),
+        value=ParameterValue(int_value=1),
+    )
+    assert does_distribution_contain_value(
+        distribution=int_distribution(low=1, high=3),
+        value=ParameterValue(int_value=2),
+    )
+    assert does_distribution_contain_value(
+        distribution=int_distribution(low=1, high=3),
+        value=ParameterValue(int_value=3),
+    )
+    assert not does_distribution_contain_value(
+        distribution=int_distribution(low=1, high=3),
+        value=ParameterValue(int_value=0),
+    )
+    assert not does_distribution_contain_value(
+        distribution=int_distribution(low=1, high=3),
+        value=ParameterValue(int_value=4),
+    )
+    assert not does_distribution_contain_value(
+        distribution=int_distribution(low=1, high=3),
+        value=ParameterValue(double_value=2.0),
+    )
+    assert not does_distribution_contain_value(
+        distribution=int_distribution(low=1, high=3),
+        value=ParameterValue(string_value="foo"),
+    )
+
+
+def test_float_distribution_contains_check() -> None:
+    assert does_distribution_contain_value(
+        distribution=float_distribution(low=1.0, high=3.0),
+        value=ParameterValue(double_value=1.0),
+    )
+    assert does_distribution_contain_value(
+        distribution=float_distribution(low=1.0, high=3.0),
+        value=ParameterValue(double_value=2.0),
+    )
+    assert does_distribution_contain_value(
+        distribution=float_distribution(low=1.0, high=3.0),
+        value=ParameterValue(double_value=3.0),
+    )
+    assert not does_distribution_contain_value(
+        distribution=float_distribution(low=1.0, high=3.0),
+        value=ParameterValue(double_value=0.0),
+    )
+    assert not does_distribution_contain_value(
+        distribution=float_distribution(low=1.0, high=3.0),
+        value=ParameterValue(double_value=4.0),
+    )
+    assert not does_distribution_contain_value(
+        distribution=float_distribution(low=1.0, high=3.0),
+        value=ParameterValue(int_value=2),
+    )
+    assert not does_distribution_contain_value(
+        distribution=float_distribution(low=1.0, high=3.0),
+        value=ParameterValue(string_value="foo"),
+    )
+
+
+def test_categorical_distribution_contains_check() -> None:
+    assert does_distribution_contain_value(
+        distribution=categorical_distribution(
+            choices=[
+                ParameterValue(int_value=1),
+                ParameterValue(double_value=2.0),
+                ParameterValue(string_value="foo"),
+            ]
+        ),
+        value=ParameterValue(int_value=1),
+    )
+    assert does_distribution_contain_value(
+        distribution=categorical_distribution(
+            choices=[
+                ParameterValue(int_value=1),
+                ParameterValue(double_value=2.0),
+                ParameterValue(string_value="foo"),
+            ]
+        ),
+        value=ParameterValue(double_value=2.0),
+    )
+    assert does_distribution_contain_value(
+        distribution=categorical_distribution(
+            choices=[
+                ParameterValue(int_value=1),
+                ParameterValue(double_value=2.0),
+                ParameterValue(string_value="foo"),
+            ]
+        ),
+        value=ParameterValue(string_value="foo"),
+    )
+    assert not does_distribution_contain_value(
+        distribution=categorical_distribution(
+            choices=[
+                ParameterValue(int_value=1),
+                ParameterValue(double_value=2.0),
+                ParameterValue(string_value="foo"),
+            ]
+        ),
+        value=ParameterValue(int_value=2),
+    )
+    assert not does_distribution_contain_value(
+        distribution=categorical_distribution(
+            choices=[
+                ParameterValue(int_value=1),
+                ParameterValue(double_value=2.0),
+                ParameterValue(string_value="foo"),
+            ]
+        ),
+        value=ParameterValue(double_value=1.0),
+    )
+    assert not does_distribution_contain_value(
+        distribution=categorical_distribution(
+            choices=[
+                ParameterValue(int_value=1),
+                ParameterValue(double_value=2.0),
+                ParameterValue(string_value="foo"),
+            ]
+        ),
+        value=ParameterValue(string_value="bar"),
+    )
+
+
+def test_fixed_distribution_contains_check() -> None:
+    assert does_distribution_contain_value(
+        distribution=fixed_distribution(
+            values=[
+                ParameterValue(int_value=1),
+                ParameterValue(double_value=2.0),
+                ParameterValue(string_value="foo"),
+            ]
+        ),
+        value=ParameterValue(int_value=1),
+    )
+    assert does_distribution_contain_value(
+        distribution=fixed_distribution(
+            values=[
+                ParameterValue(int_value=1),
+                ParameterValue(double_value=2.0),
+                ParameterValue(string_value="foo"),
+            ]
+        ),
+        value=ParameterValue(double_value=2.0),
+    )
+    assert does_distribution_contain_value(
+        distribution=fixed_distribution(
+            values=[
+                ParameterValue(int_value=1),
+                ParameterValue(double_value=2.0),
+                ParameterValue(string_value="foo"),
+            ]
+        ),
+        value=ParameterValue(string_value="foo"),
+    )
+    assert not does_distribution_contain_value(
+        distribution=fixed_distribution(
+            values=[
+                ParameterValue(int_value=1),
+                ParameterValue(double_value=2.0),
+                ParameterValue(string_value="foo"),
+            ]
+        ),
+        value=ParameterValue(int_value=2),
+    )
+    assert not does_distribution_contain_value(
+        distribution=fixed_distribution(
+            values=[
+                ParameterValue(int_value=1),
+                ParameterValue(double_value=2.0),
+                ParameterValue(string_value="foo"),
+            ]
+        ),
+        value=ParameterValue(double_value=1.0),
+    )
+    assert not does_distribution_contain_value(
+        distribution=fixed_distribution(
+            values=[
+                ParameterValue(int_value=1),
+                ParameterValue(double_value=2.0),
+                ParameterValue(string_value="foo"),
+            ]
+        ),
+        value=ParameterValue(string_value="bar"),
     )

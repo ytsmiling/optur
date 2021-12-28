@@ -22,6 +22,8 @@ def does_distribution_contain_value(distribution: Distribution, value: Parameter
         )
     if distribution.HasField("categorical_distribution"):
         return any(value == v for v in distribution.categorical_distribution.choices)
+    if distribution.HasField("fixed_distribution"):
+        return any(value == v for v in distribution.fixed_distribution.values)
     raise NotImplementedError("")
 
 
