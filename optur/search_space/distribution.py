@@ -49,8 +49,8 @@ def are_identical_distributions(a: Distribution, b: Distribution) -> bool:
 
 
 def merge_distributions(
-    original_distribution: Distribution,
-    new_distribution: Distribution,
+    a: Distribution,
+    b: Distribution,
 ) -> Distribution:
     """Merge two distributions into one distribution.
 
@@ -59,25 +59,19 @@ def merge_distributions(
     Otherwise, check whether the two distributions are identical.
     When the two distributions are incompatible, `InCompatibleSearchSpaceError` will be raised.
     """
-    if original_distribution.HasField("fixed_distribution"):
-        if new_distribution.HasField("fixed_distribution"):
-            values = [v for v in original_distribution.fixed_distribution.values]
-            for new_v in new_distribution.fixed_distribution.values:
+    if a.HasField("fixed_distribution"):
+        if b.HasField("fixed_distribution"):
+            values = [v for v in a.fixed_distribution.values]
+            for new_v in b.fixed_distribution.values:
                 if not any(new_v == v for v in values):
                     values.append(new_v)
             return Distribution(fixed_distribution=Distribution.FixedDistribution(values=values))
-        if all(
-            does_distribution_contain_value(new_distribution, value)
-            for value in original_distribution.fixed_distribution.values
-        ):
-            return new_distribution
+        if all(does_distribution_contain_value(b, value) for value in a.fixed_distribution.values):
+            return b
         raise InCompatibleSearchSpaceError("")
-    if new_distribution.HasField("fixed_distribution"):
-        if all(
-            does_distribution_contain_value(original_distribution, value)
-            for value in new_distribution.fixed_distribution.values
-        ):
-            return original_distribution
-    if are_identical_distributions(original_distribution, new_distribution):
-        return original_distribution
+    if b.HasField("fixed_distribution"):
+        if all(does_distribution_contain_value(a, value) for value in b.fixed_distribution.values):
+            return a
+    if are_identical_distributions(a, b):
+        return a
     raise InCompatibleSearchSpaceError("")  # TODO(tsuzuku)

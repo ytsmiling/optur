@@ -1,9 +1,13 @@
 from typing import Sequence
 
+import pytest  # type: ignore
+
+from optur.errors import InCompatibleSearchSpaceError
 from optur.proto.search_space_pb2 import Distribution, ParameterValue
 from optur.search_space.distribution import (
     are_identical_distributions,
     does_distribution_contain_value,
+    merge_distributions,
 )
 
 
@@ -394,4 +398,221 @@ def test_fixed_distribution_contains_check() -> None:
             ]
         ),
         value=ParameterValue(string_value="bar"),
+    )
+
+
+def test_merge_int_distributions() -> None:
+    assert are_identical_distributions(
+        merge_distributions(a=int_distribution(low=1, high=3), b=int_distribution(low=1, high=3)),
+        int_distribution(low=1, high=3),
+    )
+    assert are_identical_distributions(
+        merge_distributions(
+            a=int_distribution(low=1, high=3),
+            b=fixed_distribution(values=[ParameterValue(int_value=1)]),
+        ),
+        int_distribution(low=1, high=3),
+    )
+    assert are_identical_distributions(
+        merge_distributions(
+            a=int_distribution(low=1, high=3),
+            b=fixed_distribution(
+                values=[ParameterValue(int_value=1), ParameterValue(int_value=2)]
+            ),
+        ),
+        int_distribution(low=1, high=3),
+    )
+    with pytest.raises(InCompatibleSearchSpaceError):
+        merge_distributions(
+            a=int_distribution(low=1, high=3),
+            b=fixed_distribution(values=[ParameterValue(int_value=0)]),
+        )
+    with pytest.raises(InCompatibleSearchSpaceError):
+        merge_distributions(
+            a=int_distribution(low=1, high=3),
+            b=fixed_distribution(values=[ParameterValue(double_value=2.0)]),
+        )
+    with pytest.raises(InCompatibleSearchSpaceError):
+        merge_distributions(
+            a=int_distribution(low=1, high=3),
+            b=fixed_distribution(
+                values=[ParameterValue(int_value=2), ParameterValue(int_value=4)]
+            ),
+        )
+    with pytest.raises(InCompatibleSearchSpaceError):
+        merge_distributions(a=int_distribution(low=1, high=4), b=int_distribution(low=2, high=3))
+    with pytest.raises(InCompatibleSearchSpaceError):
+        merge_distributions(a=int_distribution(low=1, high=4), b=int_distribution(low=0, high=5))
+    with pytest.raises(InCompatibleSearchSpaceError):
+        merge_distributions(
+            a=int_distribution(low=1, high=3), b=float_distribution(low=1.0, high=3.0)
+        )
+    with pytest.raises(InCompatibleSearchSpaceError):
+        merge_distributions(
+            a=int_distribution(low=1, high=3),
+            b=categorical_distribution(choices=[ParameterValue(int_value=1)]),
+        )
+
+
+def test_merge_float_distributions() -> None:
+    assert are_identical_distributions(
+        merge_distributions(
+            a=float_distribution(low=1.0, high=3.0), b=float_distribution(low=1.0, high=3.0)
+        ),
+        float_distribution(low=1.0, high=3.0),
+    )
+    assert are_identical_distributions(
+        merge_distributions(
+            a=float_distribution(low=1.0, high=3.0),
+            b=fixed_distribution(values=[ParameterValue(double_value=1.0)]),
+        ),
+        float_distribution(low=1.0, high=3.0),
+    )
+    assert are_identical_distributions(
+        merge_distributions(
+            a=float_distribution(low=1.0, high=3.0),
+            b=fixed_distribution(
+                values=[ParameterValue(double_value=1.0), ParameterValue(double_value=2.0)]
+            ),
+        ),
+        float_distribution(low=1.0, high=3.0),
+    )
+    with pytest.raises(InCompatibleSearchSpaceError):
+        merge_distributions(
+            a=float_distribution(low=1.0, high=3.0),
+            b=fixed_distribution(values=[ParameterValue(double_value=0.0)]),
+        )
+    with pytest.raises(InCompatibleSearchSpaceError):
+        merge_distributions(
+            a=float_distribution(low=1.0, high=3.0),
+            b=fixed_distribution(values=[ParameterValue(int_value=2)]),
+        )
+    with pytest.raises(InCompatibleSearchSpaceError):
+        merge_distributions(
+            a=float_distribution(low=1.0, high=3.0),
+            b=fixed_distribution(
+                values=[ParameterValue(double_value=2.0), ParameterValue(double_value=4.0)]
+            ),
+        )
+    with pytest.raises(InCompatibleSearchSpaceError):
+        merge_distributions(
+            a=float_distribution(low=1.0, high=4.0), b=float_distribution(low=2.0, high=3.0)
+        )
+    with pytest.raises(InCompatibleSearchSpaceError):
+        merge_distributions(
+            a=float_distribution(low=1.0, high=4.0), b=float_distribution(low=0.0, high=5.0)
+        )
+    with pytest.raises(InCompatibleSearchSpaceError):
+        merge_distributions(
+            a=float_distribution(low=1.0, high=3.0), b=int_distribution(low=1, high=3)
+        )
+    with pytest.raises(InCompatibleSearchSpaceError):
+        merge_distributions(
+            a=float_distribution(low=1.0, high=3.0),
+            b=categorical_distribution(choices=[ParameterValue(double_value=1.0)]),
+        )
+
+
+def test_merge_categorical_distributions() -> None:
+    assert are_identical_distributions(
+        a=merge_distributions(
+            a=categorical_distribution(
+                choices=[ParameterValue(int_value=1), ParameterValue(int_value=2)]
+            ),
+            b=categorical_distribution(
+                choices=[ParameterValue(int_value=1), ParameterValue(int_value=2)]
+            ),
+        ),
+        b=categorical_distribution(
+            choices=[ParameterValue(int_value=1), ParameterValue(int_value=2)]
+        ),
+    )
+    assert are_identical_distributions(
+        a=merge_distributions(
+            a=categorical_distribution(
+                choices=[ParameterValue(int_value=1), ParameterValue(double_value=2.0)]
+            ),
+            b=categorical_distribution(
+                choices=[ParameterValue(double_value=2.0), ParameterValue(int_value=1)]
+            ),
+        ),
+        b=categorical_distribution(
+            choices=[ParameterValue(int_value=1), ParameterValue(double_value=2.0)]
+        ),
+    )
+    assert are_identical_distributions(
+        a=merge_distributions(
+            a=categorical_distribution(
+                choices=[ParameterValue(int_value=1), ParameterValue(double_value=2.0)]
+            ),
+            b=fixed_distribution(values=[ParameterValue(int_value=1)]),
+        ),
+        b=categorical_distribution(
+            choices=[ParameterValue(int_value=1), ParameterValue(double_value=2.0)]
+        ),
+    )
+    with pytest.raises(InCompatibleSearchSpaceError):
+        merge_distributions(
+            a=categorical_distribution(
+                choices=[ParameterValue(int_value=1), ParameterValue(int_value=2)]
+            ),
+            b=categorical_distribution(
+                choices=[ParameterValue(int_value=1), ParameterValue(int_value=3)]
+            ),
+        )
+    with pytest.raises(InCompatibleSearchSpaceError):
+        merge_distributions(
+            a=categorical_distribution(
+                choices=[ParameterValue(int_value=1), ParameterValue(double_value=2.0)]
+            ),
+            b=fixed_distribution(values=[ParameterValue(int_value=2)]),
+        )
+
+
+def test_merge_fixed_distributions() -> None:
+    assert are_identical_distributions(
+        a=merge_distributions(
+            a=fixed_distribution(
+                values=[ParameterValue(int_value=1), ParameterValue(int_value=2)]
+            ),
+            b=fixed_distribution(
+                values=[ParameterValue(int_value=1), ParameterValue(int_value=2)]
+            ),
+        ),
+        b=fixed_distribution(values=[ParameterValue(int_value=1), ParameterValue(int_value=2)]),
+    )
+    assert are_identical_distributions(
+        a=merge_distributions(
+            a=fixed_distribution(
+                values=[ParameterValue(int_value=1), ParameterValue(int_value=2)]
+            ),
+            b=fixed_distribution(
+                values=[ParameterValue(int_value=1), ParameterValue(int_value=3)]
+            ),
+        ),
+        b=fixed_distribution(
+            values=[
+                ParameterValue(int_value=1),
+                ParameterValue(int_value=2),
+                ParameterValue(int_value=3),
+            ]
+        ),
+    )
+    assert are_identical_distributions(
+        a=merge_distributions(
+            a=fixed_distribution(
+                values=[ParameterValue(int_value=1), ParameterValue(int_value=2)]
+            ),
+            b=fixed_distribution(
+                values=[ParameterValue(double_value=1.0), ParameterValue(string_value="foo")]
+            ),
+        ),
+        b=fixed_distribution(
+            values=[
+                ParameterValue(int_value=1),
+                ParameterValue(int_value=2),
+                ParameterValue(double_value=1.0),
+                ParameterValue(string_value="foo"),
+            ]
+        ),
     )
