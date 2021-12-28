@@ -25,7 +25,7 @@ def does_distribution_contain_value(distribution: Distribution, value: Parameter
     raise NotImplementedError("")
 
 
-def is_identical_distribution(a: Distribution, b: Distribution) -> bool:
+def are_identical_distributions(a: Distribution, b: Distribution) -> bool:
     """Check whether the two distributions are identical."""
     if a == b:
         # In most usecase, a == b.
@@ -37,10 +37,16 @@ def is_identical_distribution(a: Distribution, b: Distribution) -> bool:
         values2 = b.categorical_distribution.choices
         if len(values1) == len(values2) and all(any(v1 == v2 for v2 in values2) for v1 in values1):
             return True
+    if a.HasField("fixed_distribution") and b.HasField("fixed_distribution"):
+        # The same with categorical distribution.
+        values1 = a.fixed_distribution.values
+        values2 = b.fixed_distribution.values
+        if len(values1) == len(values2) and all(any(v1 == v2 for v2 in values2) for v1 in values1):
+            return True
     return False
 
 
-def merge_distribution(
+def merge_distributions(
     original_distribution: Distribution,
     new_distribution: Distribution,
 ) -> Distribution:
@@ -70,6 +76,6 @@ def merge_distribution(
             for value in new_distribution.fixed_distribution.values
         ):
             return original_distribution
-    if is_identical_distribution(original_distribution, new_distribution):
+    if are_identical_distributions(original_distribution, new_distribution):
         return original_distribution
     raise InCompatibleSearchSpaceError("")  # TODO(tsuzuku)
