@@ -14,15 +14,18 @@ _sym_db = _symbol_database.Default()
 
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
+from optur.proto import search_space_pb2 as optur_dot_proto_dot_search__space__pb2
+
 DESCRIPTOR = _descriptor.FileDescriptor(
     name="optur/proto/study.proto",
     package="optur",
     syntax="proto3",
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
-    serialized_pb=b'\n\x17optur/proto/study.proto\x12\x05optur\x1a\x1fgoogle/protobuf/timestamp.proto"\x8c\x03\n\tStudyInfo\x12\x10\n\x08study_id\x18\x01 \x01(\t\x12\x12\n\nstudy_name\x18\x02 \x01(\t\x12\x1e\n\x07targets\x18\x03 \x03(\x0b\x32\r.optur.Target\x12\x33\n\nuser_attrs\x18\x04 \x03(\x0b\x32\x1f.optur.StudyInfo.UserAttrsEntry\x12\x37\n\x0csystem_attrs\x18\x05 \x03(\x0b\x32!.optur.StudyInfo.SystemAttrsEntry\x12/\n\x0b\x63reate_time\x18\x06 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x34\n\x10last_update_time\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x1a\x30\n\x0eUserAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x32\n\x10SystemAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01"x\n\x06Target\x12\x0c\n\x04name\x18\x01 \x01(\t\x12*\n\tdirection\x18\x02 \x01(\x0e\x32\x17.optur.Target.Direction"4\n\tDirection\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x0c\n\x08MAXIMIZE\x10\x01\x12\x0c\n\x08MINIMIZE\x10\x02"\x85\x07\n\x05Trial\x12\x10\n\x08trial_id\x18\x01 \x01(\t\x12\x10\n\x08study_id\x18\x02 \x01(\t\x12,\n\x10last_known_state\x18\x03 \x01(\x0e\x32\x12.optur.Trial.State\x12/\n\nuser_attrs\x18\x04 \x03(\x0b\x32\x1b.optur.Trial.UserAttrsEntry\x12\x33\n\x0csystem_attrs\x18\x05 \x03(\x0b\x32\x1d.optur.Trial.SystemAttrsEntry\x12\x30\n\nparameters\x18\x06 \x03(\x0b\x32\x1c.optur.Trial.ParametersEntry\x12%\n\x06values\x18\x07 \x03(\x0b\x32\x15.optur.ObjectiveValue\x12\x1e\n\x07reports\x18\x08 \x03(\x0b\x32\r.optur.Report\x12"\n\tworker_id\x18\t \x01(\x0b\x32\x0f.optur.WorkerID\x12/\n\x0b\x63reate_time\x18\n \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x34\n\x10last_update_time\x18\x0b \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x36\n\rdistributions\x18\x0c \x03(\x0b\x32\x1f.optur.Trial.DistributionsEntry\x1a\x30\n\x0eUserAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x32\n\x10SystemAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x43\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x1f\n\x05value\x18\x02 \x01(\x0b\x32\x10.optur.Parameter:\x02\x38\x01\x1aI\n\x12\x44istributionsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12"\n\x05value\x18\x02 \x01(\x0b\x32\x13.optur.Distribution:\x02\x38\x01"\x91\x01\n\x05State\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x0b\n\x07\x43REATED\x10\x01\x12\x0b\n\x07WAITING\x10\x02\x12\x0b\n\x07RUNNING\x10\x03\x12\r\n\tCOMPLETED\x10\x04\x12\n\n\x06\x46\x41ILED\x10\x05\x12\n\n\x06PRUNED\x10\x06\x12\x17\n\x13PARTIALLY_COMPLETED\x10\x07\x12\x14\n\x10PARTIALLY_FAILED\x10\x08"C\n\x08WorkerID\x12\x11\n\tclient_id\x18\x01 \x01(\t\x12\x11\n\tthread_id\x18\x02 \x01(\x03\x12\x11\n\tbucket_id\x18\x03 \x01(\x03"m\n\x06Report\x12.\n\nevent_time\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x0c\n\x04step\x18\x02 \x01(\x03\x12%\n\x06values\x18\x03 \x03(\x0b\x32\x15.optur.ObjectiveValue"\xb0\x01\n\x0eObjectiveValue\x12\r\n\x05value\x18\x01 \x01(\x01\x12,\n\x06status\x18\x02 \x01(\x0e\x32\x1c.optur.ObjectiveValue.Status"a\n\x06Status\x12\x0b\n\x07UNKNOWN\x10\x00\x12\t\n\x05VALID\x10\x01\x12\x0b\n\x07SKIPPED\x10\x02\x12\x0e\n\nINFEASIBLE\x10\x03\x12\x07\n\x03NAN\x10\x04\x12\x07\n\x03INF\x10\x05\x12\x10\n\x0cNEGATIVE_INF\x10\x06"1\n\tParameter\x12$\n\x05value\x18\x01 \x01(\x0b\x32\x15.optur.ParameterValue"^\n\x0eParameterValue\x12\x13\n\tint_value\x18\x01 \x01(\x03H\x00\x12\x16\n\x0c\x64ouble_value\x18\x02 \x01(\x01H\x00\x12\x16\n\x0cstring_value\x18\x03 \x01(\tH\x00\x42\x07\n\x05value"\xbc\x03\n\x0c\x44istribution\x12\x43\n\x12\x66loat_distribution\x18\x01 \x01(\x0b\x32%.optur.Distribution.FloatDistributionH\x00\x12?\n\x10int_distribution\x18\x02 \x01(\x0b\x32#.optur.Distribution.IntDistributionH\x00\x12O\n\x18\x63\x61tegorical_distribution\x18\x03 \x01(\x0b\x32+.optur.Distribution.CategoricalDistributionH\x00\x1a\x41\n\x11\x46loatDistribution\x12\x0b\n\x03low\x18\x01 \x01(\x02\x12\x0c\n\x04high\x18\x02 \x01(\x02\x12\x11\n\tlog_scale\x18\x03 \x01(\x08\x1a?\n\x0fIntDistribution\x12\x0b\n\x03low\x18\x01 \x01(\x03\x12\x0c\n\x04high\x18\x02 \x01(\x03\x12\x11\n\tlog_scale\x18\x03 \x01(\x08\x1a\x41\n\x17\x43\x61tegoricalDistribution\x12&\n\x07\x63hoices\x18\x01 \x03(\x0b\x32\x15.optur.ParameterValueB\x0e\n\x0c\x64istribution"\x96\x01\n\x0bSearchSpace\x12<\n\rdistributions\x18\x01 \x03(\x0b\x32%.optur.SearchSpace.DistributionsEntry\x1aI\n\x12\x44istributionsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12"\n\x05value\x18\x02 \x01(\x0b\x32\x13.optur.Distribution:\x02\x38\x01\x62\x06proto3',
+    serialized_pb=b'\n\x17optur/proto/study.proto\x12\x05optur\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1eoptur/proto/search_space.proto"\x8c\x03\n\tStudyInfo\x12\x10\n\x08study_id\x18\x01 \x01(\t\x12\x12\n\nstudy_name\x18\x02 \x01(\t\x12\x1e\n\x07targets\x18\x03 \x03(\x0b\x32\r.optur.Target\x12\x33\n\nuser_attrs\x18\x04 \x03(\x0b\x32\x1f.optur.StudyInfo.UserAttrsEntry\x12\x37\n\x0csystem_attrs\x18\x05 \x03(\x0b\x32!.optur.StudyInfo.SystemAttrsEntry\x12/\n\x0b\x63reate_time\x18\x06 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x34\n\x10last_update_time\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x1a\x30\n\x0eUserAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x32\n\x10SystemAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01"x\n\x06Target\x12\x0c\n\x04name\x18\x01 \x01(\t\x12*\n\tdirection\x18\x02 \x01(\x0e\x32\x17.optur.Target.Direction"4\n\tDirection\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x0c\n\x08MAXIMIZE\x10\x01\x12\x0c\n\x08MINIMIZE\x10\x02"\x85\x07\n\x05Trial\x12\x10\n\x08trial_id\x18\x01 \x01(\t\x12\x10\n\x08study_id\x18\x02 \x01(\t\x12,\n\x10last_known_state\x18\x03 \x01(\x0e\x32\x12.optur.Trial.State\x12/\n\nuser_attrs\x18\x04 \x03(\x0b\x32\x1b.optur.Trial.UserAttrsEntry\x12\x33\n\x0csystem_attrs\x18\x05 \x03(\x0b\x32\x1d.optur.Trial.SystemAttrsEntry\x12\x30\n\nparameters\x18\x06 \x03(\x0b\x32\x1c.optur.Trial.ParametersEntry\x12%\n\x06values\x18\x07 \x03(\x0b\x32\x15.optur.ObjectiveValue\x12\x1e\n\x07reports\x18\x08 \x03(\x0b\x32\r.optur.Report\x12"\n\tworker_id\x18\t \x01(\x0b\x32\x0f.optur.WorkerID\x12/\n\x0b\x63reate_time\x18\n \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x34\n\x10last_update_time\x18\x0b \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x36\n\rdistributions\x18\x0c \x03(\x0b\x32\x1f.optur.Trial.DistributionsEntry\x1a\x30\n\x0eUserAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x32\n\x10SystemAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x43\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x1f\n\x05value\x18\x02 \x01(\x0b\x32\x10.optur.Parameter:\x02\x38\x01\x1aI\n\x12\x44istributionsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12"\n\x05value\x18\x02 \x01(\x0b\x32\x13.optur.Distribution:\x02\x38\x01"\x91\x01\n\x05State\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x0b\n\x07\x43REATED\x10\x01\x12\x0b\n\x07WAITING\x10\x02\x12\x0b\n\x07RUNNING\x10\x03\x12\r\n\tCOMPLETED\x10\x04\x12\n\n\x06\x46\x41ILED\x10\x05\x12\n\n\x06PRUNED\x10\x06\x12\x17\n\x13PARTIALLY_COMPLETED\x10\x07\x12\x14\n\x10PARTIALLY_FAILED\x10\x08"C\n\x08WorkerID\x12\x11\n\tclient_id\x18\x01 \x01(\t\x12\x11\n\tthread_id\x18\x02 \x01(\x03\x12\x11\n\tbucket_id\x18\x03 \x01(\x03"m\n\x06Report\x12.\n\nevent_time\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x0c\n\x04step\x18\x02 \x01(\x03\x12%\n\x06values\x18\x03 \x03(\x0b\x32\x15.optur.ObjectiveValue"\xb0\x01\n\x0eObjectiveValue\x12\r\n\x05value\x18\x01 \x01(\x01\x12,\n\x06status\x18\x02 \x01(\x0e\x32\x1c.optur.ObjectiveValue.Status"a\n\x06Status\x12\x0b\n\x07UNKNOWN\x10\x00\x12\t\n\x05VALID\x10\x01\x12\x0b\n\x07SKIPPED\x10\x02\x12\x0e\n\nINFEASIBLE\x10\x03\x12\x07\n\x03NAN\x10\x04\x12\x07\n\x03INF\x10\x05\x12\x10\n\x0cNEGATIVE_INF\x10\x06"1\n\tParameter\x12$\n\x05value\x18\x01 \x01(\x0b\x32\x15.optur.ParameterValueb\x06proto3',
     dependencies=[
         google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,
+        optur_dot_proto_dot_search__space__pb2.DESCRIPTOR,
     ],
 )
 
@@ -61,8 +64,8 @@ _TARGET_DIRECTION = _descriptor.EnumDescriptor(
     ],
     containing_type=None,
     serialized_options=None,
-    serialized_start=534,
-    serialized_end=586,
+    serialized_start=566,
+    serialized_end=618,
 )
 _sym_db.RegisterEnumDescriptor(_TARGET_DIRECTION)
 
@@ -148,8 +151,8 @@ _TRIAL_STATE = _descriptor.EnumDescriptor(
     ],
     containing_type=None,
     serialized_options=None,
-    serialized_start=1345,
-    serialized_end=1490,
+    serialized_start=1377,
+    serialized_end=1522,
 )
 _sym_db.RegisterEnumDescriptor(_TRIAL_STATE)
 
@@ -219,8 +222,8 @@ _OBJECTIVEVALUE_STATUS = _descriptor.EnumDescriptor(
     ],
     containing_type=None,
     serialized_options=None,
-    serialized_start=1752,
-    serialized_end=1849,
+    serialized_start=1784,
+    serialized_end=1881,
 )
 _sym_db.RegisterEnumDescriptor(_OBJECTIVEVALUE_STATUS)
 
@@ -280,8 +283,8 @@ _STUDYINFO_USERATTRSENTRY = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=364,
-    serialized_end=412,
+    serialized_start=396,
+    serialized_end=444,
 )
 
 _STUDYINFO_SYSTEMATTRSENTRY = _descriptor.Descriptor(
@@ -339,8 +342,8 @@ _STUDYINFO_SYSTEMATTRSENTRY = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=414,
-    serialized_end=464,
+    serialized_start=446,
+    serialized_end=496,
 )
 
 _STUDYINFO = _descriptor.Descriptor(
@@ -496,8 +499,8 @@ _STUDYINFO = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=68,
-    serialized_end=464,
+    serialized_start=100,
+    serialized_end=496,
 )
 
 
@@ -558,8 +561,8 @@ _TARGET = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=466,
-    serialized_end=586,
+    serialized_start=498,
+    serialized_end=618,
 )
 
 
@@ -618,8 +621,8 @@ _TRIAL_USERATTRSENTRY = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=364,
-    serialized_end=412,
+    serialized_start=396,
+    serialized_end=444,
 )
 
 _TRIAL_SYSTEMATTRSENTRY = _descriptor.Descriptor(
@@ -677,8 +680,8 @@ _TRIAL_SYSTEMATTRSENTRY = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=414,
-    serialized_end=464,
+    serialized_start=446,
+    serialized_end=496,
 )
 
 _TRIAL_PARAMETERSENTRY = _descriptor.Descriptor(
@@ -736,8 +739,8 @@ _TRIAL_PARAMETERSENTRY = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=1200,
-    serialized_end=1267,
+    serialized_start=1232,
+    serialized_end=1299,
 )
 
 _TRIAL_DISTRIBUTIONSENTRY = _descriptor.Descriptor(
@@ -795,8 +798,8 @@ _TRIAL_DISTRIBUTIONSENTRY = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=1269,
-    serialized_end=1342,
+    serialized_start=1301,
+    serialized_end=1374,
 )
 
 _TRIAL = _descriptor.Descriptor(
@@ -1051,8 +1054,8 @@ _TRIAL = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=589,
-    serialized_end=1490,
+    serialized_start=621,
+    serialized_end=1522,
 )
 
 
@@ -1130,8 +1133,8 @@ _WORKERID = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=1492,
-    serialized_end=1559,
+    serialized_start=1524,
+    serialized_end=1591,
 )
 
 
@@ -1209,8 +1212,8 @@ _REPORT = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=1561,
-    serialized_end=1670,
+    serialized_start=1593,
+    serialized_end=1702,
 )
 
 
@@ -1271,8 +1274,8 @@ _OBJECTIVEVALUE = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=1673,
-    serialized_end=1849,
+    serialized_start=1705,
+    serialized_end=1881,
 )
 
 
@@ -1312,486 +1315,8 @@ _PARAMETER = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=1851,
-    serialized_end=1900,
-)
-
-
-_PARAMETERVALUE = _descriptor.Descriptor(
-    name="ParameterValue",
-    full_name="optur.ParameterValue",
-    filename=None,
-    file=DESCRIPTOR,
-    containing_type=None,
-    create_key=_descriptor._internal_create_key,
-    fields=[
-        _descriptor.FieldDescriptor(
-            name="int_value",
-            full_name="optur.ParameterValue.int_value",
-            index=0,
-            number=1,
-            type=3,
-            cpp_type=2,
-            label=1,
-            has_default_value=False,
-            default_value=0,
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-            create_key=_descriptor._internal_create_key,
-        ),
-        _descriptor.FieldDescriptor(
-            name="double_value",
-            full_name="optur.ParameterValue.double_value",
-            index=1,
-            number=2,
-            type=1,
-            cpp_type=5,
-            label=1,
-            has_default_value=False,
-            default_value=float(0),
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-            create_key=_descriptor._internal_create_key,
-        ),
-        _descriptor.FieldDescriptor(
-            name="string_value",
-            full_name="optur.ParameterValue.string_value",
-            index=2,
-            number=3,
-            type=9,
-            cpp_type=9,
-            label=1,
-            has_default_value=False,
-            default_value=b"".decode("utf-8"),
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-            create_key=_descriptor._internal_create_key,
-        ),
-    ],
-    extensions=[],
-    nested_types=[],
-    enum_types=[],
-    serialized_options=None,
-    is_extendable=False,
-    syntax="proto3",
-    extension_ranges=[],
-    oneofs=[
-        _descriptor.OneofDescriptor(
-            name="value",
-            full_name="optur.ParameterValue.value",
-            index=0,
-            containing_type=None,
-            create_key=_descriptor._internal_create_key,
-            fields=[],
-        ),
-    ],
-    serialized_start=1902,
-    serialized_end=1996,
-)
-
-
-_DISTRIBUTION_FLOATDISTRIBUTION = _descriptor.Descriptor(
-    name="FloatDistribution",
-    full_name="optur.Distribution.FloatDistribution",
-    filename=None,
-    file=DESCRIPTOR,
-    containing_type=None,
-    create_key=_descriptor._internal_create_key,
-    fields=[
-        _descriptor.FieldDescriptor(
-            name="low",
-            full_name="optur.Distribution.FloatDistribution.low",
-            index=0,
-            number=1,
-            type=2,
-            cpp_type=6,
-            label=1,
-            has_default_value=False,
-            default_value=float(0),
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-            create_key=_descriptor._internal_create_key,
-        ),
-        _descriptor.FieldDescriptor(
-            name="high",
-            full_name="optur.Distribution.FloatDistribution.high",
-            index=1,
-            number=2,
-            type=2,
-            cpp_type=6,
-            label=1,
-            has_default_value=False,
-            default_value=float(0),
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-            create_key=_descriptor._internal_create_key,
-        ),
-        _descriptor.FieldDescriptor(
-            name="log_scale",
-            full_name="optur.Distribution.FloatDistribution.log_scale",
-            index=2,
-            number=3,
-            type=8,
-            cpp_type=7,
-            label=1,
-            has_default_value=False,
-            default_value=False,
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-            create_key=_descriptor._internal_create_key,
-        ),
-    ],
-    extensions=[],
-    nested_types=[],
-    enum_types=[],
-    serialized_options=None,
-    is_extendable=False,
-    syntax="proto3",
-    extension_ranges=[],
-    oneofs=[],
-    serialized_start=2230,
-    serialized_end=2295,
-)
-
-_DISTRIBUTION_INTDISTRIBUTION = _descriptor.Descriptor(
-    name="IntDistribution",
-    full_name="optur.Distribution.IntDistribution",
-    filename=None,
-    file=DESCRIPTOR,
-    containing_type=None,
-    create_key=_descriptor._internal_create_key,
-    fields=[
-        _descriptor.FieldDescriptor(
-            name="low",
-            full_name="optur.Distribution.IntDistribution.low",
-            index=0,
-            number=1,
-            type=3,
-            cpp_type=2,
-            label=1,
-            has_default_value=False,
-            default_value=0,
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-            create_key=_descriptor._internal_create_key,
-        ),
-        _descriptor.FieldDescriptor(
-            name="high",
-            full_name="optur.Distribution.IntDistribution.high",
-            index=1,
-            number=2,
-            type=3,
-            cpp_type=2,
-            label=1,
-            has_default_value=False,
-            default_value=0,
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-            create_key=_descriptor._internal_create_key,
-        ),
-        _descriptor.FieldDescriptor(
-            name="log_scale",
-            full_name="optur.Distribution.IntDistribution.log_scale",
-            index=2,
-            number=3,
-            type=8,
-            cpp_type=7,
-            label=1,
-            has_default_value=False,
-            default_value=False,
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-            create_key=_descriptor._internal_create_key,
-        ),
-    ],
-    extensions=[],
-    nested_types=[],
-    enum_types=[],
-    serialized_options=None,
-    is_extendable=False,
-    syntax="proto3",
-    extension_ranges=[],
-    oneofs=[],
-    serialized_start=2297,
-    serialized_end=2360,
-)
-
-_DISTRIBUTION_CATEGORICALDISTRIBUTION = _descriptor.Descriptor(
-    name="CategoricalDistribution",
-    full_name="optur.Distribution.CategoricalDistribution",
-    filename=None,
-    file=DESCRIPTOR,
-    containing_type=None,
-    create_key=_descriptor._internal_create_key,
-    fields=[
-        _descriptor.FieldDescriptor(
-            name="choices",
-            full_name="optur.Distribution.CategoricalDistribution.choices",
-            index=0,
-            number=1,
-            type=11,
-            cpp_type=10,
-            label=3,
-            has_default_value=False,
-            default_value=[],
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-            create_key=_descriptor._internal_create_key,
-        ),
-    ],
-    extensions=[],
-    nested_types=[],
-    enum_types=[],
-    serialized_options=None,
-    is_extendable=False,
-    syntax="proto3",
-    extension_ranges=[],
-    oneofs=[],
-    serialized_start=2362,
-    serialized_end=2427,
-)
-
-_DISTRIBUTION = _descriptor.Descriptor(
-    name="Distribution",
-    full_name="optur.Distribution",
-    filename=None,
-    file=DESCRIPTOR,
-    containing_type=None,
-    create_key=_descriptor._internal_create_key,
-    fields=[
-        _descriptor.FieldDescriptor(
-            name="float_distribution",
-            full_name="optur.Distribution.float_distribution",
-            index=0,
-            number=1,
-            type=11,
-            cpp_type=10,
-            label=1,
-            has_default_value=False,
-            default_value=None,
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-            create_key=_descriptor._internal_create_key,
-        ),
-        _descriptor.FieldDescriptor(
-            name="int_distribution",
-            full_name="optur.Distribution.int_distribution",
-            index=1,
-            number=2,
-            type=11,
-            cpp_type=10,
-            label=1,
-            has_default_value=False,
-            default_value=None,
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-            create_key=_descriptor._internal_create_key,
-        ),
-        _descriptor.FieldDescriptor(
-            name="categorical_distribution",
-            full_name="optur.Distribution.categorical_distribution",
-            index=2,
-            number=3,
-            type=11,
-            cpp_type=10,
-            label=1,
-            has_default_value=False,
-            default_value=None,
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-            create_key=_descriptor._internal_create_key,
-        ),
-    ],
-    extensions=[],
-    nested_types=[
-        _DISTRIBUTION_FLOATDISTRIBUTION,
-        _DISTRIBUTION_INTDISTRIBUTION,
-        _DISTRIBUTION_CATEGORICALDISTRIBUTION,
-    ],
-    enum_types=[],
-    serialized_options=None,
-    is_extendable=False,
-    syntax="proto3",
-    extension_ranges=[],
-    oneofs=[
-        _descriptor.OneofDescriptor(
-            name="distribution",
-            full_name="optur.Distribution.distribution",
-            index=0,
-            containing_type=None,
-            create_key=_descriptor._internal_create_key,
-            fields=[],
-        ),
-    ],
-    serialized_start=1999,
-    serialized_end=2443,
-)
-
-
-_SEARCHSPACE_DISTRIBUTIONSENTRY = _descriptor.Descriptor(
-    name="DistributionsEntry",
-    full_name="optur.SearchSpace.DistributionsEntry",
-    filename=None,
-    file=DESCRIPTOR,
-    containing_type=None,
-    create_key=_descriptor._internal_create_key,
-    fields=[
-        _descriptor.FieldDescriptor(
-            name="key",
-            full_name="optur.SearchSpace.DistributionsEntry.key",
-            index=0,
-            number=1,
-            type=9,
-            cpp_type=9,
-            label=1,
-            has_default_value=False,
-            default_value=b"".decode("utf-8"),
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-            create_key=_descriptor._internal_create_key,
-        ),
-        _descriptor.FieldDescriptor(
-            name="value",
-            full_name="optur.SearchSpace.DistributionsEntry.value",
-            index=1,
-            number=2,
-            type=11,
-            cpp_type=10,
-            label=1,
-            has_default_value=False,
-            default_value=None,
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-            create_key=_descriptor._internal_create_key,
-        ),
-    ],
-    extensions=[],
-    nested_types=[],
-    enum_types=[],
-    serialized_options=b"8\001",
-    is_extendable=False,
-    syntax="proto3",
-    extension_ranges=[],
-    oneofs=[],
-    serialized_start=1269,
-    serialized_end=1342,
-)
-
-_SEARCHSPACE = _descriptor.Descriptor(
-    name="SearchSpace",
-    full_name="optur.SearchSpace",
-    filename=None,
-    file=DESCRIPTOR,
-    containing_type=None,
-    create_key=_descriptor._internal_create_key,
-    fields=[
-        _descriptor.FieldDescriptor(
-            name="distributions",
-            full_name="optur.SearchSpace.distributions",
-            index=0,
-            number=1,
-            type=11,
-            cpp_type=10,
-            label=3,
-            has_default_value=False,
-            default_value=[],
-            message_type=None,
-            enum_type=None,
-            containing_type=None,
-            is_extension=False,
-            extension_scope=None,
-            serialized_options=None,
-            file=DESCRIPTOR,
-            create_key=_descriptor._internal_create_key,
-        ),
-    ],
-    extensions=[],
-    nested_types=[
-        _SEARCHSPACE_DISTRIBUTIONSENTRY,
-    ],
-    enum_types=[],
-    serialized_options=None,
-    is_extendable=False,
-    syntax="proto3",
-    extension_ranges=[],
-    oneofs=[],
-    serialized_start=2446,
-    serialized_end=2596,
+    serialized_start=1883,
+    serialized_end=1932,
 )
 
 _STUDYINFO_USERATTRSENTRY.containing_type = _STUDYINFO
@@ -1811,7 +1336,9 @@ _TRIAL_USERATTRSENTRY.containing_type = _TRIAL
 _TRIAL_SYSTEMATTRSENTRY.containing_type = _TRIAL
 _TRIAL_PARAMETERSENTRY.fields_by_name["value"].message_type = _PARAMETER
 _TRIAL_PARAMETERSENTRY.containing_type = _TRIAL
-_TRIAL_DISTRIBUTIONSENTRY.fields_by_name["value"].message_type = _DISTRIBUTION
+_TRIAL_DISTRIBUTIONSENTRY.fields_by_name[
+    "value"
+].message_type = optur_dot_proto_dot_search__space__pb2._DISTRIBUTION
 _TRIAL_DISTRIBUTIONSENTRY.containing_type = _TRIAL
 _TRIAL.fields_by_name["last_known_state"].enum_type = _TRIAL_STATE
 _TRIAL.fields_by_name["user_attrs"].message_type = _TRIAL_USERATTRSENTRY
@@ -1834,53 +1361,9 @@ _REPORT.fields_by_name[
 _REPORT.fields_by_name["values"].message_type = _OBJECTIVEVALUE
 _OBJECTIVEVALUE.fields_by_name["status"].enum_type = _OBJECTIVEVALUE_STATUS
 _OBJECTIVEVALUE_STATUS.containing_type = _OBJECTIVEVALUE
-_PARAMETER.fields_by_name["value"].message_type = _PARAMETERVALUE
-_PARAMETERVALUE.oneofs_by_name["value"].fields.append(_PARAMETERVALUE.fields_by_name["int_value"])
-_PARAMETERVALUE.fields_by_name["int_value"].containing_oneof = _PARAMETERVALUE.oneofs_by_name[
+_PARAMETER.fields_by_name[
     "value"
-]
-_PARAMETERVALUE.oneofs_by_name["value"].fields.append(
-    _PARAMETERVALUE.fields_by_name["double_value"]
-)
-_PARAMETERVALUE.fields_by_name["double_value"].containing_oneof = _PARAMETERVALUE.oneofs_by_name[
-    "value"
-]
-_PARAMETERVALUE.oneofs_by_name["value"].fields.append(
-    _PARAMETERVALUE.fields_by_name["string_value"]
-)
-_PARAMETERVALUE.fields_by_name["string_value"].containing_oneof = _PARAMETERVALUE.oneofs_by_name[
-    "value"
-]
-_DISTRIBUTION_FLOATDISTRIBUTION.containing_type = _DISTRIBUTION
-_DISTRIBUTION_INTDISTRIBUTION.containing_type = _DISTRIBUTION
-_DISTRIBUTION_CATEGORICALDISTRIBUTION.fields_by_name["choices"].message_type = _PARAMETERVALUE
-_DISTRIBUTION_CATEGORICALDISTRIBUTION.containing_type = _DISTRIBUTION
-_DISTRIBUTION.fields_by_name["float_distribution"].message_type = _DISTRIBUTION_FLOATDISTRIBUTION
-_DISTRIBUTION.fields_by_name["int_distribution"].message_type = _DISTRIBUTION_INTDISTRIBUTION
-_DISTRIBUTION.fields_by_name[
-    "categorical_distribution"
-].message_type = _DISTRIBUTION_CATEGORICALDISTRIBUTION
-_DISTRIBUTION.oneofs_by_name["distribution"].fields.append(
-    _DISTRIBUTION.fields_by_name["float_distribution"]
-)
-_DISTRIBUTION.fields_by_name["float_distribution"].containing_oneof = _DISTRIBUTION.oneofs_by_name[
-    "distribution"
-]
-_DISTRIBUTION.oneofs_by_name["distribution"].fields.append(
-    _DISTRIBUTION.fields_by_name["int_distribution"]
-)
-_DISTRIBUTION.fields_by_name["int_distribution"].containing_oneof = _DISTRIBUTION.oneofs_by_name[
-    "distribution"
-]
-_DISTRIBUTION.oneofs_by_name["distribution"].fields.append(
-    _DISTRIBUTION.fields_by_name["categorical_distribution"]
-)
-_DISTRIBUTION.fields_by_name[
-    "categorical_distribution"
-].containing_oneof = _DISTRIBUTION.oneofs_by_name["distribution"]
-_SEARCHSPACE_DISTRIBUTIONSENTRY.fields_by_name["value"].message_type = _DISTRIBUTION
-_SEARCHSPACE_DISTRIBUTIONSENTRY.containing_type = _SEARCHSPACE
-_SEARCHSPACE.fields_by_name["distributions"].message_type = _SEARCHSPACE_DISTRIBUTIONSENTRY
+].message_type = optur_dot_proto_dot_search__space__pb2._PARAMETERVALUE
 DESCRIPTOR.message_types_by_name["StudyInfo"] = _STUDYINFO
 DESCRIPTOR.message_types_by_name["Target"] = _TARGET
 DESCRIPTOR.message_types_by_name["Trial"] = _TRIAL
@@ -1888,9 +1371,6 @@ DESCRIPTOR.message_types_by_name["WorkerID"] = _WORKERID
 DESCRIPTOR.message_types_by_name["Report"] = _REPORT
 DESCRIPTOR.message_types_by_name["ObjectiveValue"] = _OBJECTIVEVALUE
 DESCRIPTOR.message_types_by_name["Parameter"] = _PARAMETER
-DESCRIPTOR.message_types_by_name["ParameterValue"] = _PARAMETERVALUE
-DESCRIPTOR.message_types_by_name["Distribution"] = _DISTRIBUTION
-DESCRIPTOR.message_types_by_name["SearchSpace"] = _SEARCHSPACE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 StudyInfo = _reflection.GeneratedProtocolMessageType(
@@ -2030,79 +1510,6 @@ Parameter = _reflection.GeneratedProtocolMessageType(
 )
 _sym_db.RegisterMessage(Parameter)
 
-ParameterValue = _reflection.GeneratedProtocolMessageType(
-    "ParameterValue",
-    (_message.Message,),
-    {
-        "DESCRIPTOR": _PARAMETERVALUE,
-        "__module__": "optur.proto.study_pb2"
-        # @@protoc_insertion_point(class_scope:optur.ParameterValue)
-    },
-)
-_sym_db.RegisterMessage(ParameterValue)
-
-Distribution = _reflection.GeneratedProtocolMessageType(
-    "Distribution",
-    (_message.Message,),
-    {
-        "FloatDistribution": _reflection.GeneratedProtocolMessageType(
-            "FloatDistribution",
-            (_message.Message,),
-            {
-                "DESCRIPTOR": _DISTRIBUTION_FLOATDISTRIBUTION,
-                "__module__": "optur.proto.study_pb2"
-                # @@protoc_insertion_point(class_scope:optur.Distribution.FloatDistribution)
-            },
-        ),
-        "IntDistribution": _reflection.GeneratedProtocolMessageType(
-            "IntDistribution",
-            (_message.Message,),
-            {
-                "DESCRIPTOR": _DISTRIBUTION_INTDISTRIBUTION,
-                "__module__": "optur.proto.study_pb2"
-                # @@protoc_insertion_point(class_scope:optur.Distribution.IntDistribution)
-            },
-        ),
-        "CategoricalDistribution": _reflection.GeneratedProtocolMessageType(
-            "CategoricalDistribution",
-            (_message.Message,),
-            {
-                "DESCRIPTOR": _DISTRIBUTION_CATEGORICALDISTRIBUTION,
-                "__module__": "optur.proto.study_pb2"
-                # @@protoc_insertion_point(class_scope:optur.Distribution.CategoricalDistribution)
-            },
-        ),
-        "DESCRIPTOR": _DISTRIBUTION,
-        "__module__": "optur.proto.study_pb2"
-        # @@protoc_insertion_point(class_scope:optur.Distribution)
-    },
-)
-_sym_db.RegisterMessage(Distribution)
-_sym_db.RegisterMessage(Distribution.FloatDistribution)
-_sym_db.RegisterMessage(Distribution.IntDistribution)
-_sym_db.RegisterMessage(Distribution.CategoricalDistribution)
-
-SearchSpace = _reflection.GeneratedProtocolMessageType(
-    "SearchSpace",
-    (_message.Message,),
-    {
-        "DistributionsEntry": _reflection.GeneratedProtocolMessageType(
-            "DistributionsEntry",
-            (_message.Message,),
-            {
-                "DESCRIPTOR": _SEARCHSPACE_DISTRIBUTIONSENTRY,
-                "__module__": "optur.proto.study_pb2"
-                # @@protoc_insertion_point(class_scope:optur.SearchSpace.DistributionsEntry)
-            },
-        ),
-        "DESCRIPTOR": _SEARCHSPACE,
-        "__module__": "optur.proto.study_pb2"
-        # @@protoc_insertion_point(class_scope:optur.SearchSpace)
-    },
-)
-_sym_db.RegisterMessage(SearchSpace)
-_sym_db.RegisterMessage(SearchSpace.DistributionsEntry)
-
 
 _STUDYINFO_USERATTRSENTRY._options = None
 _STUDYINFO_SYSTEMATTRSENTRY._options = None
@@ -2110,5 +1517,4 @@ _TRIAL_USERATTRSENTRY._options = None
 _TRIAL_SYSTEMATTRSENTRY._options = None
 _TRIAL_PARAMETERSENTRY._options = None
 _TRIAL_DISTRIBUTIONSENTRY._options = None
-_SEARCHSPACE_DISTRIBUTIONSENTRY._options = None
 # @@protoc_insertion_point(module_scope)

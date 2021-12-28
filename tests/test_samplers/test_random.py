@@ -1,5 +1,5 @@
 from optur.proto.sampler_pb2 import RandomSamplerConfig
-from optur.proto.study_pb2 import Distribution, ParameterValue, SearchSpace
+from optur.proto.search_space_pb2 import Distribution, ParameterValue, SearchSpace
 from optur.samplers.random import RandomSampler
 
 FD = Distribution.FloatDistribution

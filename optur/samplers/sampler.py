@@ -4,7 +4,7 @@ from typing import Dict, Optional, Sequence
 from google.protobuf.timestamp_pb2 import Timestamp
 
 from optur.proto.sampler_pb2 import SamplerConfig
-from optur.proto.study_pb2 import Distribution, ParameterValue, SearchSpace
+from optur.proto.search_space_pb2 import Distribution, ParameterValue, SearchSpace
 from optur.proto.study_pb2 import Trial as TrialProto
 
 

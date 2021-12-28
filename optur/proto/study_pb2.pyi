@@ -29,6 +29,13 @@ from google.protobuf.timestamp_pb2 import (
 )
 from typing_extensions import Literal as typing_extensions___Literal
 
+from optur.proto.search_space_pb2 import (
+    Distribution as optur___proto___search_space_pb2___Distribution,
+)
+from optur.proto.search_space_pb2 import (
+    ParameterValue as optur___proto___search_space_pb2___ParameterValue,
+)
+
 builtin___bool = bool
 builtin___bytes = bytes
 builtin___float = float
@@ -231,12 +238,12 @@ class Trial(google___protobuf___message___Message):
         DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
         key: typing___Text = ...
         @property
-        def value(self) -> type___Distribution: ...
+        def value(self) -> optur___proto___search_space_pb2___Distribution: ...
         def __init__(
             self,
             *,
             key: typing___Optional[typing___Text] = None,
-            value: typing___Optional[type___Distribution] = None,
+            value: typing___Optional[optur___proto___search_space_pb2___Distribution] = None,
         ) -> None: ...
         def HasField(
             self, field_name: typing_extensions___Literal["value", b"value"]
@@ -274,7 +281,11 @@ class Trial(google___protobuf___message___Message):
     @property
     def last_update_time(self) -> google___protobuf___timestamp_pb2___Timestamp: ...
     @property
-    def distributions(self) -> typing___MutableMapping[typing___Text, type___Distribution]: ...
+    def distributions(
+        self,
+    ) -> typing___MutableMapping[
+        typing___Text, optur___proto___search_space_pb2___Distribution
+    ]: ...
     def __init__(
         self,
         *,
@@ -290,7 +301,7 @@ class Trial(google___protobuf___message___Message):
         create_time: typing___Optional[google___protobuf___timestamp_pb2___Timestamp] = None,
         last_update_time: typing___Optional[google___protobuf___timestamp_pb2___Timestamp] = None,
         distributions: typing___Optional[
-            typing___Mapping[typing___Text, type___Distribution]
+            typing___Mapping[typing___Text, optur___proto___search_space_pb2___Distribution]
         ] = None,
     ) -> None: ...
     def HasField(
@@ -431,11 +442,11 @@ type___ObjectiveValue = ObjectiveValue
 class Parameter(google___protobuf___message___Message):
     DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
     @property
-    def value(self) -> type___ParameterValue: ...
+    def value(self) -> optur___proto___search_space_pb2___ParameterValue: ...
     def __init__(
         self,
         *,
-        value: typing___Optional[type___ParameterValue] = None,
+        value: typing___Optional[optur___proto___search_space_pb2___ParameterValue] = None,
     ) -> None: ...
     def HasField(
         self, field_name: typing_extensions___Literal["value", b"value"]
@@ -443,188 +454,3 @@ class Parameter(google___protobuf___message___Message):
     def ClearField(self, field_name: typing_extensions___Literal["value", b"value"]) -> None: ...
 
 type___Parameter = Parameter
-
-class ParameterValue(google___protobuf___message___Message):
-    DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
-    int_value: builtin___int = ...
-    double_value: builtin___float = ...
-    string_value: typing___Text = ...
-    def __init__(
-        self,
-        *,
-        int_value: typing___Optional[builtin___int] = None,
-        double_value: typing___Optional[builtin___float] = None,
-        string_value: typing___Optional[typing___Text] = None,
-    ) -> None: ...
-    def HasField(
-        self,
-        field_name: typing_extensions___Literal[
-            "double_value",
-            b"double_value",
-            "int_value",
-            b"int_value",
-            "string_value",
-            b"string_value",
-            "value",
-            b"value",
-        ],
-    ) -> builtin___bool: ...
-    def ClearField(
-        self,
-        field_name: typing_extensions___Literal[
-            "double_value",
-            b"double_value",
-            "int_value",
-            b"int_value",
-            "string_value",
-            b"string_value",
-            "value",
-            b"value",
-        ],
-    ) -> None: ...
-    def WhichOneof(
-        self, oneof_group: typing_extensions___Literal["value", b"value"]
-    ) -> typing_extensions___Literal["int_value", "double_value", "string_value"]: ...
-
-type___ParameterValue = ParameterValue
-
-class Distribution(google___protobuf___message___Message):
-    DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
-    class FloatDistribution(google___protobuf___message___Message):
-        DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
-        low: builtin___float = ...
-        high: builtin___float = ...
-        log_scale: builtin___bool = ...
-        def __init__(
-            self,
-            *,
-            low: typing___Optional[builtin___float] = None,
-            high: typing___Optional[builtin___float] = None,
-            log_scale: typing___Optional[builtin___bool] = None,
-        ) -> None: ...
-        def ClearField(
-            self,
-            field_name: typing_extensions___Literal[
-                "high", b"high", "log_scale", b"log_scale", "low", b"low"
-            ],
-        ) -> None: ...
-    type___FloatDistribution = FloatDistribution
-    class IntDistribution(google___protobuf___message___Message):
-        DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
-        low: builtin___int = ...
-        high: builtin___int = ...
-        log_scale: builtin___bool = ...
-        def __init__(
-            self,
-            *,
-            low: typing___Optional[builtin___int] = None,
-            high: typing___Optional[builtin___int] = None,
-            log_scale: typing___Optional[builtin___bool] = None,
-        ) -> None: ...
-        def ClearField(
-            self,
-            field_name: typing_extensions___Literal[
-                "high", b"high", "log_scale", b"log_scale", "low", b"low"
-            ],
-        ) -> None: ...
-    type___IntDistribution = IntDistribution
-    class CategoricalDistribution(google___protobuf___message___Message):
-        DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
-        @property
-        def choices(
-            self,
-        ) -> google___protobuf___internal___containers___RepeatedCompositeFieldContainer[
-            type___ParameterValue
-        ]: ...
-        def __init__(
-            self,
-            *,
-            choices: typing___Optional[typing___Iterable[type___ParameterValue]] = None,
-        ) -> None: ...
-        def ClearField(
-            self, field_name: typing_extensions___Literal["choices", b"choices"]
-        ) -> None: ...
-    type___CategoricalDistribution = CategoricalDistribution
-    @property
-    def float_distribution(self) -> type___Distribution.FloatDistribution: ...
-    @property
-    def int_distribution(self) -> type___Distribution.IntDistribution: ...
-    @property
-    def categorical_distribution(self) -> type___Distribution.CategoricalDistribution: ...
-    def __init__(
-        self,
-        *,
-        float_distribution: typing___Optional[type___Distribution.FloatDistribution] = None,
-        int_distribution: typing___Optional[type___Distribution.IntDistribution] = None,
-        categorical_distribution: typing___Optional[
-            type___Distribution.CategoricalDistribution
-        ] = None,
-    ) -> None: ...
-    def HasField(
-        self,
-        field_name: typing_extensions___Literal[
-            "categorical_distribution",
-            b"categorical_distribution",
-            "distribution",
-            b"distribution",
-            "float_distribution",
-            b"float_distribution",
-            "int_distribution",
-            b"int_distribution",
-        ],
-    ) -> builtin___bool: ...
-    def ClearField(
-        self,
-        field_name: typing_extensions___Literal[
-            "categorical_distribution",
-            b"categorical_distribution",
-            "distribution",
-            b"distribution",
-            "float_distribution",
-            b"float_distribution",
-            "int_distribution",
-            b"int_distribution",
-        ],
-    ) -> None: ...
-    def WhichOneof(
-        self, oneof_group: typing_extensions___Literal["distribution", b"distribution"]
-    ) -> typing_extensions___Literal[
-        "float_distribution", "int_distribution", "categorical_distribution"
-    ]: ...
-
-type___Distribution = Distribution
-
-class SearchSpace(google___protobuf___message___Message):
-    DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
-    class DistributionsEntry(google___protobuf___message___Message):
-        DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
-        key: typing___Text = ...
-        @property
-        def value(self) -> type___Distribution: ...
-        def __init__(
-            self,
-            *,
-            key: typing___Optional[typing___Text] = None,
-            value: typing___Optional[type___Distribution] = None,
-        ) -> None: ...
-        def HasField(
-            self, field_name: typing_extensions___Literal["value", b"value"]
-        ) -> builtin___bool: ...
-        def ClearField(
-            self, field_name: typing_extensions___Literal["key", b"key", "value", b"value"]
-        ) -> None: ...
-    type___DistributionsEntry = DistributionsEntry
-    @property
-    def distributions(self) -> typing___MutableMapping[typing___Text, type___Distribution]: ...
-    def __init__(
-        self,
-        *,
-        distributions: typing___Optional[
-            typing___Mapping[typing___Text, type___Distribution]
-        ] = None,
-    ) -> None: ...
-    def ClearField(
-        self, field_name: typing_extensions___Literal["distributions", b"distributions"]
-    ) -> None: ...
-
-type___SearchSpace = SearchSpace

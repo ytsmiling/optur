@@ -1,6 +1,7 @@
 from typing import Dict, Sequence, Union, overload
 
-from optur.proto.study_pb2 import Distribution, Parameter, ParameterValue, StudyInfo
+from optur.proto.search_space_pb2 import Distribution, ParameterValue
+from optur.proto.study_pb2 import Parameter, StudyInfo
 from optur.proto.study_pb2 import Trial as TrialProto
 from optur.samplers import Sampler
 from optur.storages import StorageClient

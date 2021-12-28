@@ -1,7 +1,7 @@
 import random
 
 from optur.proto.sampler_pb2 import RandomSamplerConfig, SamplerConfig
-from optur.proto.study_pb2 import Distribution, ParameterValue
+from optur.proto.search_space_pb2 import Distribution, ParameterValue
 from optur.samplers.sampler import Sampler
 
 
