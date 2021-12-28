@@ -1,4 +1,4 @@
-from typing import Dict, Sequence, Union
+from typing import Dict, Optional, Sequence, Union
 
 from optur.proto.search_space_pb2 import Distribution, ParameterValue
 from optur.proto.study_pb2 import Parameter, StudyInfo
@@ -29,7 +29,9 @@ class Trial:
         ret.CopyFrom(self._trial_proto)
         return ret
 
-    def suggest_parameter(self, name: str, distribution: Distribution) -> ParameterValue:
+    def suggest_parameter(
+        self, name: str, distribution: Optional[Distribution] = None
+    ) -> ParameterValue:
         """Draw a parameter from the distribution.
 
         Args:
@@ -45,6 +47,7 @@ class Trial:
             return self._trial_proto.parameters[name].value
         if name in self._suggested_parameters:
             return self._suggested_parameters[name]
+        assert distribution is not None  # TODO(tsuzuku): More graceful check.
         value = self._sampler.sample(distribution=distribution)
         self._trial_proto.parameters[name].CopyFrom(Parameter(value=value))
         return value

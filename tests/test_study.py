@@ -4,12 +4,14 @@ from unittest.mock import MagicMock, call
 
 from google.protobuf.timestamp_pb2 import Timestamp
 
+from optur.proto.search_space_pb2 import ParameterValue
 from optur.proto.study_pb2 import ObjectiveValue, StudyInfo
 from optur.proto.study_pb2 import Trial as TrialProto
 from optur.proto.study_pb2 import WorkerID
 from optur.study import (
     _ask,
     _infer_trial_state_from_objective_values,
+    _run_trial,
     _value_to_objective_value,
 )
 
@@ -245,4 +247,86 @@ def test_ask_uses_waiting_trial() -> None:
 
 def test_ask_sets_worker_id() -> None:
     # TODO(tsuzuku): Test this.
+    pass
+
+
+def test_run_trial_uses_joint_sample() -> None:
+    objective = MagicMock()
+    sampler = MagicMock()
+    storage = MagicMock()
+    queue = MagicMock()
+    objective.return_value = 0.1
+    sampler.last_update_time = None
+    sampler.joint_sample.return_value = {
+        "foo": ParameterValue(int_value=1),
+        "bar": ParameterValue(double_value=2.0),
+    }
+    storage.get_current_timestamp.return_value = None
+    storage.get_trials.return_value = []
+    queue.get_trial.return_value = None
+    _run_trial(
+        objective=objective,
+        study_info=StudyInfo(),
+        sampler=sampler,
+        storage_client=storage,
+        worker_id=WorkerID(),
+        catch=(),
+        callbacks=(),
+        trial_queue=queue,
+    )
+    objective.assert_called_once
+    trial = objective.call_args.args[0]
+    assert trial.suggest_parameter("foo") == ParameterValue(int_value=1)
+    assert trial.suggest_parameter("bar") == ParameterValue(double_value=2.0)
+
+
+def test_run_trial_uses_waiting_trial() -> None:
+    objective = MagicMock()
+    sampler = MagicMock()
+    storage = MagicMock()
+    queue = MagicMock()
+    objective.return_value = 0.1
+    sampler.last_update_time = None
+    sampler.joint_sample.return_value = {}
+    storage.get_current_timestamp.return_value = None
+    storage.get_trials.return_value = []
+    trial_id = uuid.uuid4().hex
+    queue.get_trial.return_value = TrialProto(trial_id=trial_id)
+    _run_trial(
+        objective=objective,
+        study_info=StudyInfo(),
+        sampler=sampler,
+        storage_client=storage,
+        worker_id=WorkerID(),
+        catch=(),
+        callbacks=(),
+        trial_queue=queue,
+    )
+    objective.assert_called_once
+    trial = objective.call_args.args[0]
+    assert trial.get_proto().trial_id == trial_id
+
+
+def test_run_trial_return_value_handling() -> None:
+    # TODO(tsuzuku)
+    pass
+
+
+def test_run_trial_calls_objective_function() -> None:
+    # TODO(tsuzuku)
+    pass
+
+
+def test_run_trial_sets_complete_state() -> None:
+    # TODO(tsuzuku)
+    pass
+
+
+def test_run_trial_sets_pruned_state() -> None:
+    # TODO(tsuzuku)
+    pass
+
+
+def test_run_trial_sets_failed_state() -> None:
+    # TODO(tsuzuku)
     pass

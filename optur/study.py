@@ -223,7 +223,7 @@ def _run_trial(
     storage_client: StorageClient,
     worker_id: WorkerID,
     catch: Tuple[Type[Exception], ...],
-    callbacks: Optional[List[Callable[[Trial], None]]],
+    callbacks: Optional[Sequence[Callable[[Trial], None]]],
     trial_queue: _TrialQueue,
 ) -> None:
     trial = _ask(
