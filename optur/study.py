@@ -1,9 +1,9 @@
+import concurrent.futures
 import itertools
 import math
 import uuid
 from collections.abc import Sequence as SequenceType
-from concurrent.futures import ThreadPoolExecutor
-from typing import Callable, Dict, List, Optional, Sequence, Tuple, Type, Union
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Type, Union
 
 from google.protobuf.timestamp_pb2 import Timestamp
 
@@ -41,18 +41,7 @@ class _Study:
         catch: Tuple[Type[Exception], ...] = (),
         callbacks: Optional[List[Callable[[Trial], None]]] = None,
     ) -> None:
-        if n_jobs > 1:
-            # Storage instance cannot be shared by multiple threads
-            # or processes. See :class:`~optur.storage.Storage`'s
-            # classdoc for more details.
-            clients = [self._storage.create_client() for _ in range(n_jobs)]
-        else:
-            # Avoid using storage's clients to reduce runtime overhead.
-            # TODO(tsuzuku): Benchmark.
-            clients = [self._storage]
-        with ThreadPoolExecutor(max_workers=n_jobs) as executor:
-            # TODO(tsuzuku): Use correct argument.s
-            executor.map(_run_trials, [() for _ in clients], timeout=timeout)
+        pass
 
 
 class Study(_Study):
@@ -212,24 +201,28 @@ def _optimize(
         # Avoid using storage's clients to reduce runtime overhead.
         # TODO(tsuzuku): Benchmark.
         clients = [(0, storage)]
-    with ThreadPoolExecutor(max_workers=n_jobs) as executor:
-        executor.map(
-            _run_trials,
-            [
-                (
-                    objective,
-                    study_info,
-                    sampler_config,
-                    WorkerID(client_id=client_id, thread_id=thread_id),
-                    client,
-                    n_trials,
-                    catch,
-                    callbacks,
-                )
-                for thread_id, client in clients
-            ],
-            timeout=timeout,
-        )
+    with concurrent.futures.ThreadPoolExecutor(max_workers=n_jobs) as executor:
+        futures: List[concurrent.futures.Future[Any]] = []
+        for thread_id, client in clients:
+            # Prefer submit over map for readability.
+            future = executor.submit(
+                _run_trials,
+                objective=objective,
+                study_info=study_info,
+                sampler_config=sampler_config,
+                worker_id=WorkerID(client_id=client_id, thread_id=thread_id),
+                storage_client=client,
+                n_trials=n_trials,
+                catch=catch,
+                callbacks=callbacks,
+            )
+            futures.append(future)
+        try:
+            for future in futures:
+                future.result(timeout=timeout)
+        except concurrent.futures.TimeoutError:
+            # TODO(tsuzuku): Log a timeout message.
+            pass
 
 
 def _run_trials(
