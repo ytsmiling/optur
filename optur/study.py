@@ -103,10 +103,16 @@ class Study(_Study):
 class _TrialQueue:
     """Trial queue for managing WAITING trials."""
 
-    def __init__(self, states: "Sequence[TrialProto.StateValue]") -> None:
+    def __init__(self, states: "Sequence[TrialProto.StateValue]", worker_id: WorkerID) -> None:
         self._trials: Dict[str, TrialProto] = {}
         self._timestamp: Optional[Timestamp] = None
         self._states = states
+        self._worker_id = worker_id
+
+    def _is_target_trial(self, trial: TrialProto) -> bool:
+        return trial.last_known_state in self._states and _does_own_trial(
+            self._worker_id, trial.worker_id
+        )
 
     @property
     def last_update_time(self) -> Optional[Timestamp]:
@@ -118,12 +124,12 @@ class _TrialQueue:
     def sync(self, trials: Sequence[TrialProto]) -> None:
         for trial in trials:
             if trial.trial_id in self._trials:
-                if trial.last_known_state in self._states:
+                if self._is_target_trial(trial):
                     self._trials[trial.trial_id] = trial
                 else:
                     del self._trials[trial.trial_id]
             else:
-                if trial.last_known_state in self._states:
+                if self._is_target_trial(trial):
                     self._trials[trial.trial_id] = trial
 
     def get_trial(self, state: "TrialProto.StateValue") -> Optional[TrialProto]:
@@ -132,6 +138,12 @@ class _TrialQueue:
                 del self._trials[trial.trial_id]
                 return trial
         return None
+
+
+def _does_own_trial(owner_worker_id: WorkerID, trial_worker_id: WorkerID) -> bool:
+    if owner_worker_id.client_id != trial_worker_id.client_id:
+        return False
+    return owner_worker_id.thread_id == 0 or owner_worker_id == trial_worker_id
 
 
 def _ask(
@@ -201,7 +213,7 @@ def _run_trials(
     # Unlike samplers, we are free to share _TrialQueue between processes or threads.
     # We're creating the queue here because the current implementation of `_TrialQueue`
     # is not process/thread-safe.
-    trial_queue = _TrialQueue([TrialProto.State.WAITING])
+    trial_queue = _TrialQueue([TrialProto.State.WAITING], worker_id=worker_id)
     trial_counter = itertools.count() if n_trials is None else range(n_trials)
     for _ in trial_counter:
         _run_trial(
