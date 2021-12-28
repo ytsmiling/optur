@@ -76,3 +76,116 @@ def test_suggest_parameter_skip_sample_when_fixed() -> None:
     assert value == expected_value
     assert sampler.mock_calls == []
     assert storage.mock_calls == []
+
+
+def test_reset_method_resets_suggested_parameters() -> None:
+    sampler = MagicMock()
+    storage = MagicMock()
+    distribution = Distribution(int_distribution=Distribution.IntDistribution(low=1, high=3))
+    original_value = ParameterValue(int_value=2)
+    sampler.sample.return_value = original_value
+    trial = Trial(
+        trial_proto=TrialProto(),
+        study_info=StudyInfo(),
+        storage=storage,
+        sampler=sampler,
+    )
+    trial.suggest_parameter(name="foo", distribution=distribution)
+    trial.reset(hard=False, reload=False)
+    new_value = ParameterValue(int_value=3)
+    sampler.sample.return_value = new_value
+    value = trial.suggest_parameter(name="foo", distribution=distribution)
+    assert value == new_value
+
+
+def test_reset_method_does_not_reset_fixed_parameters() -> None:
+    sampler = MagicMock()
+    storage = MagicMock()
+    sampler.joint_sample.return_value = {}
+    distribution = Distribution(int_distribution=Distribution.IntDistribution(low=1, high=3))
+    original_value = ParameterValue(int_value=2)
+    trial = Trial(
+        trial_proto=TrialProto(parameters={"foo": Parameter(value=original_value)}),
+        study_info=StudyInfo(),
+        storage=storage,
+        sampler=sampler,
+    )
+    trial.reset(hard=False, reload=False)
+    new_value = ParameterValue(int_value=3)
+    sampler.sample.return_value = new_value
+    value = trial.suggest_parameter(name="foo", distribution=distribution)
+    assert value == original_value
+
+
+def test_hard_reset_does_reset_fixed_parameters() -> None:
+    sampler = MagicMock()
+    storage = MagicMock()
+    distribution = Distribution(int_distribution=Distribution.IntDistribution(low=1, high=3))
+    original_value = ParameterValue(int_value=2)
+    trial = Trial(
+        trial_proto=TrialProto(parameters={"foo": Parameter(value=original_value)}),
+        study_info=StudyInfo(),
+        storage=storage,
+        sampler=sampler,
+    )
+    trial.reset(hard=True, reload=False)
+    new_value = ParameterValue(int_value=3)
+    sampler.sample.return_value = new_value
+    value = trial.suggest_parameter(name="foo", distribution=distribution)
+    assert value == new_value
+
+
+def test_reset_method_calls_joint_sample() -> None:
+    sampler = MagicMock()
+    storage = MagicMock()
+    trial = Trial(
+        trial_proto=TrialProto(),
+        study_info=StudyInfo(),
+        storage=storage,
+        sampler=sampler,
+    )
+    trial.reset(hard=False, reload=False)
+    # TODO(tsuzuku): Test arguments.
+    assert len(sampler.joint_sample.call_args_list) > 0
+
+
+def test_reset_does_not_sync_sampler() -> None:
+    sampler = MagicMock()
+    storage = MagicMock()
+    trial = Trial(
+        trial_proto=TrialProto(),
+        study_info=StudyInfo(),
+        storage=storage,
+        sampler=sampler,
+    )
+    trial.reset(hard=True, reload=False)
+    assert not storage.mock_calls
+    assert len(sampler.sync.call_args_list) == 0
+
+
+def test_hard_reset_does_sync_sampler() -> None:
+    sampler = MagicMock()
+    storage = MagicMock()
+    trial = Trial(
+        trial_proto=TrialProto(),
+        study_info=StudyInfo(),
+        storage=storage,
+        sampler=sampler,
+    )
+    trial.reset(hard=True, reload=False)
+    assert not storage.mock_calls
+    assert len(sampler.sync.call_args_list) == 0
+
+
+def test_reset_with_reload_sync_sampler() -> None:
+    sampler = MagicMock()
+    storage = MagicMock()
+    trial = Trial(
+        trial_proto=TrialProto(),
+        study_info=StudyInfo(),
+        storage=storage,
+        sampler=sampler,
+    )
+    trial.reset(hard=False, reload=True)
+    assert len(storage.get_trials.call_args_list) > 0
+    assert len(sampler.sync.call_args_list) > 0
