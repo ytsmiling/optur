@@ -15,6 +15,7 @@ from optur.proto.study_pb2 import WorkerID
 from optur.study import (
     _ask,
     _infer_trial_state_from_objective_values,
+    _optimize,
     _run_trial,
     _run_trials,
     _value_to_objective_value,
@@ -443,6 +444,26 @@ def test_run_trials_call_objective_multiple_times() -> None:
         worker_id=WorkerID(),
         storage_client=storage,
         n_trials=7,
+        catch=(),
+        callbacks=(),
+    )
+    assert len(objective.call_args_list) == 7
+
+
+def test_optimize_single_worker_sanity_check() -> None:
+    objective = MagicMock()
+    storage = MagicMock()
+    storage.get_current_timestamp.return_value = None
+    storage.get_trials.return_value = []
+    _optimize(
+        objective=objective,
+        study_info=StudyInfo(),
+        sampler_config=SamplerConfig(random=RandomSamplerConfig()),
+        client_id=uuid.uuid4().hex,
+        storage=storage,
+        n_trials=7,
+        timeout=None,
+        n_jobs=1,
         catch=(),
         callbacks=(),
     )

@@ -191,6 +191,47 @@ def _ask(
     return ret
 
 
+def _optimize(
+    objective: ObjectiveFuncType,
+    study_info: StudyInfo,
+    sampler_config: SamplerConfig,
+    client_id: str,
+    storage: Storage,
+    n_trials: Optional[int],
+    timeout: Optional[float],
+    n_jobs: int,
+    catch: Tuple[Type[Exception], ...],
+    callbacks: Optional[List[Callable[[Trial], None]]],
+) -> None:
+    if n_jobs > 1:
+        # Storage instance cannot be shared by multiple threads
+        # or processes. See :class:`~optur.storage.Storage`'s
+        # classdoc for more details.
+        clients = [(idx + 1, storage.create_client()) for idx in range(n_jobs)]
+    else:
+        # Avoid using storage's clients to reduce runtime overhead.
+        # TODO(tsuzuku): Benchmark.
+        clients = [(0, storage)]
+    with ThreadPoolExecutor(max_workers=n_jobs) as executor:
+        executor.map(
+            _run_trials,
+            [
+                (
+                    objective,
+                    study_info,
+                    sampler_config,
+                    WorkerID(client_id=client_id, thread_id=thread_id),
+                    client,
+                    n_trials,
+                    catch,
+                    callbacks,
+                )
+                for thread_id, client in clients
+            ],
+            timeout=timeout,
+        )
+
+
 def _run_trials(
     objective: ObjectiveFuncType,
     study_info: StudyInfo,
@@ -201,6 +242,7 @@ def _run_trials(
     catch: Tuple[Type[Exception], ...],
     callbacks: Optional[Sequence[Callable[[Trial], None]]],
 ) -> None:
+    print("foo", flush=True)
     # We need to create sampler instances per thread because
     # they are neither thread-safe nor process-safe.
     # Additionally, if we share sampler instances among workers,
