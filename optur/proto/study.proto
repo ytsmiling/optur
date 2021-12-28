@@ -82,10 +82,6 @@ message Trial {
     repeated Report reports = 8;
     // An ID to distinguish who created the trial.
     // This ID is used to avoid contention during distributed search.
-    // For example, enqueued trials can be used exclusively from the same worker.
-    // "Worker" can be finer-grained notion than processes or threads.
-    // For example, in HyperBand, several samplers are instantiated in a same process,
-    // and all of them are treated as different workers.
     WorkerID worker_id = 9;
     // Create time of the trial since epoch.
     google.protobuf.Timestamp create_time = 10;
@@ -101,11 +97,7 @@ message Trial {
 }
 
 // An ID to distinguish workers.
-// "Worker" can be finer-grained notion than processes or threads.
-// For example, in HyperBand, several samplers are instantiated in a same process,
-// and all of them are treated as different workers.
-// TODO(tsuzuku): It turned out that `bucket_id` is not used.
-// TODO(tsuzuku): It turned out that who to collect WAITING trials is difficult when `bucket_id` is present.
+// "Worker" corresponds to a process or a thread.
 message WorkerID {
     // User-defined UUID of the worker.
     // This ID corresponds to an unique `Study` instance.
@@ -118,9 +110,6 @@ message WorkerID {
     // This value must be unique among processes/threads with the same `client_id`.
     // Zero means not set.
     int64 thread_id = 2;
-    // Bucket ID of successive halving algorithms like hyperband.
-    // Zero means not set.
-    int64 bucket_id = 3;
 }
 
 // Data registered by `trial.report()`.

@@ -351,18 +351,16 @@ class WorkerID(google___protobuf___message___Message):
     DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
     client_id: typing___Text = ...
     thread_id: builtin___int = ...
-    bucket_id: builtin___int = ...
     def __init__(
         self,
         *,
         client_id: typing___Optional[typing___Text] = None,
         thread_id: typing___Optional[builtin___int] = None,
-        bucket_id: typing___Optional[builtin___int] = None,
     ) -> None: ...
     def ClearField(
         self,
         field_name: typing_extensions___Literal[
-            "bucket_id", b"bucket_id", "client_id", b"client_id", "thread_id", b"thread_id"
+            "client_id", b"client_id", "thread_id", b"thread_id"
         ],
     ) -> None: ...
 
