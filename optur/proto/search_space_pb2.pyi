@@ -126,12 +126,30 @@ class Distribution(google___protobuf___message___Message):
             self, field_name: typing_extensions___Literal["choices", b"choices"]
         ) -> None: ...
     type___CategoricalDistribution = CategoricalDistribution
+    class FixedDistribution(google___protobuf___message___Message):
+        DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
+        @property
+        def value(self) -> type___ParameterValue: ...
+        def __init__(
+            self,
+            *,
+            value: typing___Optional[type___ParameterValue] = None,
+        ) -> None: ...
+        def HasField(
+            self, field_name: typing_extensions___Literal["value", b"value"]
+        ) -> builtin___bool: ...
+        def ClearField(
+            self, field_name: typing_extensions___Literal["value", b"value"]
+        ) -> None: ...
+    type___FixedDistribution = FixedDistribution
     @property
     def float_distribution(self) -> type___Distribution.FloatDistribution: ...
     @property
     def int_distribution(self) -> type___Distribution.IntDistribution: ...
     @property
     def categorical_distribution(self) -> type___Distribution.CategoricalDistribution: ...
+    @property
+    def fixed_distribution(self) -> type___Distribution.FixedDistribution: ...
     def __init__(
         self,
         *,
@@ -140,6 +158,7 @@ class Distribution(google___protobuf___message___Message):
         categorical_distribution: typing___Optional[
             type___Distribution.CategoricalDistribution
         ] = None,
+        fixed_distribution: typing___Optional[type___Distribution.FixedDistribution] = None,
     ) -> None: ...
     def HasField(
         self,
@@ -148,6 +167,8 @@ class Distribution(google___protobuf___message___Message):
             b"categorical_distribution",
             "distribution",
             b"distribution",
+            "fixed_distribution",
+            b"fixed_distribution",
             "float_distribution",
             b"float_distribution",
             "int_distribution",
@@ -161,6 +182,8 @@ class Distribution(google___protobuf___message___Message):
             b"categorical_distribution",
             "distribution",
             b"distribution",
+            "fixed_distribution",
+            b"fixed_distribution",
             "float_distribution",
             b"float_distribution",
             "int_distribution",
@@ -170,7 +193,7 @@ class Distribution(google___protobuf___message___Message):
     def WhichOneof(
         self, oneof_group: typing_extensions___Literal["distribution", b"distribution"]
     ) -> typing_extensions___Literal[
-        "float_distribution", "int_distribution", "categorical_distribution"
+        "float_distribution", "int_distribution", "categorical_distribution", "fixed_distribution"
     ]: ...
 
 type___Distribution = Distribution

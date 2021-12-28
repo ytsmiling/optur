@@ -29,10 +29,15 @@ message Distribution {
         repeated ParameterValue choices = 1;
     }
 
+    message FixedDistribution {
+        ParameterValue value = 1;
+    }
+
     oneof distribution {
         FloatDistribution float_distribution = 1;
         IntDistribution int_distribution = 2;
         CategoricalDistribution categorical_distribution = 3;
+        FixedDistribution fixed_distribution = 4;
     }
     // TODO(tsuzuku): Support prior distribution.
 }
