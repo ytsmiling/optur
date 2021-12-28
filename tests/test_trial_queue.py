@@ -18,7 +18,7 @@ def test_update_timestamp() -> None:
 
 
 def test_enqueue_and_get_trial() -> None:
-    worker_id = WorkerID()
+    worker_id = WorkerID(client_id=uuid.uuid4().hex)
     queue = _TrialQueue(states=(Trial.State.WAITING,), worker_id=worker_id)
     assert queue.get_trial(state=Trial.State.WAITING) is None
     waiting_trials = [
@@ -36,9 +36,19 @@ def test_enqueue_and_get_trial() -> None:
                 last_known_state=Trial.State.RUNNING,
                 worker_id=worker_id,
             ),
+            Trial(
+                trial_id=uuid.uuid4().hex,
+                last_known_state=Trial.State.WAITING,
+                worker_id=WorkerID(client_id=uuid.uuid4().hex),
+            ),
         ]
         + waiting_trials
         + [
+            Trial(
+                trial_id=uuid.uuid4().hex,
+                last_known_state=Trial.State.WAITING,
+                worker_id=WorkerID(client_id=uuid.uuid4().hex),
+            ),
             Trial(
                 trial_id=uuid.uuid4().hex,
                 last_known_state=Trial.State.COMPLETED,
