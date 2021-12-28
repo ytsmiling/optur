@@ -75,12 +75,12 @@ class Trial:
             value = self._sampler.sample(
                 distribution=Distribution(
                     categorical_distribution=Distribution.CategoricalDistribution(
-                        choices=[]  # TODO(tsuzuku): Implement this.
+                        choices=[_value_to_parameter_value(choice) for choice in choices]
                     )
                 )
             )
         self._trial_proto.parameters[name].value.CopyFrom(value)
-        return value.double_value  # TODO(tsuzuku): Handle other types.
+        return _parameter_value_to_value(value)
 
     @overload
     def set_parameter(self, name: str, value: int, *, force: bool = False) -> int:
@@ -148,3 +148,17 @@ class Trial:
     def flush(self) -> None:
         """Write this trial to the storage."""
         self._storage.write_trial(self._trial_proto)
+
+
+def _value_to_parameter_value(value: Union[int, float, str]) -> ParameterValue:
+    pass
+
+
+def _parameter_value_to_value(value: ParameterValue) -> Union[int, float, str]:
+    if value.HasField("int_value"):
+        return value.int_value
+    if value.HasField("double_value"):
+        return value.double_value
+    if value.HasField("string_value"):
+        return value.string_value
+    raise ValueError("")  # TODO(tsuzuku)
