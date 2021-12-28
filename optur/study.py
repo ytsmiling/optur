@@ -135,7 +135,7 @@ class _TrialQueue:
 
 
 def _ask(
-    study_id: str,
+    study_info: StudyInfo,
     sampler: Sampler,
     storage: StorageClient,
     trial_queue: _TrialQueue,
@@ -152,7 +152,7 @@ def _ask(
     # Sync trial_queue and storage.
     queue_timestamp = trial_queue.last_update_time
     new_timestamp = storage.get_current_timestamp()
-    trials = storage.get_trials(study_id=study_id, timestamp=queue_timestamp)
+    trials = storage.get_trials(study_id=study_info.study_id, timestamp=queue_timestamp)
     trial_queue.sync(trials)
     trial_queue.update_timestamp(new_timestamp)
     # Get waiting trial if exists.
@@ -169,12 +169,12 @@ def _ask(
     sampler_timestamp = sampler.last_update_time
     if queue_timestamp != sampler_timestamp:
         new_timestamp = storage.get_current_timestamp()
-        trials = storage.get_trials(study_id=study_id, timestamp=sampler_timestamp)
+        trials = storage.get_trials(study_id=study_info.study_id, timestamp=sampler_timestamp)
     sampler.sync(trials)
     sampler.update_timestamp(new_timestamp)
     # TODO(tsuzuku): Persist trial when necessary.
     # Call joint_sample of sampler
-    ret = Trial(trial_proto=initial_trial, storage=storage, sampler=sampler)
+    ret = Trial(trial_proto=initial_trial, study_info=study_info, storage=storage, sampler=sampler)
     # TODO(tsuzuku): Pass fixed_parameters and search_space.
     ret.update_parameters(sampler.joint_sample())
     return ret
@@ -182,7 +182,7 @@ def _ask(
 
 def _run_trials(
     objective: ObjectiveFuncType,
-    study_id: str,
+    study_info: StudyInfo,
     sampler_config: SamplerConfig,
     worker_id: WorkerID,
     storage_client: StorageClient,
@@ -206,7 +206,7 @@ def _run_trials(
     trial_counter = itertools.count() if n_trials is None else range(n_trials)
     for _ in trial_counter:
         _run_trial(
-            study_id=study_id,
+            study_info=study_info,
             objective=objective,
             sampler=sampler,
             storage_client=storage_client,
@@ -219,7 +219,7 @@ def _run_trials(
 
 def _run_trial(
     objective: ObjectiveFuncType,
-    study_id: str,
+    study_info: StudyInfo,
     sampler: Sampler,
     storage_client: StorageClient,
     worker_id: WorkerID,
@@ -228,7 +228,7 @@ def _run_trial(
     trial_queue: _TrialQueue,
 ) -> None:
     trial = _ask(
-        study_id=study_id,
+        study_info=study_info,
         sampler=sampler,
         storage=storage_client,
         worker_id=worker_id,
