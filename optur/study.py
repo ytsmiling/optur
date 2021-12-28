@@ -153,8 +153,8 @@ def _ask(
     queue_timestamp = trial_queue.last_update_time
     new_timestamp = storage.get_current_timestamp()
     trials = storage.get_trials(study_id=study_info.study_id, timestamp=queue_timestamp)
-    trial_queue.sync(trials)
-    trial_queue.update_timestamp(new_timestamp)
+    trial_queue.sync(trials=trials)
+    trial_queue.update_timestamp(timestamp=new_timestamp)
     # Get waiting trial if exists.
     initial_trial = trial_queue.get_trial(state=TrialProto.State.WAITING)
     if initial_trial is None:
@@ -170,8 +170,8 @@ def _ask(
     if queue_timestamp != sampler_timestamp:
         new_timestamp = storage.get_current_timestamp()
         trials = storage.get_trials(study_id=study_info.study_id, timestamp=sampler_timestamp)
-    sampler.sync(trials)
-    sampler.update_timestamp(new_timestamp)
+    sampler.sync(trials=trials)
+    sampler.update_timestamp(timestamp=new_timestamp)
     # TODO(tsuzuku): Persist trial when necessary.
     # Call joint_sample of sampler
     ret = Trial(trial_proto=initial_trial, study_info=study_info, storage=storage, sampler=sampler)
