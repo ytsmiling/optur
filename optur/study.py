@@ -201,7 +201,7 @@ def _optimize(
     timeout: Optional[float],
     n_jobs: int,
     catch: Tuple[Type[Exception], ...],
-    callbacks: Optional[List[Callable[[Trial], None]]],
+    callbacks: Optional[Sequence[Callable[[Trial], None]]],
 ) -> None:
     if n_jobs > 1:
         # Storage instance cannot be shared by multiple threads
