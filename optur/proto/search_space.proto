@@ -30,7 +30,7 @@ message Distribution {
     }
 
     message FixedDistribution {
-        ParameterValue value = 1;
+        repeated ParameterValue values = 1;
     }
 
     oneof distribution {

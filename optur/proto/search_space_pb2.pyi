@@ -129,17 +129,18 @@ class Distribution(google___protobuf___message___Message):
     class FixedDistribution(google___protobuf___message___Message):
         DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
         @property
-        def value(self) -> type___ParameterValue: ...
+        def values(
+            self,
+        ) -> google___protobuf___internal___containers___RepeatedCompositeFieldContainer[
+            type___ParameterValue
+        ]: ...
         def __init__(
             self,
             *,
-            value: typing___Optional[type___ParameterValue] = None,
+            values: typing___Optional[typing___Iterable[type___ParameterValue]] = None,
         ) -> None: ...
-        def HasField(
-            self, field_name: typing_extensions___Literal["value", b"value"]
-        ) -> builtin___bool: ...
         def ClearField(
-            self, field_name: typing_extensions___Literal["value", b"value"]
+            self, field_name: typing_extensions___Literal["values", b"values"]
         ) -> None: ...
     type___FixedDistribution = FixedDistribution
     @property

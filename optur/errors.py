@@ -3,6 +3,7 @@ OK = 0
 ALREADY_EXISTS = 1
 NOT_FOUND = 2
 UNINITIALIZED = 3
+INCOMPATIBLE_SEARCHSPACE = 4
 
 
 class PrunedException(Exception):
@@ -29,3 +30,8 @@ class NotFoundError(StatusError):
 class UnInitializedError(StatusError):
     def __init__(self, message: str) -> None:
         super().__init__(message, UNINITIALIZED)
+
+
+class InCompatibleSearchSpaceError(StatusError):
+    def __init__(self, message: str) -> None:
+        super().__init__(message, INCOMPATIBLE_SEARCHSPACE)
