@@ -124,7 +124,9 @@ class Trial:
             return False
         return True
 
-    def clear(self, *, hard: bool, reload: bool) -> None:
+    # This method is named `reset`, not `clear`, because this method
+    # calls `sampler.joint_sample` and reset suggested parameters.
+    def reset(self, *, hard: bool, reload: bool) -> None:
         if hard:
             self._initial_trial_proto.parameters.clear()
             del self._initial_trial_proto.values[:]
@@ -139,11 +141,12 @@ class Trial:
             )
             self._sampler.sync(trials)
             self._sampler.update_timestamp(timestamp)
-            self._suggested_parameters = self._sampler.joint_sample(
-                fixed_parameters={
-                    key: param.value for key, param in self._initial_trial_proto.parameters.items()
-                }
-            )
+        self._suggested_parameters = self._sampler.joint_sample(
+            fixed_parameters={
+                key: param.value for key, param in self._initial_trial_proto.parameters.items()
+            },
+            search_space=None,  # TODO(tsuzuku): Set study_info.search_space.
+        )
 
     def flush(self) -> None:
         """Write this trial to the storage."""

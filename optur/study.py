@@ -9,7 +9,6 @@ from google.protobuf.timestamp_pb2 import Timestamp
 
 from optur.errors import PrunedException
 from optur.proto.sampler_pb2 import SamplerConfig
-from optur.proto.search_space_pb2 import Distribution
 from optur.proto.study_pb2 import ObjectiveValue, StudyInfo
 from optur.proto.study_pb2 import Trial as TrialProto
 from optur.proto.study_pb2 import WorkerID
@@ -176,11 +175,7 @@ def _ask(
     # TODO(tsuzuku): Persist trial when necessary.
     # Call joint_sample of sampler
     ret = Trial(trial_proto=initial_trial, study_info=study_info, storage=storage, sampler=sampler)
-    # TODO(tsuzuku): Pass fixed_parameters and search_space.
-    parameters = sampler.joint_sample()
-    for name, _parameter in parameters.items():
-        # TODO(tsuzuku): Use FixedDistribution.
-        ret.suggest_parameter(name, Distribution(int_distribution=Distribution.IntDistribution()))
+    ret.reset(hard=False, reload=False)
     return ret
 
 
