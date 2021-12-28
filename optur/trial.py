@@ -29,7 +29,7 @@ class Trial:
         ret.CopyFrom(self._trial_proto)
         return ret
 
-    def suggest(self, name: str, distribution: Distribution) -> ParameterValue:
+    def suggest_parameter(self, name: str, distribution: Distribution) -> ParameterValue:
         # TODO(tsuzuku): Check distribution compatibility.
         if name in self._trial_proto.parameters:
             return self._trial_proto.parameters[name].value
@@ -44,7 +44,7 @@ class Trial:
         distribution = Distribution(
             int_distribution=Distribution.IntDistribution(low=low, high=high, log_scale=log_scale)
         )
-        return self.suggest(name=name, distribution=distribution).int_value
+        return self.suggest_parameter(name=name, distribution=distribution).int_value
 
     def suggest_float(self, name: str, low: float, high: float, *, log_scale: bool) -> float:
         """Suggest float parameter."""
@@ -53,7 +53,7 @@ class Trial:
                 low=low, high=high, log_scale=log_scale
             )
         )
-        return self.suggest(name=name, distribution=distribution).double_value
+        return self.suggest_parameter(name=name, distribution=distribution).double_value
 
     def suggest_categorical(
         self, name: str, choices: Sequence[Union[int, float, str]]
@@ -64,7 +64,7 @@ class Trial:
                 choices=[_value_to_parameter_value(choice) for choice in choices]
             )
         )
-        value = self.suggest(name=name, distribution=distribution)
+        value = self.suggest_parameter(name=name, distribution=distribution)
         return _parameter_value_to_value(value)
 
     def set_parameter(
@@ -102,9 +102,6 @@ class Trial:
                 return True
             return False
         return True
-
-    def update_parameters(self, parameters: Dict[str, ParameterValue]) -> None:
-        pass
 
     def clear(self, *, hard: bool, reload: bool) -> None:
         if hard:
