@@ -1,14 +1,14 @@
 import random
 
-from optur.proto.sampler_pb2 import RandomSamplerConfig, SamplerConfig
+from optur.proto.sampler_pb2 import SamplerConfig
 from optur.proto.search_space_pb2 import Distribution, ParameterValue
 from optur.samplers.sampler import Sampler
 
 
 class RandomSampler(Sampler):
-    def __init__(self, config: RandomSamplerConfig) -> None:
-        super().__init__(SamplerConfig(random=config))
-        self._config = config
+    def __init__(self, sampler_config: SamplerConfig) -> None:
+        assert sampler_config.HasField("random")
+        super().__init__(sampler_config=sampler_config)
 
     def sample(self, distribution: Distribution) -> ParameterValue:
         """Sample a parameter."""

@@ -1,4 +1,4 @@
-from optur.proto.sampler_pb2 import RandomSamplerConfig
+from optur.proto.sampler_pb2 import RandomSamplerConfig, SamplerConfig
 from optur.proto.search_space_pb2 import Distribution, ParameterValue, SearchSpace
 from optur.samplers.random import RandomSampler
 
@@ -8,7 +8,7 @@ CD = Distribution.CategoricalDistribution
 
 
 def test_random_sampler_backend_respects_float_distribution_ranges() -> None:
-    sampler = RandomSampler(RandomSamplerConfig())
+    sampler = RandomSampler(sampler_config=SamplerConfig(random=RandomSamplerConfig()))
     for _ in range(10):
         distribution = Distribution(float_distribution=FD(low=10, high=100, log_scale=False))
         v = sampler.sample(distribution=distribution)
@@ -20,7 +20,7 @@ def test_random_sampler_backend_respects_float_distribution_ranges() -> None:
 
 
 def test_random_sampler_backend_respects_int_distribution_ranges() -> None:
-    sampler = RandomSampler(RandomSamplerConfig())
+    sampler = RandomSampler(sampler_config=SamplerConfig(random=RandomSamplerConfig()))
     for _ in range(10):
         distribution = Distribution(int_distribution=ID(low=10, high=100, log_scale=False))
         v = sampler.sample(distribution=distribution)
@@ -32,7 +32,7 @@ def test_random_sampler_backend_respects_int_distribution_ranges() -> None:
 
 
 def test_random_sampler_backend_respects_categorical_distribution_choices() -> None:
-    sampler = RandomSampler(RandomSamplerConfig())
+    sampler = RandomSampler(sampler_config=SamplerConfig(random=RandomSamplerConfig()))
     for _ in range(10):
         choices = [
             ParameterValue(string_value="foo"),
@@ -53,7 +53,7 @@ def test_random_sampler_backend_respects_categorical_distribution_choices() -> N
 
 
 def test_random_sampler_joint_sample_respects_fixed_parameters() -> None:
-    sampler = RandomSampler(RandomSamplerConfig())
+    sampler = RandomSampler(sampler_config=SamplerConfig(random=RandomSamplerConfig()))
     fixed_parameters = {
         "foo": ParameterValue(int_value=3),
         "bar": ParameterValue(double_value=2.4),
@@ -64,7 +64,7 @@ def test_random_sampler_joint_sample_respects_fixed_parameters() -> None:
 
 
 def test_random_sampler_joint_sample_respects_search_space() -> None:
-    sampler = RandomSampler(RandomSamplerConfig())
+    sampler = RandomSampler(sampler_config=SamplerConfig(random=RandomSamplerConfig()))
     search_space = SearchSpace(
         distributions={
             "foo": Distribution(int_distribution=ID(low=10, high=100)),
@@ -77,7 +77,7 @@ def test_random_sampler_joint_sample_respects_search_space() -> None:
 
 
 def test_random_sampler_joint_sample_prioritizes_fixed_parameters() -> None:
-    sampler = RandomSampler(RandomSamplerConfig())
+    sampler = RandomSampler(sampler_config=SamplerConfig(random=RandomSamplerConfig()))
     fixed_parameters = {
         "foo": ParameterValue(int_value=3),
         "bar": ParameterValue(double_value=2.4),

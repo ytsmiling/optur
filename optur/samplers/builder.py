@@ -4,5 +4,6 @@ from optur.samplers.sampler import Sampler
 
 
 def create_sampler(sampler_config: SamplerConfig) -> Sampler:
-    # TODO(tsuzuku): Implement this function.
-    return RandomSampler(sampler_config.random)
+    if sampler_config.HasField("random"):
+        return RandomSampler(sampler_config=sampler_config)
+    raise NotImplementedError("")  # TODO(tsuzuku)
