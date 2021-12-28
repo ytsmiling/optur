@@ -252,9 +252,9 @@ def _run_trial(
         proto.last_known_state = _infer_trial_state_from_objective_values(objective_values)
     if callbacks:
         for callback in callbacks:
+            # TODO(tsuzuku): Think about a better type to pass callbacks.
             callback(trial)
-    # TODO(tsuzuku): Values and states are not synced yet.
-    trial.flush()
+    storage_client.write_trial(proto)
 
 
 def _value_to_objective_value(value: float) -> ObjectiveValue:

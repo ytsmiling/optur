@@ -1,7 +1,9 @@
 import math
 import uuid
+from typing import Any
 from unittest.mock import MagicMock, call
 
+import pytest  # type: ignore
 from google.protobuf.timestamp_pb2 import Timestamp
 
 from optur.proto.search_space_pb2 import ParameterValue
@@ -307,14 +309,42 @@ def test_run_trial_uses_waiting_trial() -> None:
     assert trial.get_proto().trial_id == trial_id
 
 
-def test_run_trial_return_value_handling() -> None:
-    # TODO(tsuzuku)
-    pass
-
-
-def test_run_trial_calls_objective_function() -> None:
-    # TODO(tsuzuku)
-    pass
+@pytest.mark.parametrize(  # type: ignore
+    "values,state",
+    [
+        (0.1, TrialProto.State.COMPLETED),
+        ([0.1, 0.2], TrialProto.State.COMPLETED),
+        ([0.1, math.inf], TrialProto.State.PARTIALLY_FAILED),
+        ([0.1, -math.inf], TrialProto.State.PARTIALLY_FAILED),
+        ([math.inf, -math.inf], TrialProto.State.PARTIALLY_FAILED),
+        ([math.nan, -math.inf], TrialProto.State.PARTIALLY_FAILED),
+        ([math.nan, 0.2], TrialProto.State.PARTIALLY_FAILED),
+    ],
+)
+def test_run_trial_return_value_handling(values: Any, state: "TrialProto.StateValue") -> None:
+    objective = MagicMock()
+    sampler = MagicMock()
+    storage = MagicMock()
+    queue = MagicMock()
+    sampler.last_update_time = None
+    sampler.joint_sample.return_value = {}
+    storage.get_current_timestamp.return_value = None
+    storage.get_trials.return_value = []
+    objective.return_value = values
+    queue.get_trial.return_value = None
+    _run_trial(
+        objective=objective,
+        study_info=StudyInfo(),
+        sampler=sampler,
+        storage_client=storage,
+        worker_id=WorkerID(),
+        catch=(),
+        callbacks=(),
+        trial_queue=queue,
+    )
+    storage.write_trial.assert_called_once
+    trial = storage.write_trial.call_args.args[0]
+    assert trial.last_known_state == state
 
 
 def test_run_trial_sets_complete_state() -> None:
