@@ -19,32 +19,7 @@ from optur.trial import Trial
 ObjectiveFuncType = Callable[[Trial], Union[float, Sequence[float]]]
 
 
-class _Study:
-    def __init__(
-        self,
-        study_info: StudyInfo,
-        sampler_config: SamplerConfig,
-        storage: Storage,
-    ) -> None:
-        self._study_info = study_info
-        self._sampler_config = sampler_config
-        self._storage = storage
-
-    def optimize(
-        self,
-        objective: ObjectiveFuncType,
-        client_id: str,
-        *,
-        n_trials: Optional[int] = None,
-        timeout: Optional[float] = None,
-        n_jobs: int = 1,
-        catch: Tuple[Type[Exception], ...] = (),
-        callbacks: Optional[List[Callable[[Trial], None]]] = None,
-    ) -> None:
-        pass
-
-
-class Study(_Study):
+class Study:
     def __init__(
         self,
         study_info: StudyInfo,
@@ -52,18 +27,15 @@ class Study(_Study):
         sampler: Sampler,
         client_id: Optional[str] = None,
     ) -> None:
-        super().__init__(
-            study_info=study_info,
-            storage=storage,
-            sampler_config=sampler.to_sampler_config(),
-        )
+        super().__init__()
+        self._study_info = study_info
         self._storage = storage
-        # The following three (sampler, client_id, last_update_time) should not be shared by
+        self._client_id = client_id or uuid.uuid4().hex
+        # The following two (sampler, last_update_time) should not be shared by
         # multiple threads or processes.
         # Thus, they are re-instantiated in Study.optimize() function.
         # These three are instantated here for study.ask() and study.tell() APIs.
         self._sampler = sampler
-        self._client_id = client_id
         self._last_update_time = Timestamp(seconds=0, nanos=0)
 
     def ask(self) -> Trial:
@@ -81,6 +53,29 @@ class Study(_Study):
         # Update trial
         # Write trial
         pass
+
+    def optimize(
+        self,
+        objective: ObjectiveFuncType,
+        *,
+        n_trials: Optional[int] = None,
+        timeout: Optional[float] = None,
+        n_jobs: int = 1,
+        catch: Tuple[Type[Exception], ...] = (),
+        callbacks: Optional[List[Callable[[Trial], None]]] = None,
+    ) -> None:
+        _optimize(
+            objective=objective,
+            study_info=self._study_info,
+            sampler_config=self._sampler.to_sampler_config(),
+            client_id=self._client_id,
+            storage=self._storage,
+            n_trials=n_trials,
+            timeout=timeout,
+            n_jobs=n_jobs,
+            catch=catch,
+            callbacks=callbacks,
+        )
 
     def add_trial(self, trial: TrialProto) -> None:
         pass
