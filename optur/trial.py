@@ -1,4 +1,4 @@
-from typing import Dict, Sequence, Union, overload
+from typing import Dict, Sequence, Union
 
 from optur.proto.search_space_pb2 import Distribution, ParameterValue
 from optur.proto.study_pb2 import Parameter, StudyInfo
@@ -41,15 +41,17 @@ class Trial:
 
     def suggest_int(self, name: str, low: int, high: int, *, log_scale: bool) -> int:
         """Suggest int parameter."""
-        distribution=Distribution(
+        distribution = Distribution(
             int_distribution=Distribution.IntDistribution(low=low, high=high, log_scale=log_scale)
         )
         return self.suggest(name=name, distribution=distribution).int_value
 
     def suggest_float(self, name: str, low: float, high: float, *, log_scale: bool) -> float:
         """Suggest float parameter."""
-        distribution=Distribution(
-            float_distribution=Distribution.FloatDistribution(low=low, high=high, log_scale=log_scale)
+        distribution = Distribution(
+            float_distribution=Distribution.FloatDistribution(
+                low=low, high=high, log_scale=log_scale
+            )
         )
         return self.suggest(name=name, distribution=distribution).double_value
 
@@ -57,7 +59,7 @@ class Trial:
         self, name: str, choices: Sequence[Union[int, float, str]]
     ) -> Union[int, float, str]:
         """Suggest categorical parameter."""
-        distribution=Distribution(
+        distribution = Distribution(
             categorical_distribution=Distribution.CategoricalDistribution(
                 choices=[_value_to_parameter_value(choice) for choice in choices]
             )
@@ -65,30 +67,27 @@ class Trial:
         value = self.suggest(name=name, distribution=distribution)
         return _parameter_value_to_value(value)
 
-    @overload
-    def set_parameter(self, name: str, value: int, *, force: bool = False) -> int:
-        ...
-
-    @overload
-    def set_parameter(self, name: str, value: float, *, force: bool = False) -> float:
-        ...
-
-    @overload
-    def set_parameter(self, name: str, value: str, *, force: bool = False) -> str:
-        ...
-
     def set_parameter(
-        self, name: str, value: Union[int, float, str], *, force: bool = False
-    ) -> Union[int, float, str]:
+        self, name: str, value: ParameterValue, *, force: bool = False
+    ) -> ParameterValue:
+        # TODO(tsuzuku): Check distribution compatibility.
         if not force and name in self._trial_proto.parameters:
             parameter_value = self._trial_proto.parameters[name].value
             if name in self._suggested_parameters:
                 del self._suggested_parameters[name]
-            return parameter_value.int_value  # TODO(tsuzuku): Handle other types.
+            return parameter_value
         else:
-            # TODO(tsuzuku): Set value.
-            self._trial_proto.parameters[name].CopyFrom(Parameter(value=ParameterValue()))
+            self._trial_proto.parameters[name].CopyFrom(Parameter(value=value))
             return value
+
+    def set_int(self, name: str, value: int, *, force: bool = False) -> int:
+        pass
+
+    def set_float(self, name: str, value: float, *, force: bool = False) -> float:
+        pass
+
+    def set_string(self, name: str, value: str, *, force: bool = False) -> str:
+        pass
 
     def clear_parameter(self, name: str, *, force: bool) -> bool:
         if name in self._suggested_parameters:
