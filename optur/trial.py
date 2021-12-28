@@ -29,57 +29,40 @@ class Trial:
         ret.CopyFrom(self._trial_proto)
         return ret
 
+    def suggest(self, name: str, distribution: Distribution) -> ParameterValue:
+        # TODO(tsuzuku): Check distribution compatibility.
+        if name in self._trial_proto.parameters:
+            return self._trial_proto.parameters[name].value
+        if name in self._suggested_parameters:
+            return self._suggested_parameters[name]
+        value = self._sampler.sample(distribution=distribution)
+        self._trial_proto.parameters[name].value.CopyFrom(value)
+        return value
+
     def suggest_int(self, name: str, low: int, high: int, *, log_scale: bool) -> int:
         """Suggest int parameter."""
-        if name in self._trial_proto.parameters:
-            value = self._trial_proto.parameters[name].value
-            if not value.HasField("int_value"):
-                raise RuntimeError()  # TODO(tsuzuku)
-            return value.int_value
-        value = self._sampler.sample(
-            distribution=Distribution(
-                int_distribution=Distribution.IntDistribution(
-                    low=low, high=high, log_scale=log_scale
-                )
-            )
+        distribution=Distribution(
+            int_distribution=Distribution.IntDistribution(low=low, high=high, log_scale=log_scale)
         )
-        assert value.HasField("int_value")
-        self._trial_proto.parameters[name].value.CopyFrom(value)
-        return value.int_value
+        return self.suggest(name=name, distribution=distribution).int_value
 
     def suggest_float(self, name: str, low: float, high: float, *, log_scale: bool) -> float:
         """Suggest float parameter."""
-        if name in self._trial_proto.parameters:
-            value = self._trial_proto.parameters[name].value
-            if not value.HasField("double_value"):
-                raise RuntimeError()  # TODO(tsuzuku)
-            return value.double_value
-        value = self._sampler.sample(
-            distribution=Distribution(
-                float_distribution=Distribution.FloatDistribution(
-                    low=low, high=high, log_scale=log_scale
-                )
-            )
+        distribution=Distribution(
+            float_distribution=Distribution.FloatDistribution(low=low, high=high, log_scale=log_scale)
         )
-        assert value.HasField("double_value")
-        self._trial_proto.parameters[name].value.CopyFrom(value)
-        return value.double_value
+        return self.suggest(name=name, distribution=distribution).double_value
 
     def suggest_categorical(
         self, name: str, choices: Sequence[Union[int, float, str]]
     ) -> Union[int, float, str]:
         """Suggest categorical parameter."""
-        if name in self._trial_proto.parameters:
-            value = self._trial_proto.parameters[name].value
-        else:
-            value = self._sampler.sample(
-                distribution=Distribution(
-                    categorical_distribution=Distribution.CategoricalDistribution(
-                        choices=[_value_to_parameter_value(choice) for choice in choices]
-                    )
-                )
+        distribution=Distribution(
+            categorical_distribution=Distribution.CategoricalDistribution(
+                choices=[_value_to_parameter_value(choice) for choice in choices]
             )
-        self._trial_proto.parameters[name].value.CopyFrom(value)
+        )
+        value = self.suggest(name=name, distribution=distribution)
         return _parameter_value_to_value(value)
 
     @overload
