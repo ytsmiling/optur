@@ -174,7 +174,7 @@ def _ask(
     sampler.update_timestamp(new_timestamp)
     # TODO(tsuzuku): Persist trial when necessary.
     # Call joint_sample of sampler
-    ret = Trial(trial_proto=initial_trial, storage=storage)
+    ret = Trial(trial_proto=initial_trial, storage=storage, sampler=sampler)
     # TODO(tsuzuku): Pass fixed_parameters and search_space.
     ret.update_parameters(sampler.joint_sample())
     return ret
