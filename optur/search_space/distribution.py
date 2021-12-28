@@ -3,6 +3,7 @@ from optur.proto.search_space_pb2 import Distribution, ParameterValue
 
 
 def does_distribution_contain_value(distribution: Distribution, value: ParameterValue) -> bool:
+    """Check whether the value can be drawn from the distribution."""
     if distribution.HasField("int_distribution"):
         if not value.HasField("int_value"):
             return False
@@ -24,10 +25,32 @@ def does_distribution_contain_value(distribution: Distribution, value: Parameter
     raise NotImplementedError("")
 
 
-def extend_distribution(
+def is_identical_distribution(a: Distribution, b: Distribution) -> bool:
+    """Check whether the two distributions are identical."""
+    if a == b:
+        # In most usecase, a == b.
+        return True
+    if a.HasField("categorical_distribution") and b.HasField("categorical_distribution"):
+        # When values have different order, categorical distributions do not satisfy ``a == b``
+        # even if they are identical.
+        values1 = a.categorical_distribution.choices
+        values2 = b.categorical_distribution.choices
+        if len(values1) == len(values2) and all(any(v1 == v2 for v2 in values2) for v1 in values1):
+            return True
+    return False
+
+
+def merge_distribution(
     original_distribution: Distribution,
     new_distribution: Distribution,
 ) -> Distribution:
+    """Merge two distributions into one distribution.
+
+    When one or more distributions are `FixedDistribution`,
+    this method merges the two distributions.
+    Otherwise, check whether the two distributions are identical.
+    When the two distributions are incompatible, `InCompatibleSearchSpaceError` will be raised.
+    """
     if original_distribution.HasField("fixed_distribution"):
         if new_distribution.HasField("fixed_distribution"):
             values = [v for v in original_distribution.fixed_distribution.values]
@@ -47,13 +70,6 @@ def extend_distribution(
             for value in new_distribution.fixed_distribution.values
         ):
             return original_distribution
-    if original_distribution == new_distribution:
+    if is_identical_distribution(original_distribution, new_distribution):
         return original_distribution
-    if original_distribution.HasField("categorical_distribution") and new_distribution.HasField(
-        "categorical_distribution"
-    ):
-        values1 = original_distribution.categorical_distribution.choices
-        values2 = new_distribution.categorical_distribution.choices
-        if len(values1) == len(values2) and all(any(v1 == v2 for v2 in values2) for v1 in values1):
-            return original_distribution
     raise InCompatibleSearchSpaceError("")  # TODO(tsuzuku)
