@@ -6,6 +6,7 @@ from unittest.mock import MagicMock, call
 import pytest  # type: ignore
 from google.protobuf.timestamp_pb2 import Timestamp
 
+from optur.errors import PrunedException
 from optur.proto.search_space_pb2 import ParameterValue
 from optur.proto.study_pb2 import ObjectiveValue, StudyInfo
 from optur.proto.study_pb2 import Trial as TrialProto
@@ -350,16 +351,79 @@ def test_run_trial_return_value_handling(values: Any, state: "TrialProto.StateVa
     assert trial.last_known_state == state
 
 
-def test_run_trial_sets_complete_state() -> None:
-    # TODO(tsuzuku)
-    pass
-
-
 def test_run_trial_sets_pruned_state() -> None:
-    # TODO(tsuzuku)
-    pass
+    objective = MagicMock()
+    sampler = MagicMock()
+    storage = MagicMock()
+    queue = MagicMock()
+    sampler.last_update_time = None
+    sampler.joint_sample.return_value = {}
+    storage.get_current_timestamp.return_value = None
+    storage.get_trials.return_value = []
+    objective.side_effect = PrunedException
+    queue.get_trial.return_value = None
+    _run_trial(
+        objective=objective,
+        study_info=StudyInfo(),
+        sampler=sampler,
+        storage_client=storage,
+        worker_id=WorkerID(),
+        catch=(),
+        callbacks=(),
+        trial_queue=queue,
+    )
+    storage.write_trial.assert_called_once
+    _, kwargs = storage.write_trial.call_args
+    trial = kwargs["trial"]
+    assert trial.last_known_state == TrialProto.State.PRUNED
 
 
-def test_run_trial_sets_failed_state() -> None:
-    # TODO(tsuzuku)
-    pass
+def test_run_trial_catch_and_sets_failed_state() -> None:
+    objective = MagicMock()
+    sampler = MagicMock()
+    storage = MagicMock()
+    queue = MagicMock()
+    sampler.last_update_time = None
+    sampler.joint_sample.return_value = {}
+    storage.get_current_timestamp.return_value = None
+    storage.get_trials.return_value = []
+    objective.side_effect = RuntimeError
+    queue.get_trial.return_value = None
+    _run_trial(
+        objective=objective,
+        study_info=StudyInfo(),
+        sampler=sampler,
+        storage_client=storage,
+        worker_id=WorkerID(),
+        catch=(RuntimeError,),
+        callbacks=(),
+        trial_queue=queue,
+    )
+    storage.write_trial.assert_called_once
+    _, kwargs = storage.write_trial.call_args
+    trial = kwargs["trial"]
+    assert trial.last_known_state == TrialProto.State.FAILED
+
+
+def test_run_trial_does_not_catch() -> None:
+    objective = MagicMock()
+    sampler = MagicMock()
+    storage = MagicMock()
+    queue = MagicMock()
+    sampler.last_update_time = None
+    sampler.joint_sample.return_value = {}
+    storage.get_current_timestamp.return_value = None
+    storage.get_trials.return_value = []
+    objective.side_effect = RuntimeError
+    queue.get_trial.return_value = None
+    with pytest.raises(RuntimeError):
+        _run_trial(
+            objective=objective,
+            study_info=StudyInfo(),
+            sampler=sampler,
+            storage_client=storage,
+            worker_id=WorkerID(),
+            catch=(),
+            callbacks=(),
+            trial_queue=queue,
+        )
