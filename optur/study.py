@@ -31,15 +31,25 @@ class Study:
         self._study_info = study_info
         self._storage = storage
         self._client_id = client_id or uuid.uuid4().hex
-        # The following two (sampler, last_update_time) should not be shared by
+        # The following three (sampler, last_update_time, trial_queue) should not be shared by
         # multiple threads or processes.
         # Thus, they are re-instantiated in Study.optimize() function.
         # These three are instantated here for study.ask() and study.tell() APIs.
         self._sampler = sampler
         self._last_update_time = Timestamp(seconds=0, nanos=0)
+        self._trial_queue = _TrialQueue(
+            states=(TrialProto.State.WAITING,),
+            worker_id=WorkerID(client_id=client_id, thread_id=0),
+        )
 
     def ask(self) -> Trial:
-        pass
+        return _ask(
+            study_info=self._study_info,
+            sampler=self._sampler,
+            storage=self._storage,
+            trial_queue=self._trial_queue,
+            worker_id=WorkerID(client_id=self._client_id, thread_id=0),
+        )
 
     def tell(
         self,
