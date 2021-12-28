@@ -7,6 +7,7 @@ import pytest  # type: ignore
 from google.protobuf.timestamp_pb2 import Timestamp
 
 from optur.errors import PrunedException
+from optur.proto.sampler_pb2 import RandomSamplerConfig, SamplerConfig
 from optur.proto.search_space_pb2 import ParameterValue
 from optur.proto.study_pb2 import ObjectiveValue, StudyInfo
 from optur.proto.study_pb2 import Trial as TrialProto
@@ -15,6 +16,7 @@ from optur.study import (
     _ask,
     _infer_trial_state_from_objective_values,
     _run_trial,
+    _run_trials,
     _value_to_objective_value,
 )
 
@@ -427,3 +429,21 @@ def test_run_trial_does_not_catch() -> None:
             callbacks=(),
             trial_queue=queue,
         )
+
+
+def test_run_trials_call_objective_multiple_times() -> None:
+    objective = MagicMock()
+    storage = MagicMock()
+    storage.get_current_timestamp.return_value = None
+    storage.get_trials.return_value = []
+    _run_trials(
+        objective=objective,
+        study_info=StudyInfo(),
+        sampler_config=SamplerConfig(random=RandomSamplerConfig()),
+        worker_id=WorkerID(),
+        storage_client=storage,
+        n_trials=7,
+        catch=(),
+        callbacks=(),
+    )
+    assert len(objective.call_args_list) == 7

@@ -187,7 +187,7 @@ def _run_trials(
     storage_client: StorageClient,
     n_trials: Optional[int],
     catch: Tuple[Type[Exception], ...],
-    callbacks: Optional[List[Callable[[Trial], None]]],
+    callbacks: Optional[Sequence[Callable[[Trial], None]]],
 ) -> None:
     # We need to create sampler instances per thread because
     # they are neither thread-safe nor process-safe.

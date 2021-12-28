@@ -11,12 +11,13 @@ from optur.proto.study_pb2 import Trial as TrialProto
 class Sampler(abc.ABC):
     def __init__(self, sampler_config: SamplerConfig) -> None:
         self._sampler_config = sampler_config
+        self._last_update_time: Optional[Timestamp] = None
 
     @property
-    def last_update_time(self) -> Timestamp:
+    def last_update_time(self) -> Optional[Timestamp]:
         return self._last_update_time
 
-    def update_timestamp(self, timestamp: Timestamp) -> None:
+    def update_timestamp(self, timestamp: Optional[Timestamp]) -> None:
         self._last_update_time = timestamp
 
     def to_sampler_config(self) -> SamplerConfig:
