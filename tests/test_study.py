@@ -467,4 +467,14 @@ def test_optimize_single_worker_sanity_check() -> None:
         catch=(),
         callbacks=(),
     )
-    assert len(objective.call_args_list) == 7
+    if len(objective.call_args_list) != 7:
+        if not objective.call_args_list:
+            raise AssertionError(
+                "Objective was not called. You might have changed the signature of _run_trials "
+                "and `Executor` might have failed silently."
+            )
+        else:
+            raise AssertionError(
+                f"Objective was called {len(objective.call_args_list)} times, while "
+                "7 times are requested."
+            )
