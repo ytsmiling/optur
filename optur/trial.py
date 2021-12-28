@@ -81,13 +81,34 @@ class Trial:
             return value
 
     def set_int(self, name: str, value: int, *, force: bool = False) -> int:
-        pass
+        parameter_value = self.set_parameter(
+            name=name,
+            value=ParameterValue(int_value=value),
+            force=force,
+        )
+        if not parameter_value.HasField("int_value"):
+            raise RuntimeError("")  # TODO(tsuzuku)
+        return parameter_value.int_value
 
     def set_float(self, name: str, value: float, *, force: bool = False) -> float:
-        pass
+        parameter_value = self.set_parameter(
+            name=name,
+            value=ParameterValue(double_value=value),
+            force=force,
+        )
+        if not parameter_value.HasField("double_value"):
+            raise RuntimeError("")  # TODO(tsuzuku)
+        return parameter_value.double_value
 
     def set_string(self, name: str, value: str, *, force: bool = False) -> str:
-        pass
+        parameter_value = self.set_parameter(
+            name=name,
+            value=ParameterValue(string_value=value),
+            force=force,
+        )
+        if not parameter_value.HasField("string_value"):
+            raise RuntimeError("")  # TODO(tsuzuku)
+        return parameter_value.string_value
 
     def clear_parameter(self, name: str, *, force: bool) -> bool:
         if name in self._suggested_parameters:
