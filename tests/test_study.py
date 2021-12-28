@@ -277,7 +277,8 @@ def test_run_trial_uses_joint_sample() -> None:
         trial_queue=queue,
     )
     objective.assert_called_once
-    trial = objective.call_args.args[0]
+    args, _ = objective.call_args
+    trial = args[0]
     assert trial.suggest_parameter("foo") == ParameterValue(int_value=1)
     assert trial.suggest_parameter("bar") == ParameterValue(double_value=2.0)
 
@@ -305,7 +306,8 @@ def test_run_trial_uses_waiting_trial() -> None:
         trial_queue=queue,
     )
     objective.assert_called_once
-    trial = objective.call_args.args[0]
+    args, _ = objective.call_args
+    trial = args[0]
     assert trial.get_proto().trial_id == trial_id
 
 
@@ -343,7 +345,8 @@ def test_run_trial_return_value_handling(values: Any, state: "TrialProto.StateVa
         trial_queue=queue,
     )
     storage.write_trial.assert_called_once
-    trial = storage.write_trial.call_args.args[0]
+    _, kwargs = storage.write_trial.call_args
+    trial = kwargs["trial"]
     assert trial.last_known_state == state
 
 

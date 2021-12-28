@@ -254,7 +254,7 @@ def _run_trial(
         for callback in callbacks:
             # TODO(tsuzuku): Think about a better type to pass callbacks.
             callback(trial)
-    storage_client.write_trial(proto)
+    storage_client.write_trial(trial=proto)
 
 
 def _value_to_objective_value(value: float) -> ObjectiveValue:
