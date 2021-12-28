@@ -30,24 +30,64 @@ class Trial:
         return ret
 
     def suggest_parameter(self, name: str, distribution: Distribution) -> ParameterValue:
+        """Draw a parameter from the distribution.
+
+        Args:
+            name:
+                Name of a parameter to suggest.
+            distribution:
+                A distribution from which the parameter will be drawn.
+        Return:
+            A parameter drawn from the distribution.
+        """
         # TODO(tsuzuku): Check distribution compatibility.
         if name in self._trial_proto.parameters:
             return self._trial_proto.parameters[name].value
         if name in self._suggested_parameters:
             return self._suggested_parameters[name]
         value = self._sampler.sample(distribution=distribution)
-        self._trial_proto.parameters[name].value.CopyFrom(value)
+        self._trial_proto.parameters[name].CopyFrom(Parameter(value=value))
         return value
 
     def suggest_int(self, name: str, low: int, high: int, *, log_scale: bool) -> int:
-        """Suggest int parameter."""
+        """Suggest an int parameter.
+
+        This is a convenient wrapper of `suggest_parameter` method.
+
+        Args:
+            name:
+                Name of a parameter to suggest.
+            low:
+                Lower bound of the parameter. This value is included in the valid range.
+            high:
+                Upper bound of the parameter. This value is **included** in the valid range.
+            log_scale:
+                Tell samplers that the parameter is better represented by log-scale.
+        Return:
+            A suggested int parameter.
+        """
         distribution = Distribution(
             int_distribution=Distribution.IntDistribution(low=low, high=high, log_scale=log_scale)
         )
         return self.suggest_parameter(name=name, distribution=distribution).int_value
 
     def suggest_float(self, name: str, low: float, high: float, *, log_scale: bool) -> float:
-        """Suggest float parameter."""
+        """Suggest float parameter.
+
+        This is a convenient wrapper of `suggest_parameter` method.
+
+        Args:
+            name:
+                Name of a parameter to suggest.
+            low:
+                Lower bound of the parameter. This value is included in the valid range.
+            high:
+                Upper bound of the parameter. This value is **included** in the valid range.
+            log_scale:
+                Tell samplers that the parameter is better represented by log-scale.
+        Return:
+            A suggested float parameter.
+        """
         distribution = Distribution(
             float_distribution=Distribution.FloatDistribution(
                 low=low, high=high, log_scale=log_scale
@@ -58,7 +98,18 @@ class Trial:
     def suggest_categorical(
         self, name: str, choices: Sequence[Union[int, float, str]]
     ) -> Union[int, float, str]:
-        """Suggest categorical parameter."""
+        """Suggest categorical parameter.
+
+        This is a convenient wrapper of `suggest_parameter` method.
+
+        Args:
+            name:
+                Name of a parameter to suggest.
+            choices:
+                Values to choose.
+        Return:
+            A suggested parameter.
+        """
         distribution = Distribution(
             categorical_distribution=Distribution.CategoricalDistribution(
                 choices=[_value_to_parameter_value(choice) for choice in choices]
