@@ -154,7 +154,17 @@ class Trial:
 
 
 def _value_to_parameter_value(value: Union[int, float, str]) -> ParameterValue:
-    pass
+    if isinstance(value, int):
+        return ParameterValue(int_value=value)
+    elif isinstance(value, float):
+        return ParameterValue(double_value=value)
+    elif isinstance(value, str):
+        return ParameterValue(string_value=value)
+    else:
+        raise ValueError(
+            "Only values with (int, float, str) can be converted to ParameterValue, "
+            f"but recieved '{type(value)}'"
+        )
 
 
 def _parameter_value_to_value(value: ParameterValue) -> Union[int, float, str]:
