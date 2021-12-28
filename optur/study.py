@@ -210,9 +210,8 @@ def _run_trials(
     # sampler algorithms in optur, but still, we want to ensure that samplers
     # see the same cache in all `joint_sample` and `sample` calls for the same trial.
     sampler = create_sampler(sampler_config=sampler_config)
-    # Unlike samplers, we are free to share _TrialQueue between processes or threads.
-    # We're creating the queue here because the current implementation of `_TrialQueue`
-    # is not process/thread-safe.
+    # We also need to create _TrialQueue per thread/process becasue it's associated
+    # with worker-id.
     trial_queue = _TrialQueue([TrialProto.State.WAITING], worker_id=worker_id)
     trial_counter = itertools.count() if n_trials is None else range(n_trials)
     for _ in trial_counter:
