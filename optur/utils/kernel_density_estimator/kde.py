@@ -1,7 +1,7 @@
 import abc
-from typing import List, Sequence
+from typing import Dict, List, Optional, Sequence
 
-from optur.proto.search_space_pb2 import Observation, SearchSpace
+from optur.proto.search_space_pb2 import Observation, ParameterValue, SearchSpace
 
 
 class KDE(abc.ABC):
@@ -14,5 +14,7 @@ class KDE(abc.ABC):
         pass
 
     @abc.abstractclassmethod
-    def sample(self, k: int) -> List[Observation]:
+    def sample(
+        self, k: int, fixed_parameters: Optional[Dict[str, ParameterValue]]
+    ) -> List[Observation]:
         pass
