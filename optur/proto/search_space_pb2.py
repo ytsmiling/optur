@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     syntax="proto3",
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
-    serialized_pb=b'\n\x1eoptur/proto/search_space.proto\x12\x05optur"^\n\x0eParameterValue\x12\x13\n\tint_value\x18\x01 \x01(\x03H\x00\x12\x16\n\x0c\x64ouble_value\x18\x02 \x01(\x01H\x00\x12\x16\n\x0cstring_value\x18\x03 \x01(\tH\x00\x42\x07\n\x05value"\xbd\x04\n\x0c\x44istribution\x12\x43\n\x12\x66loat_distribution\x18\x01 \x01(\x0b\x32%.optur.Distribution.FloatDistributionH\x00\x12?\n\x10int_distribution\x18\x02 \x01(\x0b\x32#.optur.Distribution.IntDistributionH\x00\x12O\n\x18\x63\x61tegorical_distribution\x18\x03 \x01(\x0b\x32+.optur.Distribution.CategoricalDistributionH\x00\x12\x43\n\x12\x66ixed_distribution\x18\x04 \x01(\x0b\x32%.optur.Distribution.FixedDistributionH\x00\x1a\x41\n\x11\x46loatDistribution\x12\x0b\n\x03low\x18\x01 \x01(\x02\x12\x0c\n\x04high\x18\x02 \x01(\x02\x12\x11\n\tlog_scale\x18\x03 \x01(\x08\x1a?\n\x0fIntDistribution\x12\x0b\n\x03low\x18\x01 \x01(\x03\x12\x0c\n\x04high\x18\x02 \x01(\x03\x12\x11\n\tlog_scale\x18\x03 \x01(\x08\x1a\x41\n\x17\x43\x61tegoricalDistribution\x12&\n\x07\x63hoices\x18\x01 \x03(\x0b\x32\x15.optur.ParameterValue\x1a:\n\x11\x46ixedDistribution\x12%\n\x06values\x18\x01 \x03(\x0b\x32\x15.optur.ParameterValueB\x0e\n\x0c\x64istribution"\x96\x01\n\x0bSearchSpace\x12<\n\rdistributions\x18\x01 \x03(\x0b\x32%.optur.SearchSpace.DistributionsEntry\x1aI\n\x12\x44istributionsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12"\n\x05value\x18\x02 \x01(\x0b\x32\x13.optur.Distribution:\x02\x38\x01\x62\x06proto3',
+    serialized_pb=b'\n\x1eoptur/proto/search_space.proto\x12\x05optur"^\n\x0eParameterValue\x12\x13\n\tint_value\x18\x01 \x01(\x03H\x00\x12\x16\n\x0c\x64ouble_value\x18\x02 \x01(\x01H\x00\x12\x16\n\x0cstring_value\x18\x03 \x01(\tH\x00\x42\x07\n\x05value"\xbd\x04\n\x0c\x44istribution\x12\x43\n\x12\x66loat_distribution\x18\x01 \x01(\x0b\x32%.optur.Distribution.FloatDistributionH\x00\x12?\n\x10int_distribution\x18\x02 \x01(\x0b\x32#.optur.Distribution.IntDistributionH\x00\x12O\n\x18\x63\x61tegorical_distribution\x18\x03 \x01(\x0b\x32+.optur.Distribution.CategoricalDistributionH\x00\x12\x43\n\x12\x66ixed_distribution\x18\x04 \x01(\x0b\x32%.optur.Distribution.FixedDistributionH\x00\x1a\x41\n\x11\x46loatDistribution\x12\x0b\n\x03low\x18\x01 \x01(\x02\x12\x0c\n\x04high\x18\x02 \x01(\x02\x12\x11\n\tlog_scale\x18\x03 \x01(\x08\x1a?\n\x0fIntDistribution\x12\x0b\n\x03low\x18\x01 \x01(\x03\x12\x0c\n\x04high\x18\x02 \x01(\x03\x12\x11\n\tlog_scale\x18\x03 \x01(\x08\x1a\x41\n\x17\x43\x61tegoricalDistribution\x12&\n\x07\x63hoices\x18\x01 \x03(\x0b\x32\x15.optur.ParameterValue\x1a:\n\x11\x46ixedDistribution\x12%\n\x06values\x18\x01 \x03(\x0b\x32\x15.optur.ParameterValueB\x0e\n\x0c\x64istribution"\x96\x01\n\x0bSearchSpace\x12<\n\rdistributions\x18\x01 \x03(\x0b\x32%.optur.SearchSpace.DistributionsEntry\x1aI\n\x12\x44istributionsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12"\n\x05value\x18\x02 \x01(\x0b\x32\x13.optur.Distribution:\x02\x38\x01"\x8f\x01\n\x0bObservation\x12\x36\n\nparameters\x18\x01 \x03(\x0b\x32".optur.Observation.ParametersEntry\x1aH\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12$\n\x05value\x18\x02 \x01(\x0b\x32\x15.optur.ParameterValue:\x02\x38\x01\x62\x06proto3',
 )
 
 
@@ -559,6 +559,108 @@ _SEARCHSPACE = _descriptor.Descriptor(
     serialized_end=864,
 )
 
+
+_OBSERVATION_PARAMETERSENTRY = _descriptor.Descriptor(
+    name="ParametersEntry",
+    full_name="optur.Observation.ParametersEntry",
+    filename=None,
+    file=DESCRIPTOR,
+    containing_type=None,
+    create_key=_descriptor._internal_create_key,
+    fields=[
+        _descriptor.FieldDescriptor(
+            name="key",
+            full_name="optur.Observation.ParametersEntry.key",
+            index=0,
+            number=1,
+            type=9,
+            cpp_type=9,
+            label=1,
+            has_default_value=False,
+            default_value=b"".decode("utf-8"),
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+        _descriptor.FieldDescriptor(
+            name="value",
+            full_name="optur.Observation.ParametersEntry.value",
+            index=1,
+            number=2,
+            type=11,
+            cpp_type=10,
+            label=1,
+            has_default_value=False,
+            default_value=None,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+    ],
+    extensions=[],
+    nested_types=[],
+    enum_types=[],
+    serialized_options=b"8\001",
+    is_extendable=False,
+    syntax="proto3",
+    extension_ranges=[],
+    oneofs=[],
+    serialized_start=938,
+    serialized_end=1010,
+)
+
+_OBSERVATION = _descriptor.Descriptor(
+    name="Observation",
+    full_name="optur.Observation",
+    filename=None,
+    file=DESCRIPTOR,
+    containing_type=None,
+    create_key=_descriptor._internal_create_key,
+    fields=[
+        _descriptor.FieldDescriptor(
+            name="parameters",
+            full_name="optur.Observation.parameters",
+            index=0,
+            number=1,
+            type=11,
+            cpp_type=10,
+            label=3,
+            has_default_value=False,
+            default_value=[],
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+    ],
+    extensions=[],
+    nested_types=[
+        _OBSERVATION_PARAMETERSENTRY,
+    ],
+    enum_types=[],
+    serialized_options=None,
+    is_extendable=False,
+    syntax="proto3",
+    extension_ranges=[],
+    oneofs=[],
+    serialized_start=867,
+    serialized_end=1010,
+)
+
 _PARAMETERVALUE.oneofs_by_name["value"].fields.append(_PARAMETERVALUE.fields_by_name["int_value"])
 _PARAMETERVALUE.fields_by_name["int_value"].containing_oneof = _PARAMETERVALUE.oneofs_by_name[
     "value"
@@ -614,9 +716,13 @@ _DISTRIBUTION.fields_by_name["fixed_distribution"].containing_oneof = _DISTRIBUT
 _SEARCHSPACE_DISTRIBUTIONSENTRY.fields_by_name["value"].message_type = _DISTRIBUTION
 _SEARCHSPACE_DISTRIBUTIONSENTRY.containing_type = _SEARCHSPACE
 _SEARCHSPACE.fields_by_name["distributions"].message_type = _SEARCHSPACE_DISTRIBUTIONSENTRY
+_OBSERVATION_PARAMETERSENTRY.fields_by_name["value"].message_type = _PARAMETERVALUE
+_OBSERVATION_PARAMETERSENTRY.containing_type = _OBSERVATION
+_OBSERVATION.fields_by_name["parameters"].message_type = _OBSERVATION_PARAMETERSENTRY
 DESCRIPTOR.message_types_by_name["ParameterValue"] = _PARAMETERVALUE
 DESCRIPTOR.message_types_by_name["Distribution"] = _DISTRIBUTION
 DESCRIPTOR.message_types_by_name["SearchSpace"] = _SEARCHSPACE
+DESCRIPTOR.message_types_by_name["Observation"] = _OBSERVATION
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 ParameterValue = _reflection.GeneratedProtocolMessageType(
@@ -702,6 +808,28 @@ SearchSpace = _reflection.GeneratedProtocolMessageType(
 _sym_db.RegisterMessage(SearchSpace)
 _sym_db.RegisterMessage(SearchSpace.DistributionsEntry)
 
+Observation = _reflection.GeneratedProtocolMessageType(
+    "Observation",
+    (_message.Message,),
+    {
+        "ParametersEntry": _reflection.GeneratedProtocolMessageType(
+            "ParametersEntry",
+            (_message.Message,),
+            {
+                "DESCRIPTOR": _OBSERVATION_PARAMETERSENTRY,
+                "__module__": "optur.proto.search_space_pb2"
+                # @@protoc_insertion_point(class_scope:optur.Observation.ParametersEntry)
+            },
+        ),
+        "DESCRIPTOR": _OBSERVATION,
+        "__module__": "optur.proto.search_space_pb2"
+        # @@protoc_insertion_point(class_scope:optur.Observation)
+    },
+)
+_sym_db.RegisterMessage(Observation)
+_sym_db.RegisterMessage(Observation.ParametersEntry)
+
 
 _SEARCHSPACE_DISTRIBUTIONSENTRY._options = None
+_OBSERVATION_PARAMETERSENTRY._options = None
 # @@protoc_insertion_point(module_scope)

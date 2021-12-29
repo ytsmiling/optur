@@ -48,3 +48,8 @@ message SearchSpace {
     map<string, Distribution> distributions = 1;
     // TODO(tsuzuku): Support conditional search spaces.
 }
+
+
+message Observation {
+    map<string, ParameterValue> parameters = 1;
+}

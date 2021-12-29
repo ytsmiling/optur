@@ -233,3 +233,38 @@ class SearchSpace(google___protobuf___message___Message):
     ) -> None: ...
 
 type___SearchSpace = SearchSpace
+
+class Observation(google___protobuf___message___Message):
+    DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
+    class ParametersEntry(google___protobuf___message___Message):
+        DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
+        key: typing___Text = ...
+        @property
+        def value(self) -> type___ParameterValue: ...
+        def __init__(
+            self,
+            *,
+            key: typing___Optional[typing___Text] = None,
+            value: typing___Optional[type___ParameterValue] = None,
+        ) -> None: ...
+        def HasField(
+            self, field_name: typing_extensions___Literal["value", b"value"]
+        ) -> builtin___bool: ...
+        def ClearField(
+            self, field_name: typing_extensions___Literal["key", b"key", "value", b"value"]
+        ) -> None: ...
+    type___ParametersEntry = ParametersEntry
+    @property
+    def parameters(self) -> typing___MutableMapping[typing___Text, type___ParameterValue]: ...
+    def __init__(
+        self,
+        *,
+        parameters: typing___Optional[
+            typing___Mapping[typing___Text, type___ParameterValue]
+        ] = None,
+    ) -> None: ...
+    def ClearField(
+        self, field_name: typing_extensions___Literal["parameters", b"parameters"]
+    ) -> None: ...
+
+type___Observation = Observation

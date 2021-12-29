@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     syntax="proto3",
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
-    serialized_pb=b'\n\x19optur/proto/sampler.proto\x12\x05optur"H\n\rSamplerConfig\x12,\n\x06random\x18\x01 \x01(\x0b\x32\x1a.optur.RandomSamplerConfigH\x00\x42\t\n\x07sampler"\x15\n\x13RandomSamplerConfigb\x06proto3',
+    serialized_pb=b'\n\x19optur/proto/sampler.proto\x12\x05optur"p\n\rSamplerConfig\x12,\n\x06random\x18\x01 \x01(\x0b\x32\x1a.optur.RandomSamplerConfigH\x00\x12&\n\x03tpe\x18\x02 \x01(\x0b\x32\x17.optur.TPESamplerConfigH\x00\x42\t\n\x07sampler"r\n\tKDEConfig\x12\x16\n\x0e\x63onsider_prior\x18\x01 \x01(\x08\x12\x14\n\x0cprior_weight\x18\x02 \x01(\x01\x12\x1b\n\x13\x63onsider_magic_clip\x18\x03 \x01(\x08\x12\x1a\n\x12\x63onsider_endpoints\x18\x04 \x01(\x08"\x15\n\x13RandomSamplerConfig"\x94\x01\n\x10TPESamplerConfig\x12\x1d\n\x03kde\x18\x01 \x01(\x0b\x32\x10.optur.KDEConfig\x12\x18\n\x10n_startup_trials\x18\x02 \x01(\x03\x12\x17\n\x0fn_ei_candidates\x18\x03 \x01(\x03\x12.\n\x10\x66\x61llback_sampler\x18\x04 \x01(\x0b\x32\x14.optur.SamplerConfigb\x06proto3',
 )
 
 
@@ -35,6 +35,25 @@ _SAMPLERCONFIG = _descriptor.Descriptor(
             full_name="optur.SamplerConfig.random",
             index=0,
             number=1,
+            type=11,
+            cpp_type=10,
+            label=1,
+            has_default_value=False,
+            default_value=None,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+        _descriptor.FieldDescriptor(
+            name="tpe",
+            full_name="optur.SamplerConfig.tpe",
+            index=1,
+            number=2,
             type=11,
             cpp_type=10,
             label=1,
@@ -68,7 +87,105 @@ _SAMPLERCONFIG = _descriptor.Descriptor(
         ),
     ],
     serialized_start=36,
-    serialized_end=108,
+    serialized_end=148,
+)
+
+
+_KDECONFIG = _descriptor.Descriptor(
+    name="KDEConfig",
+    full_name="optur.KDEConfig",
+    filename=None,
+    file=DESCRIPTOR,
+    containing_type=None,
+    create_key=_descriptor._internal_create_key,
+    fields=[
+        _descriptor.FieldDescriptor(
+            name="consider_prior",
+            full_name="optur.KDEConfig.consider_prior",
+            index=0,
+            number=1,
+            type=8,
+            cpp_type=7,
+            label=1,
+            has_default_value=False,
+            default_value=False,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+        _descriptor.FieldDescriptor(
+            name="prior_weight",
+            full_name="optur.KDEConfig.prior_weight",
+            index=1,
+            number=2,
+            type=1,
+            cpp_type=5,
+            label=1,
+            has_default_value=False,
+            default_value=float(0),
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+        _descriptor.FieldDescriptor(
+            name="consider_magic_clip",
+            full_name="optur.KDEConfig.consider_magic_clip",
+            index=2,
+            number=3,
+            type=8,
+            cpp_type=7,
+            label=1,
+            has_default_value=False,
+            default_value=False,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+        _descriptor.FieldDescriptor(
+            name="consider_endpoints",
+            full_name="optur.KDEConfig.consider_endpoints",
+            index=3,
+            number=4,
+            type=8,
+            cpp_type=7,
+            label=1,
+            has_default_value=False,
+            default_value=False,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+    ],
+    extensions=[],
+    nested_types=[],
+    enum_types=[],
+    serialized_options=None,
+    is_extendable=False,
+    syntax="proto3",
+    extension_ranges=[],
+    oneofs=[],
+    serialized_start=150,
+    serialized_end=264,
 )
 
 
@@ -88,15 +205,120 @@ _RANDOMSAMPLERCONFIG = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=110,
-    serialized_end=131,
+    serialized_start=266,
+    serialized_end=287,
+)
+
+
+_TPESAMPLERCONFIG = _descriptor.Descriptor(
+    name="TPESamplerConfig",
+    full_name="optur.TPESamplerConfig",
+    filename=None,
+    file=DESCRIPTOR,
+    containing_type=None,
+    create_key=_descriptor._internal_create_key,
+    fields=[
+        _descriptor.FieldDescriptor(
+            name="kde",
+            full_name="optur.TPESamplerConfig.kde",
+            index=0,
+            number=1,
+            type=11,
+            cpp_type=10,
+            label=1,
+            has_default_value=False,
+            default_value=None,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+        _descriptor.FieldDescriptor(
+            name="n_startup_trials",
+            full_name="optur.TPESamplerConfig.n_startup_trials",
+            index=1,
+            number=2,
+            type=3,
+            cpp_type=2,
+            label=1,
+            has_default_value=False,
+            default_value=0,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+        _descriptor.FieldDescriptor(
+            name="n_ei_candidates",
+            full_name="optur.TPESamplerConfig.n_ei_candidates",
+            index=2,
+            number=3,
+            type=3,
+            cpp_type=2,
+            label=1,
+            has_default_value=False,
+            default_value=0,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+        _descriptor.FieldDescriptor(
+            name="fallback_sampler",
+            full_name="optur.TPESamplerConfig.fallback_sampler",
+            index=3,
+            number=4,
+            type=11,
+            cpp_type=10,
+            label=1,
+            has_default_value=False,
+            default_value=None,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+    ],
+    extensions=[],
+    nested_types=[],
+    enum_types=[],
+    serialized_options=None,
+    is_extendable=False,
+    syntax="proto3",
+    extension_ranges=[],
+    oneofs=[],
+    serialized_start=290,
+    serialized_end=438,
 )
 
 _SAMPLERCONFIG.fields_by_name["random"].message_type = _RANDOMSAMPLERCONFIG
+_SAMPLERCONFIG.fields_by_name["tpe"].message_type = _TPESAMPLERCONFIG
 _SAMPLERCONFIG.oneofs_by_name["sampler"].fields.append(_SAMPLERCONFIG.fields_by_name["random"])
 _SAMPLERCONFIG.fields_by_name["random"].containing_oneof = _SAMPLERCONFIG.oneofs_by_name["sampler"]
+_SAMPLERCONFIG.oneofs_by_name["sampler"].fields.append(_SAMPLERCONFIG.fields_by_name["tpe"])
+_SAMPLERCONFIG.fields_by_name["tpe"].containing_oneof = _SAMPLERCONFIG.oneofs_by_name["sampler"]
+_TPESAMPLERCONFIG.fields_by_name["kde"].message_type = _KDECONFIG
+_TPESAMPLERCONFIG.fields_by_name["fallback_sampler"].message_type = _SAMPLERCONFIG
 DESCRIPTOR.message_types_by_name["SamplerConfig"] = _SAMPLERCONFIG
+DESCRIPTOR.message_types_by_name["KDEConfig"] = _KDECONFIG
 DESCRIPTOR.message_types_by_name["RandomSamplerConfig"] = _RANDOMSAMPLERCONFIG
+DESCRIPTOR.message_types_by_name["TPESamplerConfig"] = _TPESAMPLERCONFIG
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 SamplerConfig = _reflection.GeneratedProtocolMessageType(
@@ -110,6 +332,17 @@ SamplerConfig = _reflection.GeneratedProtocolMessageType(
 )
 _sym_db.RegisterMessage(SamplerConfig)
 
+KDEConfig = _reflection.GeneratedProtocolMessageType(
+    "KDEConfig",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _KDECONFIG,
+        "__module__": "optur.proto.sampler_pb2"
+        # @@protoc_insertion_point(class_scope:optur.KDEConfig)
+    },
+)
+_sym_db.RegisterMessage(KDEConfig)
+
 RandomSamplerConfig = _reflection.GeneratedProtocolMessageType(
     "RandomSamplerConfig",
     (_message.Message,),
@@ -120,6 +353,17 @@ RandomSamplerConfig = _reflection.GeneratedProtocolMessageType(
     },
 )
 _sym_db.RegisterMessage(RandomSamplerConfig)
+
+TPESamplerConfig = _reflection.GeneratedProtocolMessageType(
+    "TPESamplerConfig",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _TPESAMPLERCONFIG,
+        "__module__": "optur.proto.sampler_pb2"
+        # @@protoc_insertion_point(class_scope:optur.TPESamplerConfig)
+    },
+)
+_sym_db.RegisterMessage(TPESamplerConfig)
 
 
 # @@protoc_insertion_point(module_scope)

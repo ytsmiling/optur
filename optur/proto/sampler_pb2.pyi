@@ -22,22 +22,61 @@ class SamplerConfig(google___protobuf___message___Message):
     DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
     @property
     def random(self) -> type___RandomSamplerConfig: ...
+    @property
+    def tpe(self) -> type___TPESamplerConfig: ...
     def __init__(
         self,
         *,
         random: typing___Optional[type___RandomSamplerConfig] = None,
+        tpe: typing___Optional[type___TPESamplerConfig] = None,
     ) -> None: ...
     def HasField(
-        self, field_name: typing_extensions___Literal["random", b"random", "sampler", b"sampler"]
+        self,
+        field_name: typing_extensions___Literal[
+            "random", b"random", "sampler", b"sampler", "tpe", b"tpe"
+        ],
     ) -> builtin___bool: ...
     def ClearField(
-        self, field_name: typing_extensions___Literal["random", b"random", "sampler", b"sampler"]
+        self,
+        field_name: typing_extensions___Literal[
+            "random", b"random", "sampler", b"sampler", "tpe", b"tpe"
+        ],
     ) -> None: ...
     def WhichOneof(
         self, oneof_group: typing_extensions___Literal["sampler", b"sampler"]
-    ) -> typing_extensions___Literal["random"]: ...
+    ) -> typing_extensions___Literal["random", "tpe"]: ...
 
 type___SamplerConfig = SamplerConfig
+
+class KDEConfig(google___protobuf___message___Message):
+    DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
+    consider_prior: builtin___bool = ...
+    prior_weight: builtin___float = ...
+    consider_magic_clip: builtin___bool = ...
+    consider_endpoints: builtin___bool = ...
+    def __init__(
+        self,
+        *,
+        consider_prior: typing___Optional[builtin___bool] = None,
+        prior_weight: typing___Optional[builtin___float] = None,
+        consider_magic_clip: typing___Optional[builtin___bool] = None,
+        consider_endpoints: typing___Optional[builtin___bool] = None,
+    ) -> None: ...
+    def ClearField(
+        self,
+        field_name: typing_extensions___Literal[
+            "consider_endpoints",
+            b"consider_endpoints",
+            "consider_magic_clip",
+            b"consider_magic_clip",
+            "consider_prior",
+            b"consider_prior",
+            "prior_weight",
+            b"prior_weight",
+        ],
+    ) -> None: ...
+
+type___KDEConfig = KDEConfig
 
 class RandomSamplerConfig(google___protobuf___message___Message):
     DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
@@ -46,3 +85,41 @@ class RandomSamplerConfig(google___protobuf___message___Message):
     ) -> None: ...
 
 type___RandomSamplerConfig = RandomSamplerConfig
+
+class TPESamplerConfig(google___protobuf___message___Message):
+    DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
+    n_startup_trials: builtin___int = ...
+    n_ei_candidates: builtin___int = ...
+    @property
+    def kde(self) -> type___KDEConfig: ...
+    @property
+    def fallback_sampler(self) -> type___SamplerConfig: ...
+    def __init__(
+        self,
+        *,
+        kde: typing___Optional[type___KDEConfig] = None,
+        n_startup_trials: typing___Optional[builtin___int] = None,
+        n_ei_candidates: typing___Optional[builtin___int] = None,
+        fallback_sampler: typing___Optional[type___SamplerConfig] = None,
+    ) -> None: ...
+    def HasField(
+        self,
+        field_name: typing_extensions___Literal[
+            "fallback_sampler", b"fallback_sampler", "kde", b"kde"
+        ],
+    ) -> builtin___bool: ...
+    def ClearField(
+        self,
+        field_name: typing_extensions___Literal[
+            "fallback_sampler",
+            b"fallback_sampler",
+            "kde",
+            b"kde",
+            "n_ei_candidates",
+            b"n_ei_candidates",
+            "n_startup_trials",
+            b"n_startup_trials",
+        ],
+    ) -> None: ...
+
+type___TPESamplerConfig = TPESamplerConfig
