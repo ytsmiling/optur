@@ -52,7 +52,7 @@ class Trial:
         self._trial_proto.parameters[name].CopyFrom(Parameter(value=value))
         return value
 
-    def suggest_int(self, name: str, low: int, high: int, *, log_scale: bool) -> int:
+    def suggest_int(self, name: str, low: int, high: int, *, log_scale: bool = False) -> int:
         """Suggest an int parameter.
 
         This is a convenient wrapper of `suggest_parameter` method.
@@ -74,7 +74,9 @@ class Trial:
         )
         return self.suggest_parameter(name=name, distribution=distribution).int_value
 
-    def suggest_float(self, name: str, low: float, high: float, *, log_scale: bool) -> float:
+    def suggest_float(
+        self, name: str, low: float, high: float, *, log_scale: bool = False
+    ) -> float:
         """Suggest float parameter.
 
         This is a convenient wrapper of `suggest_parameter` method.

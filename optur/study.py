@@ -94,6 +94,23 @@ class Study:
         pass
 
 
+def create_study(
+    *,
+    storage: Storage,
+    sampler: Sampler,
+    study_name: Optional[str] = None,
+    client_id: Optional[str] = None,
+) -> Study:
+    study_info = StudyInfo(study_id=uuid.uuid4().hex, study_name=study_name)
+    storage.write_study(study=study_info)
+    return Study(
+        study_info=study_info,
+        storage=storage,
+        sampler=sampler,
+        client_id=client_id,
+    )
+
+
 class _TrialQueue:
     """Trial queue for managing WAITING trials."""
 
@@ -166,6 +183,7 @@ def _ask(
     if initial_trial is None:
         initial_trial = TrialProto(
             trial_id=uuid.uuid4().hex,
+            study_id=study_info.study_id,
             create_time=new_timestamp,
             last_update_time=new_timestamp,
             last_known_state=TrialProto.State.CREATED,

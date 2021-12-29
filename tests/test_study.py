@@ -164,6 +164,30 @@ def test_valid_value_to_objective_value() -> None:
     assert math.isclose(_value_to_objective_value(0.2).value, 0.2)
 
 
+def test_ask_sets_study_id() -> None:
+    sampler = MagicMock()
+    storage = MagicMock()
+    sampler_timestamp = Timestamp(seconds=1234)
+    storage_timestamp = Timestamp(seconds=2345)
+    queue_timestamp = Timestamp(seconds=3456)
+    study_id = uuid.uuid4().hex
+    trials = [TrialProto(trial_id=uuid.uuid4().hex)]
+    sampler.last_update_time = sampler_timestamp
+    storage.get_current_timestamp.return_value = storage_timestamp
+    storage.get_trials.return_value = trials
+    trial_queue = MagicMock()
+    trial_queue.get_trial.return_value = None
+    trial_queue.last_update_time = queue_timestamp
+    trial = _ask(
+        study_info=StudyInfo(study_id=study_id),
+        sampler=sampler,
+        storage=storage,
+        trial_queue=trial_queue,
+        worker_id=WorkerID(),
+    )
+    assert trial.get_proto().study_id == study_id
+
+
 def test_ask_sync_sampler() -> None:
     sampler = MagicMock()
     storage = MagicMock()
