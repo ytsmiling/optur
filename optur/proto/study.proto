@@ -87,13 +87,6 @@ message Trial {
     google.protobuf.Timestamp create_time = 10;
     // Last update time of the trial since epoch.
     google.protobuf.Timestamp last_update_time = 11;
-    // Distributions used to suggest the parameters.
-    // Ideally, we want to keep distributions per study, not per trial.
-    // However, it's difficult for two reasons.
-    // 1. We know that users want to change distributions dynamically in a study.
-    // 2. Storing distributions per study requires synchronization among workers,
-    //    which is not permitted in optur's computation model.
-    map<string, Distribution> distributions = 12;
 }
 
 // An ID to distinguish workers.
@@ -151,4 +144,11 @@ message ObjectiveValue {
 message Parameter {
     // A value of the parameter.
     optur.ParameterValue value = 1;
+    // Distributions used to suggest the parameters.
+    // Ideally, we want to keep distributions per study, not per trial.
+    // However, it's difficult for two reasons.
+    // 1. We know that users want to change distributions dynamically in a study.
+    // 2. Storing distributions per study requires synchronization among workers,
+    //    which is not permitted in optur's computation model.
+    optur.Distribution distribution = 2;
 }

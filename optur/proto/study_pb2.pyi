@@ -234,24 +234,6 @@ class Trial(google___protobuf___message___Message):
             self, field_name: typing_extensions___Literal["key", b"key", "value", b"value"]
         ) -> None: ...
     type___ParametersEntry = ParametersEntry
-    class DistributionsEntry(google___protobuf___message___Message):
-        DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
-        key: typing___Text = ...
-        @property
-        def value(self) -> optur___proto___search_space_pb2___Distribution: ...
-        def __init__(
-            self,
-            *,
-            key: typing___Optional[typing___Text] = None,
-            value: typing___Optional[optur___proto___search_space_pb2___Distribution] = None,
-        ) -> None: ...
-        def HasField(
-            self, field_name: typing_extensions___Literal["value", b"value"]
-        ) -> builtin___bool: ...
-        def ClearField(
-            self, field_name: typing_extensions___Literal["key", b"key", "value", b"value"]
-        ) -> None: ...
-    type___DistributionsEntry = DistributionsEntry
 
     trial_id: typing___Text = ...
     study_id: typing___Text = ...
@@ -280,12 +262,6 @@ class Trial(google___protobuf___message___Message):
     def create_time(self) -> google___protobuf___timestamp_pb2___Timestamp: ...
     @property
     def last_update_time(self) -> google___protobuf___timestamp_pb2___Timestamp: ...
-    @property
-    def distributions(
-        self,
-    ) -> typing___MutableMapping[
-        typing___Text, optur___proto___search_space_pb2___Distribution
-    ]: ...
     def __init__(
         self,
         *,
@@ -300,9 +276,6 @@ class Trial(google___protobuf___message___Message):
         worker_id: typing___Optional[type___WorkerID] = None,
         create_time: typing___Optional[google___protobuf___timestamp_pb2___Timestamp] = None,
         last_update_time: typing___Optional[google___protobuf___timestamp_pb2___Timestamp] = None,
-        distributions: typing___Optional[
-            typing___Mapping[typing___Text, optur___proto___search_space_pb2___Distribution]
-        ] = None,
     ) -> None: ...
     def HasField(
         self,
@@ -320,8 +293,6 @@ class Trial(google___protobuf___message___Message):
         field_name: typing_extensions___Literal[
             "create_time",
             b"create_time",
-            "distributions",
-            b"distributions",
             "last_known_state",
             b"last_known_state",
             "last_update_time",
@@ -441,14 +412,25 @@ class Parameter(google___protobuf___message___Message):
     DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
     @property
     def value(self) -> optur___proto___search_space_pb2___ParameterValue: ...
+    @property
+    def distribution(self) -> optur___proto___search_space_pb2___Distribution: ...
     def __init__(
         self,
         *,
         value: typing___Optional[optur___proto___search_space_pb2___ParameterValue] = None,
+        distribution: typing___Optional[optur___proto___search_space_pb2___Distribution] = None,
     ) -> None: ...
     def HasField(
-        self, field_name: typing_extensions___Literal["value", b"value"]
+        self,
+        field_name: typing_extensions___Literal[
+            "distribution", b"distribution", "value", b"value"
+        ],
     ) -> builtin___bool: ...
-    def ClearField(self, field_name: typing_extensions___Literal["value", b"value"]) -> None: ...
+    def ClearField(
+        self,
+        field_name: typing_extensions___Literal[
+            "distribution", b"distribution", "value", b"value"
+        ],
+    ) -> None: ...
 
 type___Parameter = Parameter

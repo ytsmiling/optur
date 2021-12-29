@@ -1,5 +1,60 @@
+from typing import Optional, Sequence
+
+from google.protobuf.timestamp_pb2 import Timestamp
+
 from optur.errors import InCompatibleSearchSpaceError
-from optur.proto.search_space_pb2 import Distribution, ParameterValue
+from optur.proto.search_space_pb2 import Distribution, ParameterValue, SearchSpace
+from optur.proto.study_pb2 import Trial
+
+
+class SearchSpaceTracker:
+    def __init__(self, search_space: Optional[SearchSpace]) -> None:
+        self._initial_search_space = search_space
+        self._current_search_space = SearchSpace()
+        if search_space is not None:
+            self._current_search_space.CopyFrom(search_space)
+        self._last_update_time: Optional[Timestamp] = None
+
+    @property
+    def last_update_time(self) -> Optional[Timestamp]:
+        return self._last_update_time
+
+    def update_timestamp(self, timestamp: Timestamp) -> None:
+        self._last_update_time = timestamp
+
+    @property
+    def current_search_space(self) -> SearchSpace:
+        return self._current_search_space
+
+    def contains(self, name: str, value: ParameterValue) -> bool:
+        return (
+            name not in self._current_search_space.distributions
+            or does_distribution_contain_value(
+                self._current_search_space.distributions[name], value
+            )
+        )
+
+    def sync(self, trials: Sequence[Trial]) -> None:
+        for trial in trials:
+            for name, param in trial.parameters.items():
+                if param.HasField("distribution"):
+                    pdist = param.distribution
+                else:
+                    pdist = Distribution(
+                        fixed_distribution=Distribution.FixedDistribution(values=[param.value])
+                    )
+                if name in self._current_search_space.distributions:
+                    cur_dist = self._current_search_space.distributions[name]
+                    if not are_identical_distributions(pdist, cur_dist):
+                        try:
+                            new_search_space = merge_distributions(pdist, cur_dist)
+                            self._current_search_space.distributions[name].CopyFrom(
+                                new_search_space
+                            )
+                        except InCompatibleSearchSpaceError as e:
+                            raise InCompatibleSearchSpaceError("") from e  # TODO(tsuzuku)
+                else:
+                    self._current_search_space.distributions[name].CopyFrom(pdist)
 
 
 def does_distribution_contain_value(distribution: Distribution, value: ParameterValue) -> bool:
