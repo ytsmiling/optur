@@ -4,7 +4,7 @@ import pytest  # type: ignore
 
 from optur.errors import InCompatibleSearchSpaceError
 from optur.proto.search_space_pb2 import Distribution, ParameterValue
-from optur.search_space.distribution import (
+from optur.utils.search_space_tracker import (
     are_identical_distributions,
     does_distribution_contain_value,
     merge_distributions,
