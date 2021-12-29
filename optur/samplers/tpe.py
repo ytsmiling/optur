@@ -1,6 +1,6 @@
-from typing import Dict, Optional, Sequence, List
+from typing import Dict, List, Optional, Sequence
 
-from optur.proto.sampler_pb2 import SamplerConfig, RandomSamplerConfig
+from optur.proto.sampler_pb2 import RandomSamplerConfig, SamplerConfig
 from optur.proto.search_space_pb2 import Distribution, ParameterValue, SearchSpace
 from optur.proto.study_pb2 import Trial as TrialProto
 from optur.samplers.random import RandomSampler
