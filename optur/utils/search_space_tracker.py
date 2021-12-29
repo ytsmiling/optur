@@ -8,6 +8,13 @@ from optur.proto.study_pb2 import Trial
 
 
 class SearchSpaceTracker:
+    """Infer search space from the past trials.
+
+    This class infers the search space from the past trials.
+    This process is called `intersection_searchspace` in optuna, but
+    optur does not necessarily infer the same search space with optuna.
+    """
+
     def __init__(self, search_space: Optional[SearchSpace]) -> None:
         self._initial_search_space = search_space
         self._current_search_space = SearchSpace()

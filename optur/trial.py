@@ -201,7 +201,6 @@ class Trial:
             fixed_parameters={
                 key: param.value for key, param in self._initial_trial_proto.parameters.items()
             },
-            search_space=None,  # TODO(tsuzuku): Set study_info.search_space.
         )
 
     def flush(self) -> None:

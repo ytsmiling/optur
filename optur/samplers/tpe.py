@@ -26,7 +26,6 @@ class TPESampler(Sampler):
     def joint_sample(
         self,
         fixed_parameters: Optional[Dict[str, ParameterValue]] = None,
-        search_space: Optional[SearchSpace] = None,
     ) -> Dict[str, ParameterValue]:
         sorted_trials = self._sorted_trials.to_list()
         if len(sorted_trials) < self._tpe_config.n_startup_trials:
@@ -38,9 +37,7 @@ class TPESampler(Sampler):
         assert _less_half_trials  # TODO(tsuzuku)
         assert _greater_half_trials  # TODO(tsuzuku)
         kde: KDE = FactorizedKDE()  # TODO(tsuzuku)
-        if search_space is None:
-            return {}
-        kde.init(search_space=search_space, observations=[])  # TODO(tsuzuku)
+        kde.init(search_space=SearchSpace(), observations=[])  # TODO(tsuzuku)
         samples = kde.sample(fixed_parameters=fixed_parameters, k=self._tpe_config.n_ei_candidates)
         assert samples  # TODO(tsuzuku)
         # TODO(tsuzuku): Calculate log_probs and compare them.

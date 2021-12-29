@@ -20,6 +20,10 @@ class Sampler(abc.ABC):
     def update_timestamp(self, timestamp: Optional[Timestamp]) -> None:
         self._last_update_time = timestamp
 
+    @abc.abstractclassmethod
+    def set_search_space(self, search_space: Optional[SearchSpace]) -> None:
+        pass
+
     def to_sampler_config(self) -> SamplerConfig:
         return self._sampler_config
 
@@ -30,17 +34,10 @@ class Sampler(abc.ABC):
     def joint_sample(
         self,
         fixed_parameters: Optional[Dict[str, ParameterValue]] = None,
-        search_space: Optional[SearchSpace] = None,
     ) -> Dict[str, ParameterValue]:
         """Perform joint-sampling for the trial.
 
         When ``fixed_parameters`` is not :obj:`None`, the return value must includes them.
-
-        When ``search_space`` is not :obj:`None`, this method uses the ``search_space``
-        for the joint-sampling.
-        When ``search_space`` is :obj:`None`, this method infers the search space from
-        past trials. This process is called `intersection_searchspace` in optuna, but
-        optur does not necessarily infer the same search space with optuna.
 
         This method is expected to be called just after the trial starts running.
         This method accepts ``fixed_parameters`` because the trial object has non-empty parameters
@@ -53,14 +50,7 @@ class Sampler(abc.ABC):
         It is up to trials whether they use the result of the joint-sampling or not.
         """
 
-        # Default implementation for samplers that cannot take inter-parameter
-        # correlations in to account.
-        ret = fixed_parameters.copy() if fixed_parameters is not None else {}
-        if search_space:
-            for key, distribution in search_space.distributions.items():
-                if not fixed_parameters or key not in fixed_parameters:
-                    ret[key] = self.sample(distribution=distribution)
-        return ret
+        return fixed_parameters.copy() if fixed_parameters is not None else {}
 
     @abc.abstractclassmethod
     def sample(self, distribution: Distribution) -> ParameterValue:
