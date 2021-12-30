@@ -11,11 +11,14 @@ except ImportError:
 
 from optur.proto.sampler_pb2 import RandomSamplerConfig, SamplerConfig
 from optur.proto.search_space_pb2 import Distribution, ParameterValue, SearchSpace
+from optur.proto.study_pb2 import AttributeValue
 from optur.proto.study_pb2 import Trial as TrialProto
 from optur.samplers.random import RandomSampler
 from optur.samplers.sampler import JointSampleResult, Sampler
 from optur.utils.search_space_tracker import SearchSpaceTracker
 from optur.utils.sorted_trials import SortedTrials
+
+_N_RERFERENCED_TRIALS_KEY = "smpl.tpe.n"
 
 
 class TPESampler(Sampler):
@@ -66,7 +69,11 @@ class TPESampler(Sampler):
         best_sample = {name: sample[name][best_sample_idx] for name, sample in samples.items()}
         return JointSampleResult(
             parameters=kde_l.sample_to_value(best_sample),
-            system_attrs={},
+            system_attrs={
+                _N_RERFERENCED_TRIALS_KEY: AttributeValue(
+                    int_value=self._sorted_trials.n_trials()
+                ),
+            },
         )
 
     def sample(self, distribution: Distribution) -> ParameterValue:

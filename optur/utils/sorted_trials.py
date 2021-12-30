@@ -129,5 +129,10 @@ class SortedTrials:
         assert self._trial_key_generator is not None, "Only single objective is supported."
         return self._sorted_trials
 
+    def n_trials(self) -> int:
+        """The number of stored trials."""
+        assert self._trial_key_generator is not None, "Only single objective is supported."
+        return len(self._sorted_trials)
+
     def get_best_trials(self) -> List[Trial]:
         pass
