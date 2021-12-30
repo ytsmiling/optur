@@ -12,6 +12,7 @@ except ImportError:
 from optur.proto.sampler_pb2 import RandomSamplerConfig, SamplerConfig
 from optur.proto.search_space_pb2 import Distribution, ParameterValue, SearchSpace
 from optur.proto.study_pb2 import AttributeValue
+from optur.proto.study_pb2 import Trial
 from optur.proto.study_pb2 import Trial as TrialProto
 from optur.samplers.random import RandomSampler
 from optur.samplers.sampler import JointSampleResult, Sampler
@@ -55,10 +56,14 @@ class TPESampler(Sampler):
         _greater_half_trials = sorted_trials[half_idx:]  # D_g
         # TODO(tsuzuku): Calculate weights.
         kde_l = _UnivariateKDE(
-            search_space=search_space, trials=_less_half_trials, weights=np.ones(())
+            search_space=search_space,
+            trials=_less_half_trials,
+            weights=self._calculate_sample_weights(_less_half_trials),
         )
         kde_g = _UnivariateKDE(
-            search_space=search_space, trials=_greater_half_trials, weights=np.ones(())
+            search_space=search_space,
+            trials=_greater_half_trials,
+            weights=self._calculate_sample_weights(_greater_half_trials),
         )
         samples = kde_l.sample(
             fixed_parameters=fixed_parameters or {}, k=self._tpe_config.n_ei_candidates
@@ -78,6 +83,19 @@ class TPESampler(Sampler):
 
     def sample(self, distribution: Distribution) -> ParameterValue:
         return self._fallback_sampler.sample(distribution=distribution)
+
+    def _calculate_sample_weights(self, trials: Sequence[Trial]) -> "npt.NDArray[np.float64]":
+        weights: "npt.NDArray[np.float64]" = np.asarray(
+            [
+                trial.system_attrs[_N_RERFERENCED_TRIALS_KEY].int_value
+                if _N_RERFERENCED_TRIALS_KEY in trial.system_attrs
+                else 0
+                for trial in trials
+            ],
+            dtype=np.float64,
+        )
+        weights /= weights.sum()
+        return weights
 
 
 # The Gaussian kernel is used for continuous parameters.
