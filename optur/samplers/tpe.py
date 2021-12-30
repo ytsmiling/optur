@@ -17,7 +17,11 @@ from optur.proto.study_pb2 import Trial as TrialProto
 from optur.samplers.random import RandomSampler
 from optur.samplers.sampler import JointSampleResult, Sampler
 from optur.utils.search_space_tracker import SearchSpaceTracker
-from optur.utils.sorted_trials import SortedTrials, TrialFilter, TrialKeyGenerator
+from optur.utils.sorted_trials import (
+    SortedTrials,
+    TrialKeyGenerator,
+    TrialQualityFilter,
+)
 
 _N_RERFERENCED_TRIALS_KEY = "smpl.tpe.n"
 
@@ -31,7 +35,7 @@ class TPESampler(Sampler):
         self._fallback_sampler = RandomSampler(SamplerConfig(random=RandomSamplerConfig()))
         self._search_space_tracker = SearchSpaceTracker(search_space=None)
         self._sorted_trials = SortedTrials(
-            trial_filter=TrialFilter(filter_unknown=True),
+            trial_filter=TrialQualityFilter(filter_unknown=True),
             trial_key_generator=TrialKeyGenerator(study_info.targets),
             trial_comparator=None,
         )
@@ -42,7 +46,7 @@ class TPESampler(Sampler):
         self._fallback_sampler = RandomSampler(SamplerConfig(random=RandomSamplerConfig()))
         self._search_space_tracker = SearchSpaceTracker(search_space=search_space)
         self._sorted_trials = SortedTrials(
-            trial_filter=TrialFilter(filter_unknown=True),
+            trial_filter=TrialQualityFilter(filter_unknown=True),
             trial_key_generator=TrialKeyGenerator(self._study_info.targets),
             trial_comparator=None,
         )

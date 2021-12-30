@@ -4,7 +4,7 @@ from typing import Callable, List, Optional, Sequence
 from optur.proto.study_pb2 import Target, Trial
 
 
-class TrialFilter:
+class TrialQualityFilter:
     def __init__(self, *, filter_unknown: bool = True) -> None:
         self._filter_unknown = filter_unknown
 
