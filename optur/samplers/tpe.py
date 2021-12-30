@@ -11,29 +11,41 @@ except ImportError:
 
 from optur.proto.sampler_pb2 import RandomSamplerConfig, SamplerConfig
 from optur.proto.search_space_pb2 import Distribution, ParameterValue, SearchSpace
-from optur.proto.study_pb2 import AttributeValue
+from optur.proto.study_pb2 import AttributeValue, StudyInfo
 from optur.proto.study_pb2 import Trial
 from optur.proto.study_pb2 import Trial as TrialProto
 from optur.samplers.random import RandomSampler
 from optur.samplers.sampler import JointSampleResult, Sampler
 from optur.utils.search_space_tracker import SearchSpaceTracker
-from optur.utils.sorted_trials import SortedTrials
+from optur.utils.sorted_trials import SortedTrials, TrialFilter, TrialKeyGenerator
 
 _N_RERFERENCED_TRIALS_KEY = "smpl.tpe.n"
 
 
 class TPESampler(Sampler):
-    def __init__(self, sampler_config: SamplerConfig) -> None:
+    def __init__(self, sampler_config: SamplerConfig, study_info: StudyInfo) -> None:
         super().__init__(sampler_config=sampler_config)
         assert sampler_config.HasField("tpe")
+        self._study_info = study_info
         self._tpe_config = sampler_config.tpe
         self._fallback_sampler = RandomSampler(SamplerConfig(random=RandomSamplerConfig()))
         self._search_space_tracker = SearchSpaceTracker(search_space=None)
-        self._sorted_trials: SortedTrials
+        self._sorted_trials = SortedTrials(
+            trial_filter=TrialFilter(filter_unknown=True),
+            trial_key_generator=TrialKeyGenerator(study_info.targets),
+            trial_comparator=None,
+        )
 
     def set_search_space(self, search_space: Optional[SearchSpace]) -> None:
-        # TODO(tsuzuku): Reset cache (e.g., sorted trials).
+        # We need to clear all caches because a set of "valid" past trials changes
+        # by this operation.
+        self._fallback_sampler = RandomSampler(SamplerConfig(random=RandomSamplerConfig()))
         self._search_space_tracker = SearchSpaceTracker(search_space=search_space)
+        self._sorted_trials = SortedTrials(
+            trial_filter=TrialFilter(filter_unknown=True),
+            trial_key_generator=TrialKeyGenerator(self._study_info.targets),
+            trial_comparator=None,
+        )
         # We need all past trials in the next sync because we cleared the cache.
         self.update_timestamp(timestamp=None)
 
@@ -52,15 +64,14 @@ class TPESampler(Sampler):
         search_space = self._search_space_tracker.current_search_space
         # TODO(tsuzuku): Extend to MOTPE.
         half_idx = len(sorted_trials) // 2
-        _less_half_trials = sorted_trials[:half_idx]  # D_l
-        _greater_half_trials = sorted_trials[half_idx:]  # D_g
-        # TODO(tsuzuku): Calculate weights.
-        kde_l = _UnivariateKDE(
+        _less_half_trials = sorted_trials[:half_idx]
+        _greater_half_trials = sorted_trials[half_idx:]
+        kde_l = _UnivariateKDE(  # D_l
             search_space=search_space,
             trials=_less_half_trials,
             weights=self._calculate_sample_weights(_less_half_trials),
         )
-        kde_g = _UnivariateKDE(
+        kde_g = _UnivariateKDE(  # D_g
             search_space=search_space,
             trials=_greater_half_trials,
             weights=self._calculate_sample_weights(_greater_half_trials),
