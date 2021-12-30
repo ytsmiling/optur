@@ -18,18 +18,31 @@ class TrialQualityFilter:
 class TrialKeyGenerator:
     def __init__(self, targets: Sequence[Target]) -> None:
         self._targets = targets
+        self._target_idx = -1
+        if (
+            sum(
+                target.direction in (Target.Direction.MAXIMIZE, Target.Direction.MINIMIZE)
+                for target in targets
+            )
+            == 1
+        ):
+            for idx, target in enumerate(targets):
+                if target.direction in (Target.Direction.MAXIMIZE, Target.Direction.MINIMIZE):
+                    self._target_idx = idx
 
     @property
     def is_valid(self) -> bool:
-        pass
+        return self._target_idx >= 0
 
     def __call__(self, trial: Trial) -> float:
+        assert self.is_valid
         if trial.last_known_state != Trial.State.COMPLETED:
+            # TODO(tsuzuku): Check the value when it's PARTIALLY_COMPLETED.
             return math.inf
-        if self._targets[0].direction == Target.Direction.MINIMIZE:
-            return trial.values[0].value
+        if self._targets[self._target_idx].direction == Target.Direction.MINIMIZE:
+            return trial.values[self._target_idx].value
         else:
-            return -trial.values[0].value
+            return -trial.values[self._target_idx].value
 
 
 # LQ, not LE.
