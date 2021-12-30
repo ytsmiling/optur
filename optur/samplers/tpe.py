@@ -1,6 +1,6 @@
 import abc
 import math
-from typing import Any, Dict, Optional, Sequence, Tuple
+from typing import Any, Dict, Optional, Sequence
 
 import numpy as np
 
@@ -102,7 +102,7 @@ class _UnivariateKDE:
                     pass
                 continue
             active = np.argmax(np.random.multinomial(1, self.weights, size=(k,)), axis=-1)
-            ret[name] = self._distributions[name].sample(size=(k,), active_indices=active)
+            ret[name] = self._distributions[name].sample(active_indices=active)
         return ret
 
     def log_pdf(self, observations: Dict[str, "npt.NDArray[Any]"]) -> "npt.NDArray[np.float64]":
@@ -114,9 +114,7 @@ class _UnivariateKDE:
 
 class _MixturedDistributionBase(abc.ABC):
     @abc.abstractclassmethod
-    def sample(
-        self, size: Tuple[int, ...], active_indices: "npt.NDArray[np.int_]"
-    ) -> "npt.NDArray[Any]":
+    def sample(self, active_indices: "npt.NDArray[np.int_]") -> "npt.NDArray[Any]":
         pass
 
     # (n_sample,) -> (n_sample, n_distribution)
@@ -136,9 +134,7 @@ class _AitchisonAitken(_MixturedDistributionBase):
     ) -> None:
         pass
 
-    def sample(
-        self, size: Tuple[int, ...], active_indices: "npt.NDArray[np.int_]"
-    ) -> "npt.NDArray[np.int_]":
+    def sample(self, active_indices: "npt.NDArray[np.int_]") -> "npt.NDArray[np.int_]":
         raise NotImplementedError()
 
     def log_pdf(self, x: "npt.NDArray[np.int_]") -> "npt.NDArray[np.float64]":
@@ -203,15 +199,13 @@ class _TruncatedLogisticMixturedDistribution(_MixturedDistributionBase):
         )
         return ret
 
-    def sample(
-        self, size: Tuple[int, ...], active_indices: "npt.NDArray[np.int_]"
-    ) -> "npt.NDArray[np.float64]":
+    def sample(self, active_indices: "npt.NDArray[np.int_]") -> "npt.NDArray[np.float64]":
         loc = self.loc[active_indices]
         scale = self.scale[active_indices]
         trunc_low = 1 / (1 + np.exp(-(self.low - loc) / scale))
         trunc_high = 1 / (1 + np.exp(-(self.high - loc) / scale))
 
-        p = np.random.uniform(trunc_low, trunc_high, size=size)
+        p = np.random.uniform(trunc_low, trunc_high, size=active_indices.shape)
         ret: "npt.NDArray[np.float64]" = loc - scale * np.log(1 / p - 1)
         return ret
 
@@ -244,7 +238,7 @@ class _MixturedDistribution(_MixturedDistributionBase):
     ) -> None:
         self._distribution = distribution
         self._weights = weights
-        valid_examples: "npt.NDArray[np.bool_]" = np.ndarray(
+        valid_examples: "npt.NDArray[np.bool_]" = np.asarray(
             [name in trial.parameters for trial in trials]
         )
         n_observation = valid_examples.sum()
@@ -255,12 +249,12 @@ class _MixturedDistribution(_MixturedDistributionBase):
                 low=float(int_d.low) - 0.5,
                 high=float(int_d.high) + 0.5,
                 log_scale=int_d.log_scale,
-                observations=np.ndarray(
+                observations=np.asarray(
                     [
                         trial.parameters[name].value.int_value if name in trial.parameters else 1.0
                         for trial in trials
                     ],
-                    dtype=np.ndarray,
+                    dtype=np.float64,
                 ),
                 valid=valid_examples,
                 n_observation=n_observation,
@@ -273,14 +267,14 @@ class _MixturedDistribution(_MixturedDistributionBase):
                 low=float_d.low,
                 high=float_d.high,
                 log_scale=float_d.log_scale,
-                observations=np.ndarray(
+                observations=np.asarray(
                     [
                         trial.parameters[name].value.double_value
                         if name in trial.parameters
                         else 1.0
                         for trial in trials
                     ],
-                    dtype=np.ndarray,
+                    dtype=np.float64,
                 ),
                 valid=valid_examples,
                 n_observation=n_observation,
@@ -323,10 +317,26 @@ class _MixturedDistribution(_MixturedDistributionBase):
             weights=weights,
         )
 
-    def sample(
-        self, size: Tuple[int, ...], active_indices: "npt.NDArray[np.int_]"
-    ) -> "npt.NDArray[Any]":
-        pass
+    def sample(self, active_indices: "npt.NDArray[np.int_]") -> "npt.NDArray[Any]":
+        ret: "npt.NDArray[Any]"
+        if self._distribution.HasField("int_distribution"):
+            int_d = self._distribution.int_distribution
+            samples = self._kernel.sample(active_indices=active_indices)
+            if int_d.log_scale:
+                samples = np.exp(samples)
+            rounded_samples: "npt.NDArray[np.int_]" = np.round(  # type: ignore[no-untyped-call]
+                samples
+            ).astype(np.int64)
+            ret = np.clip(a=rounded_samples, a_min=int_d.low, a_max=int_d.high)
+            return ret
+        elif self._distribution.HasField("float_distribution"):
+            float_d = self._distribution.int_distribution
+            samples = self._kernel.sample(active_indices=active_indices)
+            if float_d.log_scale:
+                samples = np.exp(samples)
+            ret = np.clip(a=samples, a_min=float_d.low, a_max=float_d.high)
+            return ret
+        raise NotImplementedError()
 
     def log_pdf(self, x: "npt.NDArray[Any]") -> "npt.NDArray[np.float64]":
         pass
