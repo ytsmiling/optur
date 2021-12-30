@@ -17,13 +17,22 @@ message StudyInfo {
     // The order of targets matters like optuna.
     repeated Target targets = 3;
     // User-defined attributes.
-    map<string, string> user_attrs = 4;
+    map<string, AttributeValue> user_attrs = 4;
     // System-defined attributes.
-    map<string, string> system_attrs = 5;
+    map<string, AttributeValue> system_attrs = 5;
     // Create time of the study since epoch.
     google.protobuf.Timestamp create_time = 6;
     // Last update time of the study since epoch.
     google.protobuf.Timestamp last_update_time = 7;
+}
+
+// System/user-defined attributes of studies/trials.
+message AttributeValue {
+    oneof value {
+        int64 int_value = 1;
+        double double_value = 2;
+        string string_value = 3;
+    }
 }
 
 // Attributes of targets of objective functions.
@@ -70,9 +79,9 @@ message Trial {
     // Last-known status of the trial.
     State last_known_state = 3;
     // User-defined attributes.
-    map<string, string> user_attrs = 4;
+    map<string, AttributeValue> user_attrs = 4;
     // System-defined attributes.
-    map<string, string> system_attrs = 5;
+    map<string, AttributeValue> system_attrs = 5;
     // Parameters used to evaluate the objective function.
     // A mapping from parameter name to parameter.
     map<string, Parameter> parameters = 6;

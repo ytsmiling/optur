@@ -48,13 +48,17 @@ class StudyInfo(google___protobuf___message___Message):
     class UserAttrsEntry(google___protobuf___message___Message):
         DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
         key: typing___Text = ...
-        value: typing___Text = ...
+        @property
+        def value(self) -> type___AttributeValue: ...
         def __init__(
             self,
             *,
             key: typing___Optional[typing___Text] = None,
-            value: typing___Optional[typing___Text] = None,
+            value: typing___Optional[type___AttributeValue] = None,
         ) -> None: ...
+        def HasField(
+            self, field_name: typing_extensions___Literal["value", b"value"]
+        ) -> builtin___bool: ...
         def ClearField(
             self, field_name: typing_extensions___Literal["key", b"key", "value", b"value"]
         ) -> None: ...
@@ -62,13 +66,17 @@ class StudyInfo(google___protobuf___message___Message):
     class SystemAttrsEntry(google___protobuf___message___Message):
         DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
         key: typing___Text = ...
-        value: typing___Text = ...
+        @property
+        def value(self) -> type___AttributeValue: ...
         def __init__(
             self,
             *,
             key: typing___Optional[typing___Text] = None,
-            value: typing___Optional[typing___Text] = None,
+            value: typing___Optional[type___AttributeValue] = None,
         ) -> None: ...
+        def HasField(
+            self, field_name: typing_extensions___Literal["value", b"value"]
+        ) -> builtin___bool: ...
         def ClearField(
             self, field_name: typing_extensions___Literal["key", b"key", "value", b"value"]
         ) -> None: ...
@@ -83,9 +91,9 @@ class StudyInfo(google___protobuf___message___Message):
         type___Target
     ]: ...
     @property
-    def user_attrs(self) -> typing___MutableMapping[typing___Text, typing___Text]: ...
+    def user_attrs(self) -> typing___MutableMapping[typing___Text, type___AttributeValue]: ...
     @property
-    def system_attrs(self) -> typing___MutableMapping[typing___Text, typing___Text]: ...
+    def system_attrs(self) -> typing___MutableMapping[typing___Text, type___AttributeValue]: ...
     @property
     def create_time(self) -> google___protobuf___timestamp_pb2___Timestamp: ...
     @property
@@ -96,8 +104,12 @@ class StudyInfo(google___protobuf___message___Message):
         study_id: typing___Optional[typing___Text] = None,
         study_name: typing___Optional[typing___Text] = None,
         targets: typing___Optional[typing___Iterable[type___Target]] = None,
-        user_attrs: typing___Optional[typing___Mapping[typing___Text, typing___Text]] = None,
-        system_attrs: typing___Optional[typing___Mapping[typing___Text, typing___Text]] = None,
+        user_attrs: typing___Optional[
+            typing___Mapping[typing___Text, type___AttributeValue]
+        ] = None,
+        system_attrs: typing___Optional[
+            typing___Mapping[typing___Text, type___AttributeValue]
+        ] = None,
         create_time: typing___Optional[google___protobuf___timestamp_pb2___Timestamp] = None,
         last_update_time: typing___Optional[google___protobuf___timestamp_pb2___Timestamp] = None,
     ) -> None: ...
@@ -128,6 +140,50 @@ class StudyInfo(google___protobuf___message___Message):
     ) -> None: ...
 
 type___StudyInfo = StudyInfo
+
+class AttributeValue(google___protobuf___message___Message):
+    DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
+    int_value: builtin___int = ...
+    double_value: builtin___float = ...
+    string_value: typing___Text = ...
+    def __init__(
+        self,
+        *,
+        int_value: typing___Optional[builtin___int] = None,
+        double_value: typing___Optional[builtin___float] = None,
+        string_value: typing___Optional[typing___Text] = None,
+    ) -> None: ...
+    def HasField(
+        self,
+        field_name: typing_extensions___Literal[
+            "double_value",
+            b"double_value",
+            "int_value",
+            b"int_value",
+            "string_value",
+            b"string_value",
+            "value",
+            b"value",
+        ],
+    ) -> builtin___bool: ...
+    def ClearField(
+        self,
+        field_name: typing_extensions___Literal[
+            "double_value",
+            b"double_value",
+            "int_value",
+            b"int_value",
+            "string_value",
+            b"string_value",
+            "value",
+            b"value",
+        ],
+    ) -> None: ...
+    def WhichOneof(
+        self, oneof_group: typing_extensions___Literal["value", b"value"]
+    ) -> typing_extensions___Literal["int_value", "double_value", "string_value"]: ...
+
+type___AttributeValue = AttributeValue
 
 class Target(google___protobuf___message___Message):
     DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
@@ -191,13 +247,17 @@ class Trial(google___protobuf___message___Message):
     class UserAttrsEntry(google___protobuf___message___Message):
         DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
         key: typing___Text = ...
-        value: typing___Text = ...
+        @property
+        def value(self) -> type___AttributeValue: ...
         def __init__(
             self,
             *,
             key: typing___Optional[typing___Text] = None,
-            value: typing___Optional[typing___Text] = None,
+            value: typing___Optional[type___AttributeValue] = None,
         ) -> None: ...
+        def HasField(
+            self, field_name: typing_extensions___Literal["value", b"value"]
+        ) -> builtin___bool: ...
         def ClearField(
             self, field_name: typing_extensions___Literal["key", b"key", "value", b"value"]
         ) -> None: ...
@@ -205,13 +265,17 @@ class Trial(google___protobuf___message___Message):
     class SystemAttrsEntry(google___protobuf___message___Message):
         DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
         key: typing___Text = ...
-        value: typing___Text = ...
+        @property
+        def value(self) -> type___AttributeValue: ...
         def __init__(
             self,
             *,
             key: typing___Optional[typing___Text] = None,
-            value: typing___Optional[typing___Text] = None,
+            value: typing___Optional[type___AttributeValue] = None,
         ) -> None: ...
+        def HasField(
+            self, field_name: typing_extensions___Literal["value", b"value"]
+        ) -> builtin___bool: ...
         def ClearField(
             self, field_name: typing_extensions___Literal["key", b"key", "value", b"value"]
         ) -> None: ...
@@ -239,9 +303,9 @@ class Trial(google___protobuf___message___Message):
     study_id: typing___Text = ...
     last_known_state: type___Trial.StateValue = ...
     @property
-    def user_attrs(self) -> typing___MutableMapping[typing___Text, typing___Text]: ...
+    def user_attrs(self) -> typing___MutableMapping[typing___Text, type___AttributeValue]: ...
     @property
-    def system_attrs(self) -> typing___MutableMapping[typing___Text, typing___Text]: ...
+    def system_attrs(self) -> typing___MutableMapping[typing___Text, type___AttributeValue]: ...
     @property
     def parameters(self) -> typing___MutableMapping[typing___Text, type___Parameter]: ...
     @property
@@ -268,8 +332,12 @@ class Trial(google___protobuf___message___Message):
         trial_id: typing___Optional[typing___Text] = None,
         study_id: typing___Optional[typing___Text] = None,
         last_known_state: typing___Optional[type___Trial.StateValue] = None,
-        user_attrs: typing___Optional[typing___Mapping[typing___Text, typing___Text]] = None,
-        system_attrs: typing___Optional[typing___Mapping[typing___Text, typing___Text]] = None,
+        user_attrs: typing___Optional[
+            typing___Mapping[typing___Text, type___AttributeValue]
+        ] = None,
+        system_attrs: typing___Optional[
+            typing___Mapping[typing___Text, type___AttributeValue]
+        ] = None,
         parameters: typing___Optional[typing___Mapping[typing___Text, type___Parameter]] = None,
         values: typing___Optional[typing___Iterable[type___ObjectiveValue]] = None,
         reports: typing___Optional[typing___Iterable[type___Report]] = None,

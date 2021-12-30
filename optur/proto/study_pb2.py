@@ -22,7 +22,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     syntax="proto3",
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
-    serialized_pb=b'\n\x17optur/proto/study.proto\x12\x05optur\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1eoptur/proto/search_space.proto"\x8c\x03\n\tStudyInfo\x12\x10\n\x08study_id\x18\x01 \x01(\t\x12\x12\n\nstudy_name\x18\x02 \x01(\t\x12\x1e\n\x07targets\x18\x03 \x03(\x0b\x32\r.optur.Target\x12\x33\n\nuser_attrs\x18\x04 \x03(\x0b\x32\x1f.optur.StudyInfo.UserAttrsEntry\x12\x37\n\x0csystem_attrs\x18\x05 \x03(\x0b\x32!.optur.StudyInfo.SystemAttrsEntry\x12/\n\x0b\x63reate_time\x18\x06 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x34\n\x10last_update_time\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x1a\x30\n\x0eUserAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x32\n\x10SystemAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01"x\n\x06Target\x12\x0c\n\x04name\x18\x01 \x01(\t\x12*\n\tdirection\x18\x02 \x01(\x0e\x32\x17.optur.Target.Direction"4\n\tDirection\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x0c\n\x08MAXIMIZE\x10\x01\x12\x0c\n\x08MINIMIZE\x10\x02"\x82\x06\n\x05Trial\x12\x10\n\x08trial_id\x18\x01 \x01(\t\x12\x10\n\x08study_id\x18\x02 \x01(\t\x12,\n\x10last_known_state\x18\x03 \x01(\x0e\x32\x12.optur.Trial.State\x12/\n\nuser_attrs\x18\x04 \x03(\x0b\x32\x1b.optur.Trial.UserAttrsEntry\x12\x33\n\x0csystem_attrs\x18\x05 \x03(\x0b\x32\x1d.optur.Trial.SystemAttrsEntry\x12\x30\n\nparameters\x18\x06 \x03(\x0b\x32\x1c.optur.Trial.ParametersEntry\x12%\n\x06values\x18\x07 \x03(\x0b\x32\x15.optur.ObjectiveValue\x12\x1e\n\x07reports\x18\x08 \x03(\x0b\x32\r.optur.Report\x12"\n\tworker_id\x18\t \x01(\x0b\x32\x0f.optur.WorkerID\x12/\n\x0b\x63reate_time\x18\n \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x34\n\x10last_update_time\x18\x0b \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x1a\x30\n\x0eUserAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x32\n\x10SystemAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x1a\x43\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x1f\n\x05value\x18\x02 \x01(\x0b\x32\x10.optur.Parameter:\x02\x38\x01"\x91\x01\n\x05State\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x0b\n\x07\x43REATED\x10\x01\x12\x0b\n\x07WAITING\x10\x02\x12\x0b\n\x07RUNNING\x10\x03\x12\r\n\tCOMPLETED\x10\x04\x12\n\n\x06\x46\x41ILED\x10\x05\x12\n\n\x06PRUNED\x10\x06\x12\x17\n\x13PARTIALLY_COMPLETED\x10\x07\x12\x14\n\x10PARTIALLY_FAILED\x10\x08"0\n\x08WorkerID\x12\x11\n\tclient_id\x18\x01 \x01(\t\x12\x11\n\tthread_id\x18\x02 \x01(\x03"m\n\x06Report\x12.\n\nevent_time\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x0c\n\x04step\x18\x02 \x01(\x03\x12%\n\x06values\x18\x03 \x03(\x0b\x32\x15.optur.ObjectiveValue"\xb0\x01\n\x0eObjectiveValue\x12\r\n\x05value\x18\x01 \x01(\x01\x12,\n\x06status\x18\x02 \x01(\x0e\x32\x1c.optur.ObjectiveValue.Status"a\n\x06Status\x12\x0b\n\x07UNKNOWN\x10\x00\x12\t\n\x05VALID\x10\x01\x12\x0b\n\x07SKIPPED\x10\x02\x12\x0e\n\nINFEASIBLE\x10\x03\x12\x07\n\x03NAN\x10\x04\x12\x07\n\x03INF\x10\x05\x12\x10\n\x0cNEGATIVE_INF\x10\x06"\\\n\tParameter\x12$\n\x05value\x18\x01 \x01(\x0b\x32\x15.optur.ParameterValue\x12)\n\x0c\x64istribution\x18\x02 \x01(\x0b\x32\x13.optur.Distributionb\x06proto3',
+    serialized_pb=b'\n\x17optur/proto/study.proto\x12\x05optur\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1eoptur/proto/search_space.proto"\xba\x03\n\tStudyInfo\x12\x10\n\x08study_id\x18\x01 \x01(\t\x12\x12\n\nstudy_name\x18\x02 \x01(\t\x12\x1e\n\x07targets\x18\x03 \x03(\x0b\x32\r.optur.Target\x12\x33\n\nuser_attrs\x18\x04 \x03(\x0b\x32\x1f.optur.StudyInfo.UserAttrsEntry\x12\x37\n\x0csystem_attrs\x18\x05 \x03(\x0b\x32!.optur.StudyInfo.SystemAttrsEntry\x12/\n\x0b\x63reate_time\x18\x06 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x34\n\x10last_update_time\x18\x07 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x1aG\n\x0eUserAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12$\n\x05value\x18\x02 \x01(\x0b\x32\x15.optur.AttributeValue:\x02\x38\x01\x1aI\n\x10SystemAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12$\n\x05value\x18\x02 \x01(\x0b\x32\x15.optur.AttributeValue:\x02\x38\x01"^\n\x0e\x41ttributeValue\x12\x13\n\tint_value\x18\x01 \x01(\x03H\x00\x12\x16\n\x0c\x64ouble_value\x18\x02 \x01(\x01H\x00\x12\x16\n\x0cstring_value\x18\x03 \x01(\tH\x00\x42\x07\n\x05value"x\n\x06Target\x12\x0c\n\x04name\x18\x01 \x01(\t\x12*\n\tdirection\x18\x02 \x01(\x0e\x32\x17.optur.Target.Direction"4\n\tDirection\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x0c\n\x08MAXIMIZE\x10\x01\x12\x0c\n\x08MINIMIZE\x10\x02"\xb0\x06\n\x05Trial\x12\x10\n\x08trial_id\x18\x01 \x01(\t\x12\x10\n\x08study_id\x18\x02 \x01(\t\x12,\n\x10last_known_state\x18\x03 \x01(\x0e\x32\x12.optur.Trial.State\x12/\n\nuser_attrs\x18\x04 \x03(\x0b\x32\x1b.optur.Trial.UserAttrsEntry\x12\x33\n\x0csystem_attrs\x18\x05 \x03(\x0b\x32\x1d.optur.Trial.SystemAttrsEntry\x12\x30\n\nparameters\x18\x06 \x03(\x0b\x32\x1c.optur.Trial.ParametersEntry\x12%\n\x06values\x18\x07 \x03(\x0b\x32\x15.optur.ObjectiveValue\x12\x1e\n\x07reports\x18\x08 \x03(\x0b\x32\r.optur.Report\x12"\n\tworker_id\x18\t \x01(\x0b\x32\x0f.optur.WorkerID\x12/\n\x0b\x63reate_time\x18\n \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x34\n\x10last_update_time\x18\x0b \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x1aG\n\x0eUserAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12$\n\x05value\x18\x02 \x01(\x0b\x32\x15.optur.AttributeValue:\x02\x38\x01\x1aI\n\x10SystemAttrsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12$\n\x05value\x18\x02 \x01(\x0b\x32\x15.optur.AttributeValue:\x02\x38\x01\x1a\x43\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x1f\n\x05value\x18\x02 \x01(\x0b\x32\x10.optur.Parameter:\x02\x38\x01"\x91\x01\n\x05State\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x0b\n\x07\x43REATED\x10\x01\x12\x0b\n\x07WAITING\x10\x02\x12\x0b\n\x07RUNNING\x10\x03\x12\r\n\tCOMPLETED\x10\x04\x12\n\n\x06\x46\x41ILED\x10\x05\x12\n\n\x06PRUNED\x10\x06\x12\x17\n\x13PARTIALLY_COMPLETED\x10\x07\x12\x14\n\x10PARTIALLY_FAILED\x10\x08"0\n\x08WorkerID\x12\x11\n\tclient_id\x18\x01 \x01(\t\x12\x11\n\tthread_id\x18\x02 \x01(\x03"m\n\x06Report\x12.\n\nevent_time\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x0c\n\x04step\x18\x02 \x01(\x03\x12%\n\x06values\x18\x03 \x03(\x0b\x32\x15.optur.ObjectiveValue"\xb0\x01\n\x0eObjectiveValue\x12\r\n\x05value\x18\x01 \x01(\x01\x12,\n\x06status\x18\x02 \x01(\x0e\x32\x1c.optur.ObjectiveValue.Status"a\n\x06Status\x12\x0b\n\x07UNKNOWN\x10\x00\x12\t\n\x05VALID\x10\x01\x12\x0b\n\x07SKIPPED\x10\x02\x12\x0e\n\nINFEASIBLE\x10\x03\x12\x07\n\x03NAN\x10\x04\x12\x07\n\x03INF\x10\x05\x12\x10\n\x0cNEGATIVE_INF\x10\x06"\\\n\tParameter\x12$\n\x05value\x18\x01 \x01(\x0b\x32\x15.optur.ParameterValue\x12)\n\x0c\x64istribution\x18\x02 \x01(\x0b\x32\x13.optur.Distributionb\x06proto3',
     dependencies=[
         google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,
         optur_dot_proto_dot_search__space__pb2.DESCRIPTOR,
@@ -64,8 +64,8 @@ _TARGET_DIRECTION = _descriptor.EnumDescriptor(
     ],
     containing_type=None,
     serialized_options=None,
-    serialized_start=566,
-    serialized_end=618,
+    serialized_start=708,
+    serialized_end=760,
 )
 _sym_db.RegisterEnumDescriptor(_TARGET_DIRECTION)
 
@@ -151,8 +151,8 @@ _TRIAL_STATE = _descriptor.EnumDescriptor(
     ],
     containing_type=None,
     serialized_options=None,
-    serialized_start=1246,
-    serialized_end=1391,
+    serialized_start=1434,
+    serialized_end=1579,
 )
 _sym_db.RegisterEnumDescriptor(_TRIAL_STATE)
 
@@ -222,8 +222,8 @@ _OBJECTIVEVALUE_STATUS = _descriptor.EnumDescriptor(
     ],
     containing_type=None,
     serialized_options=None,
-    serialized_start=1634,
-    serialized_end=1731,
+    serialized_start=1822,
+    serialized_end=1919,
 )
 _sym_db.RegisterEnumDescriptor(_OBJECTIVEVALUE_STATUS)
 
@@ -260,11 +260,11 @@ _STUDYINFO_USERATTRSENTRY = _descriptor.Descriptor(
             full_name="optur.StudyInfo.UserAttrsEntry.value",
             index=1,
             number=2,
-            type=9,
-            cpp_type=9,
+            type=11,
+            cpp_type=10,
             label=1,
             has_default_value=False,
-            default_value=b"".decode("utf-8"),
+            default_value=None,
             message_type=None,
             enum_type=None,
             containing_type=None,
@@ -284,7 +284,7 @@ _STUDYINFO_USERATTRSENTRY = _descriptor.Descriptor(
     extension_ranges=[],
     oneofs=[],
     serialized_start=396,
-    serialized_end=444,
+    serialized_end=467,
 )
 
 _STUDYINFO_SYSTEMATTRSENTRY = _descriptor.Descriptor(
@@ -319,11 +319,11 @@ _STUDYINFO_SYSTEMATTRSENTRY = _descriptor.Descriptor(
             full_name="optur.StudyInfo.SystemAttrsEntry.value",
             index=1,
             number=2,
-            type=9,
-            cpp_type=9,
+            type=11,
+            cpp_type=10,
             label=1,
             has_default_value=False,
-            default_value=b"".decode("utf-8"),
+            default_value=None,
             message_type=None,
             enum_type=None,
             containing_type=None,
@@ -342,8 +342,8 @@ _STUDYINFO_SYSTEMATTRSENTRY = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=446,
-    serialized_end=496,
+    serialized_start=469,
+    serialized_end=542,
 )
 
 _STUDYINFO = _descriptor.Descriptor(
@@ -500,7 +500,95 @@ _STUDYINFO = _descriptor.Descriptor(
     extension_ranges=[],
     oneofs=[],
     serialized_start=100,
-    serialized_end=496,
+    serialized_end=542,
+)
+
+
+_ATTRIBUTEVALUE = _descriptor.Descriptor(
+    name="AttributeValue",
+    full_name="optur.AttributeValue",
+    filename=None,
+    file=DESCRIPTOR,
+    containing_type=None,
+    create_key=_descriptor._internal_create_key,
+    fields=[
+        _descriptor.FieldDescriptor(
+            name="int_value",
+            full_name="optur.AttributeValue.int_value",
+            index=0,
+            number=1,
+            type=3,
+            cpp_type=2,
+            label=1,
+            has_default_value=False,
+            default_value=0,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+        _descriptor.FieldDescriptor(
+            name="double_value",
+            full_name="optur.AttributeValue.double_value",
+            index=1,
+            number=2,
+            type=1,
+            cpp_type=5,
+            label=1,
+            has_default_value=False,
+            default_value=float(0),
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+        _descriptor.FieldDescriptor(
+            name="string_value",
+            full_name="optur.AttributeValue.string_value",
+            index=2,
+            number=3,
+            type=9,
+            cpp_type=9,
+            label=1,
+            has_default_value=False,
+            default_value=b"".decode("utf-8"),
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+    ],
+    extensions=[],
+    nested_types=[],
+    enum_types=[],
+    serialized_options=None,
+    is_extendable=False,
+    syntax="proto3",
+    extension_ranges=[],
+    oneofs=[
+        _descriptor.OneofDescriptor(
+            name="value",
+            full_name="optur.AttributeValue.value",
+            index=0,
+            containing_type=None,
+            create_key=_descriptor._internal_create_key,
+            fields=[],
+        ),
+    ],
+    serialized_start=544,
+    serialized_end=638,
 )
 
 
@@ -561,8 +649,8 @@ _TARGET = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=498,
-    serialized_end=618,
+    serialized_start=640,
+    serialized_end=760,
 )
 
 
@@ -598,11 +686,11 @@ _TRIAL_USERATTRSENTRY = _descriptor.Descriptor(
             full_name="optur.Trial.UserAttrsEntry.value",
             index=1,
             number=2,
-            type=9,
-            cpp_type=9,
+            type=11,
+            cpp_type=10,
             label=1,
             has_default_value=False,
-            default_value=b"".decode("utf-8"),
+            default_value=None,
             message_type=None,
             enum_type=None,
             containing_type=None,
@@ -622,7 +710,7 @@ _TRIAL_USERATTRSENTRY = _descriptor.Descriptor(
     extension_ranges=[],
     oneofs=[],
     serialized_start=396,
-    serialized_end=444,
+    serialized_end=467,
 )
 
 _TRIAL_SYSTEMATTRSENTRY = _descriptor.Descriptor(
@@ -657,11 +745,11 @@ _TRIAL_SYSTEMATTRSENTRY = _descriptor.Descriptor(
             full_name="optur.Trial.SystemAttrsEntry.value",
             index=1,
             number=2,
-            type=9,
-            cpp_type=9,
+            type=11,
+            cpp_type=10,
             label=1,
             has_default_value=False,
-            default_value=b"".decode("utf-8"),
+            default_value=None,
             message_type=None,
             enum_type=None,
             containing_type=None,
@@ -680,8 +768,8 @@ _TRIAL_SYSTEMATTRSENTRY = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=446,
-    serialized_end=496,
+    serialized_start=469,
+    serialized_end=542,
 )
 
 _TRIAL_PARAMETERSENTRY = _descriptor.Descriptor(
@@ -739,8 +827,8 @@ _TRIAL_PARAMETERSENTRY = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=1176,
-    serialized_end=1243,
+    serialized_start=1364,
+    serialized_end=1431,
 )
 
 _TRIAL = _descriptor.Descriptor(
@@ -975,8 +1063,8 @@ _TRIAL = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=621,
-    serialized_end=1391,
+    serialized_start=763,
+    serialized_end=1579,
 )
 
 
@@ -1035,8 +1123,8 @@ _WORKERID = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=1393,
-    serialized_end=1441,
+    serialized_start=1581,
+    serialized_end=1629,
 )
 
 
@@ -1114,8 +1202,8 @@ _REPORT = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=1443,
-    serialized_end=1552,
+    serialized_start=1631,
+    serialized_end=1740,
 )
 
 
@@ -1176,8 +1264,8 @@ _OBJECTIVEVALUE = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=1555,
-    serialized_end=1731,
+    serialized_start=1743,
+    serialized_end=1919,
 )
 
 
@@ -1236,11 +1324,13 @@ _PARAMETER = _descriptor.Descriptor(
     syntax="proto3",
     extension_ranges=[],
     oneofs=[],
-    serialized_start=1733,
-    serialized_end=1825,
+    serialized_start=1921,
+    serialized_end=2013,
 )
 
+_STUDYINFO_USERATTRSENTRY.fields_by_name["value"].message_type = _ATTRIBUTEVALUE
 _STUDYINFO_USERATTRSENTRY.containing_type = _STUDYINFO
+_STUDYINFO_SYSTEMATTRSENTRY.fields_by_name["value"].message_type = _ATTRIBUTEVALUE
 _STUDYINFO_SYSTEMATTRSENTRY.containing_type = _STUDYINFO
 _STUDYINFO.fields_by_name["targets"].message_type = _TARGET
 _STUDYINFO.fields_by_name["user_attrs"].message_type = _STUDYINFO_USERATTRSENTRY
@@ -1251,9 +1341,27 @@ _STUDYINFO.fields_by_name[
 _STUDYINFO.fields_by_name[
     "last_update_time"
 ].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
+_ATTRIBUTEVALUE.oneofs_by_name["value"].fields.append(_ATTRIBUTEVALUE.fields_by_name["int_value"])
+_ATTRIBUTEVALUE.fields_by_name["int_value"].containing_oneof = _ATTRIBUTEVALUE.oneofs_by_name[
+    "value"
+]
+_ATTRIBUTEVALUE.oneofs_by_name["value"].fields.append(
+    _ATTRIBUTEVALUE.fields_by_name["double_value"]
+)
+_ATTRIBUTEVALUE.fields_by_name["double_value"].containing_oneof = _ATTRIBUTEVALUE.oneofs_by_name[
+    "value"
+]
+_ATTRIBUTEVALUE.oneofs_by_name["value"].fields.append(
+    _ATTRIBUTEVALUE.fields_by_name["string_value"]
+)
+_ATTRIBUTEVALUE.fields_by_name["string_value"].containing_oneof = _ATTRIBUTEVALUE.oneofs_by_name[
+    "value"
+]
 _TARGET.fields_by_name["direction"].enum_type = _TARGET_DIRECTION
 _TARGET_DIRECTION.containing_type = _TARGET
+_TRIAL_USERATTRSENTRY.fields_by_name["value"].message_type = _ATTRIBUTEVALUE
 _TRIAL_USERATTRSENTRY.containing_type = _TRIAL
+_TRIAL_SYSTEMATTRSENTRY.fields_by_name["value"].message_type = _ATTRIBUTEVALUE
 _TRIAL_SYSTEMATTRSENTRY.containing_type = _TRIAL
 _TRIAL_PARAMETERSENTRY.fields_by_name["value"].message_type = _PARAMETER
 _TRIAL_PARAMETERSENTRY.containing_type = _TRIAL
@@ -1284,6 +1392,7 @@ _PARAMETER.fields_by_name[
     "distribution"
 ].message_type = optur_dot_proto_dot_search__space__pb2._DISTRIBUTION
 DESCRIPTOR.message_types_by_name["StudyInfo"] = _STUDYINFO
+DESCRIPTOR.message_types_by_name["AttributeValue"] = _ATTRIBUTEVALUE
 DESCRIPTOR.message_types_by_name["Target"] = _TARGET
 DESCRIPTOR.message_types_by_name["Trial"] = _TRIAL
 DESCRIPTOR.message_types_by_name["WorkerID"] = _WORKERID
@@ -1322,6 +1431,17 @@ StudyInfo = _reflection.GeneratedProtocolMessageType(
 _sym_db.RegisterMessage(StudyInfo)
 _sym_db.RegisterMessage(StudyInfo.UserAttrsEntry)
 _sym_db.RegisterMessage(StudyInfo.SystemAttrsEntry)
+
+AttributeValue = _reflection.GeneratedProtocolMessageType(
+    "AttributeValue",
+    (_message.Message,),
+    {
+        "DESCRIPTOR": _ATTRIBUTEVALUE,
+        "__module__": "optur.proto.study_pb2"
+        # @@protoc_insertion_point(class_scope:optur.AttributeValue)
+    },
+)
+_sym_db.RegisterMessage(AttributeValue)
 
 Target = _reflection.GeneratedProtocolMessageType(
     "Target",

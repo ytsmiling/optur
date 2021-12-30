@@ -1,11 +1,17 @@
 import abc
-from typing import Dict, Optional, Sequence
+from typing import Dict, NamedTuple, Optional, Sequence
 
 from google.protobuf.timestamp_pb2 import Timestamp
 
 from optur.proto.sampler_pb2 import SamplerConfig
 from optur.proto.search_space_pb2 import Distribution, ParameterValue, SearchSpace
+from optur.proto.study_pb2 import AttributeValue
 from optur.proto.study_pb2 import Trial as TrialProto
+
+
+class JointSampleResult(NamedTuple):
+    parameters: Dict[str, ParameterValue]
+    system_attrs: Dict[str, AttributeValue]
 
 
 class Sampler(abc.ABC):

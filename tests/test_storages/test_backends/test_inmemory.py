@@ -4,7 +4,7 @@ import uuid
 import pytest
 
 from optur.errors import NotFoundError
-from optur.proto.study_pb2 import StudyInfo, Target, Trial
+from optur.proto.study_pb2 import AttributeValue, StudyInfo, Target, Trial
 from optur.storages.backends.inmemory import InMemoryStorageBackend
 
 
@@ -74,18 +74,24 @@ def test_incremental_read_study() -> None:
 def test_read_write_trial() -> None:
     backend = InMemoryStorageBackend()
     study = StudyInfo(study_id=uuid.uuid4().hex)
-    trial = Trial(trial_id=uuid.uuid4().hex, study_id=study.study_id, system_attrs={"foo": "bar"})
+    trial = Trial(
+        trial_id=uuid.uuid4().hex,
+        study_id=study.study_id,
+        system_attrs={"foo": AttributeValue(string_value="bar")},
+    )
     backend.write_study(study=study)
     backend.write_trial(trial=trial)
     loaded_trial = backend.get_trial(trial_id=trial.trial_id)
-    assert dict(loaded_trial.system_attrs.items()) == {"foo": "bar"}
+    assert dict(loaded_trial.system_attrs.items()) == {"foo": AttributeValue(string_value="bar")}
 
 
 def test_write_trial_with_non_existent_study() -> None:
     backend = InMemoryStorageBackend()
     study = StudyInfo(study_id=uuid.uuid4().hex)
     trial = Trial(
-        trial_id=uuid.uuid4().hex, study_id=uuid.uuid4().hex, system_attrs={"foo": "bar"}
+        trial_id=uuid.uuid4().hex,
+        study_id=uuid.uuid4().hex,
+        system_attrs={"foo": AttributeValue(string_value="bar")},
     )
     backend.write_study(study=study)
     with pytest.raises(NotFoundError):
@@ -95,7 +101,11 @@ def test_write_trial_with_non_existent_study() -> None:
 def test_read_non_existent_trial() -> None:
     backend = InMemoryStorageBackend()
     study = StudyInfo(study_id=uuid.uuid4().hex)
-    trial = Trial(trial_id=uuid.uuid4().hex, study_id=study.study_id, system_attrs={"foo": "bar"})
+    trial = Trial(
+        trial_id=uuid.uuid4().hex,
+        study_id=study.study_id,
+        system_attrs={"foo": AttributeValue(string_value="bar")},
+    )
     backend.write_study(study=study)
     backend.write_trial(trial=trial)
     with pytest.raises(NotFoundError):
