@@ -93,21 +93,20 @@ class _UnivariateKDE:
         self, fixed_parameters: Dict[str, ParameterValue], k: int
     ) -> Dict[str, "npt.NDArray[Any]"]:
         ret: Dict[str, "npt.NDArray[Any]"] = {}
-        for name, distribution in self._search_space.distributions.items():
+        for name in self._search_space.distributions:
             if name in fixed_parameters:
-                if distribution.HasField("categorical_distribution"):
-                    pass
-                else:
-                    pass
-                continue
+                raise NotImplementedError()
             active = np.argmax(np.random.multinomial(1, self.weights, size=(k,)), axis=-1)
             ret[name] = self._distributions[name].sample(active_indices=active)
         return ret
 
     def log_pdf(self, observations: Dict[str, "npt.NDArray[Any]"]) -> "npt.NDArray[np.float64]":
-        ret = np.ones(shape=(1,))
+        ret = np.zeros(shape=(1,))
+        weights = np.log(self.weights)[None]
         for name, samples in observations.items():
-            ret = ret * self._distributions[name].log_pdf(samples).sum(axis=1)
+            log_pdf = self._distributions[name].log_pdf(samples)
+            # TODO(tsuzuku): Improve numerical stability.
+            ret = ret + np.log(np.exp(log_pdf + weights).sum(axis=1))
         return ret
 
 
@@ -193,6 +192,7 @@ class _TruncatedLogisticMixturedDistribution(_MixturedDistributionBase):
         return ret
 
     def sample(self, active_indices: "npt.NDArray[np.int_]") -> "npt.NDArray[np.float64]":
+        # TODO(tsuzuku): Check numerical stability.
         loc = self.loc[active_indices]
         scale = self.scale[active_indices]
         trunc_low = 1 / (1 + np.exp(-(self.low - loc) / scale))

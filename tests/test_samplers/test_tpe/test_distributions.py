@@ -14,7 +14,7 @@ def int_distribution(low: int, high: int, log_scale: bool = False) -> Distributi
     )
 
 
-def float_distribution(low: int, high: int, log_scale: bool = False) -> Distribution:
+def float_distribution(low: float, high: float, log_scale: bool = False) -> Distribution:
     return Distribution(
         float_distribution=Distribution.FloatDistribution(low=low, high=high, log_scale=log_scale)
     )
