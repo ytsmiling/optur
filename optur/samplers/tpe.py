@@ -317,7 +317,7 @@ class _MixturedDistribution(_MixturedDistributionBase):
             ret = np.clip(a=rounded_samples, a_min=int_d.low, a_max=int_d.high)
             return ret
         elif self._distribution.HasField("float_distribution"):
-            float_d = self._distribution.int_distribution
+            float_d = self._distribution.float_distribution
             samples = self._kernel.sample(active_indices=active_indices)
             if float_d.log_scale:
                 samples = np.exp(samples)
@@ -330,6 +330,11 @@ class _MixturedDistribution(_MixturedDistributionBase):
             int_d = self._distribution.int_distribution
             x = x.astype(np.float64)
             if int_d.log_scale:
+                x = np.log(x)
+            return self._kernel.log_pdf(x)
+        elif self._distribution.HasField("float_distribution"):
+            float_d = self._distribution.float_distribution
+            if float_d.log_scale:
                 x = np.log(x)
             return self._kernel.log_pdf(x)
         raise NotImplementedError()
