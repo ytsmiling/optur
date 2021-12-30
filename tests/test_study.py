@@ -3,7 +3,7 @@ import uuid
 from typing import Any
 from unittest.mock import MagicMock, call
 
-import pytest  # type: ignore
+import pytest
 from google.protobuf.timestamp_pb2 import Timestamp
 
 from optur.errors import PrunedException
@@ -339,7 +339,7 @@ def test_run_trial_uses_waiting_trial() -> None:
     assert trial.get_proto().trial_id == trial_id
 
 
-@pytest.mark.parametrize(  # type: ignore
+@pytest.mark.parametrize(
     "values,state",
     [
         (0.1, TrialProto.State.COMPLETED),

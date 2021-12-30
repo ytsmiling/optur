@@ -1,7 +1,7 @@
 import random
 
 import numpy as np
-import pytest  # type: ignore
+import pytest
 
 from optur.proto.search_space_pb2 import Distribution, ParameterValue
 from optur.proto.study_pb2 import Parameter, Trial
@@ -57,7 +57,7 @@ def test_int_distribution_calculates_valid_log_pdf(log_scale: bool) -> None:
     log_pdf = dist.log_pdf(samples)
     assert log_pdf.dtype == np.dtype("float64")  # type: ignore
     assert log_pdf.shape == (len(samples), 97)
-    assert (np.exp(log_pdf) <= 1.0).all()  # type: ignore
+    assert (np.exp(log_pdf) <= 1.0).all()
     assert (
         np.exp(dist.log_pdf(np.random.randint(10, 30, size=100))).mean()
         > np.exp(dist.log_pdf(np.random.randint(50, 80, size=100))).mean()

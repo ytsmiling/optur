@@ -1,6 +1,6 @@
 from typing import Sequence
 
-import pytest  # type: ignore
+import pytest
 
 from optur.errors import InCompatibleSearchSpaceError
 from optur.proto.search_space_pb2 import Distribution, ParameterValue

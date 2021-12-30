@@ -1,7 +1,7 @@
 import random
 import uuid
 
-import pytest  # type: ignore
+import pytest
 
 from optur.errors import NotFoundError
 from optur.proto.study_pb2 import StudyInfo, Target, Trial
