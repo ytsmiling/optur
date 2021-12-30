@@ -84,7 +84,6 @@ class _UnivariateKDE:
                 name=name,
                 distribution=distribution,
                 trials=trials,
-                weights=weights,
                 n_distribution=n_distribution,
             )
             for name, distribution in search_space.distributions.items()
@@ -176,7 +175,7 @@ class _TruncatedLogisticMixturedDistribution(_MixturedDistributionBase):
         self.loc = loc
         self.scale = scale
         self.eps = eps
-        self.normalization_constant = np.sum(
+        self.normalization_constant: "npt.NDArray[np.float64]" = (  # (1, n_observation)
             self.unnormalized_cdf(np.asarray([high])) - self.unnormalized_cdf(np.asarray([low]))
         )
 
@@ -203,19 +202,20 @@ class _TruncatedLogisticMixturedDistribution(_MixturedDistributionBase):
         ret: "npt.NDArray[np.float64]" = loc - scale * np.log(1 / p - 1)
         return ret
 
+    # Return (len(x), n_observation)
     def unnormalized_cdf(self, x: "npt.NDArray[np.float64]") -> "npt.NDArray[np.float64]":
         x = x[..., None]
         loc = self.loc[None]
         scale = self.scale[None]
-        ret: "npt.NDArray[np.float64]" = (
-            1.0 / (1 + np.exp((x - loc) / np.maximum(scale, self.eps)))
+        ret: "npt.NDArray[np.float64]" = 1.0 / (
+            1 + np.exp(-(x - loc) / np.maximum(scale, self.eps))
         )
         return ret
 
     def log_pdf(self, x: "npt.NDArray[np.float64]") -> "npt.NDArray[np.float64]":
-        p: "npt.NDArray[np.float64]" = self.unnormalized_cdf(x) * (1 - self.unnormalized_cdf(x))
-        ret: "npt.NDArray[np.float64]" = np.log(
-            p / np.maximum(self.normalization_constant, self.eps)
+        cdf: "npt.NDArray[np.float64]" = self.unnormalized_cdf(x)
+        ret: "npt.NDArray[np.float64]" = np.log(cdf * (1 - cdf)) / np.maximum(
+            self.normalization_constant, self.eps
         )
         return ret
 
@@ -226,11 +226,9 @@ class _MixturedDistribution(_MixturedDistributionBase):
         name: str,
         distribution: Distribution,
         trials: Sequence[TrialProto],
-        weights: "npt.NDArray[np.float64]",
         n_distribution: int,
     ) -> None:
         self._distribution = distribution
-        self._weights = weights
         valid_examples: "npt.NDArray[np.bool_]" = np.asarray(
             [name in trial.parameters for trial in trials]
         )
