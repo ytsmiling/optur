@@ -3,9 +3,12 @@ from typing import Sequence
 import pytest
 
 from optur.errors import InCompatibleSearchSpaceError
-from optur.proto.search_space_pb2 import Distribution, ParameterValue
+from optur.proto.search_space_pb2 import Distribution, ParameterValue, SearchSpace
+from optur.proto.study_pb2 import Parameter, Trial
 from optur.utils.search_space_tracker import (
+    SearchSpaceTracker,
     are_identical_distributions,
+    are_identical_search_spaces,
     does_distribution_contain_value,
     merge_distributions,
 )
@@ -616,3 +619,168 @@ def test_merge_fixed_distributions() -> None:
             ]
         ),
     )
+
+
+def test_search_space_tracker_merges_fixed_distributions() -> None:
+    search_space_tracker = SearchSpaceTracker(
+        search_space=SearchSpace(
+            distributions={
+                "foo": Distribution(
+                    fixed_distribution=Distribution.FixedDistribution(
+                        values=[ParameterValue(int_value=2), ParameterValue(string_value="bar")],
+                    )
+                )
+            }
+        )
+    )
+    assert are_identical_search_spaces(
+        a=search_space_tracker.current_search_space,
+        b=SearchSpace(
+            distributions={
+                "foo": fixed_distribution(
+                    values=[ParameterValue(int_value=2), ParameterValue(string_value="bar")],
+                )
+            }
+        ),
+    )
+    search_space_tracker.sync(
+        [Trial(parameters={"foo": Parameter(value=ParameterValue(double_value=0.2))})]
+    )
+    assert are_identical_search_spaces(
+        a=search_space_tracker.current_search_space,
+        b=SearchSpace(
+            distributions={
+                "foo": fixed_distribution(
+                    values=[
+                        ParameterValue(int_value=2),
+                        ParameterValue(string_value="bar"),
+                        ParameterValue(double_value=0.2),
+                    ],
+                )
+            }
+        ),
+    )
+    search_space_tracker.sync(
+        [
+            Trial(
+                parameters={
+                    "foo": Parameter(
+                        value=ParameterValue(double_value=0.3),
+                        distribution=fixed_distribution(values=[ParameterValue(double_value=0.3)]),
+                    )
+                }
+            )
+        ]
+    )
+    assert are_identical_search_spaces(
+        a=search_space_tracker.current_search_space,
+        b=SearchSpace(
+            distributions={
+                "foo": fixed_distribution(
+                    values=[
+                        ParameterValue(int_value=2),
+                        ParameterValue(string_value="bar"),
+                        ParameterValue(double_value=0.2),
+                        ParameterValue(double_value=0.3),
+                    ],
+                )
+            }
+        ),
+    )
+    search_space_tracker.sync(
+        [
+            Trial(
+                parameters={
+                    "foo": Parameter(
+                        value=ParameterValue(double_value=0.3),
+                        distribution=categorical_distribution(
+                            choices=[
+                                ParameterValue(int_value=2),
+                                ParameterValue(string_value="bar"),
+                                ParameterValue(double_value=0.2),
+                                ParameterValue(double_value=0.3),
+                                ParameterValue(double_value=0.4),
+                            ]
+                        ),
+                    )
+                }
+            )
+        ]
+    )
+    assert are_identical_search_spaces(
+        a=search_space_tracker.current_search_space,
+        b=SearchSpace(
+            distributions={
+                "foo": categorical_distribution(
+                    choices=[
+                        ParameterValue(int_value=2),
+                        ParameterValue(string_value="bar"),
+                        ParameterValue(double_value=0.2),
+                        ParameterValue(double_value=0.3),
+                        ParameterValue(double_value=0.4),
+                    ],
+                )
+            }
+        ),
+    )
+
+
+def test_search_space_tracker_updates_with_new_parameters() -> None:
+    search_space_tracker = SearchSpaceTracker(
+        search_space=SearchSpace(
+            distributions={
+                "foo": Distribution(
+                    fixed_distribution=Distribution.FixedDistribution(
+                        values=[ParameterValue(int_value=2), ParameterValue(string_value="bar")],
+                    )
+                )
+            }
+        )
+    )
+    assert are_identical_search_spaces(
+        a=search_space_tracker.current_search_space,
+        b=SearchSpace(
+            distributions={
+                "foo": fixed_distribution(
+                    values=[ParameterValue(int_value=2), ParameterValue(string_value="bar")],
+                )
+            }
+        ),
+    )
+    search_space_tracker.sync(
+        [Trial(parameters={"bar": Parameter(value=ParameterValue(double_value=0.2))})]
+    )
+    are_identical_search_spaces(
+        a=search_space_tracker.current_search_space,
+        b=SearchSpace(
+            distributions={
+                "foo": fixed_distribution(
+                    values=[
+                        ParameterValue(int_value=2),
+                        ParameterValue(string_value="bar"),
+                    ],
+                ),
+                "bar": fixed_distribution(
+                    values=[
+                        ParameterValue(double_value=0.2),
+                    ],
+                ),
+            }
+        ),
+    )
+
+
+def test_search_space_tracker_promotes_fixed_distribution_to_int_distribution() -> None:
+    pass
+
+
+def test_search_space_tracker_promotes_fixed_distribution_to_float_distribution() -> None:
+    pass
+
+
+def test_search_space_tracker_raises_on_distribution_conflicts() -> None:
+    pass
+
+
+def test_search_space_tracker_filters_incompatible_trials() -> None:
+    pass

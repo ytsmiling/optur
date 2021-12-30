@@ -42,6 +42,15 @@ class SearchSpaceTracker:
         )
 
     def sync(self, trials: Sequence[Trial]) -> None:
+        """Update the inferred search space.
+
+        This function ignores trials that are incompatible with the search space
+        used in the init method.
+
+        Raises:
+            InCompatibleSearchSpaceError:
+                When some trials conflict with the inferred search space.
+        """
         for trial in trials:
             for name, param in trial.parameters.items():
                 if param.HasField("distribution"):
@@ -137,3 +146,10 @@ def merge_distributions(
     if are_identical_distributions(a, b):
         return a
     raise InCompatibleSearchSpaceError("")  # TODO(tsuzuku)
+
+
+def are_identical_search_spaces(a: SearchSpace, b: SearchSpace) -> bool:
+    return set(a.distributions.keys()) == set(b.distributions.keys()) and all(
+        are_identical_distributions(a.distributions[key], b.distributions[key])
+        for key in a.distributions
+    )
