@@ -197,11 +197,13 @@ class Trial:
             )
             self._sampler.sync(trials)
             self._sampler.update_timestamp(timestamp)
-        self._suggested_parameters = self._sampler.joint_sample(
+        self._suggested_parameters, system_attrs = self._sampler.joint_sample(
             fixed_parameters={
                 key: param.value for key, param in self._initial_trial_proto.parameters.items()
             },
         )
+        for key, attr in system_attrs.items():
+            self._trial_proto.system_attrs[key].CopyFrom(attr)
 
     def flush(self) -> None:
         """Write this trial to the storage."""

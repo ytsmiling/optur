@@ -13,7 +13,7 @@ from optur.proto.sampler_pb2 import RandomSamplerConfig, SamplerConfig
 from optur.proto.search_space_pb2 import Distribution, ParameterValue, SearchSpace
 from optur.proto.study_pb2 import Trial as TrialProto
 from optur.samplers.random import RandomSampler
-from optur.samplers.sampler import Sampler
+from optur.samplers.sampler import JointSampleResult, Sampler
 from optur.utils.search_space_tracker import SearchSpaceTracker
 from optur.utils.sorted_trials import SortedTrials
 
@@ -41,10 +41,10 @@ class TPESampler(Sampler):
     def joint_sample(
         self,
         fixed_parameters: Optional[Dict[str, ParameterValue]] = None,
-    ) -> Dict[str, ParameterValue]:
+    ) -> JointSampleResult:
         sorted_trials = self._sorted_trials.to_list()
         if len(sorted_trials) < self._tpe_config.n_startup_trials:
-            return {}
+            return JointSampleResult(parameters={}, system_attrs={})
         search_space = self._search_space_tracker.current_search_space
         # TODO(tsuzuku): Extend to MOTPE.
         half_idx = len(sorted_trials) // 2
@@ -64,7 +64,10 @@ class TPESampler(Sampler):
         log_pdf_g = kde_g.log_pdf(samples)
         best_sample_idx = np.argmax(log_pdf_l - log_pdf_g)
         best_sample = {name: sample[name][best_sample_idx] for name, sample in samples.items()}
-        return kde_l.sample_to_value(best_sample)
+        return JointSampleResult(
+            parameters=kde_l.sample_to_value(best_sample),
+            system_attrs={},
+        )
 
     def sample(self, distribution: Distribution) -> ParameterValue:
         return self._fallback_sampler.sample(distribution=distribution)

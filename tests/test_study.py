@@ -12,6 +12,7 @@ from optur.proto.search_space_pb2 import ParameterValue
 from optur.proto.study_pb2 import ObjectiveValue, StudyInfo
 from optur.proto.study_pb2 import Trial as TrialProto
 from optur.proto.study_pb2 import WorkerID
+from optur.samplers.sampler import JointSampleResult
 from optur.study import (
     _ask,
     _infer_trial_state_from_objective_values,
@@ -173,6 +174,7 @@ def test_ask_sets_study_id() -> None:
     study_id = uuid.uuid4().hex
     trials = [TrialProto(trial_id=uuid.uuid4().hex)]
     sampler.last_update_time = sampler_timestamp
+    sampler.joint_sample.return_value = JointSampleResult(parameters={}, system_attrs={})
     storage.get_current_timestamp.return_value = storage_timestamp
     storage.get_trials.return_value = trials
     trial_queue = MagicMock()
@@ -197,6 +199,7 @@ def test_ask_sync_sampler() -> None:
     study_id = uuid.uuid4().hex
     trials = [TrialProto(trial_id=uuid.uuid4().hex)]
     sampler.last_update_time = sampler_timestamp
+    sampler.joint_sample.return_value = JointSampleResult(parameters={}, system_attrs={})
     storage.get_current_timestamp.return_value = storage_timestamp
     storage.get_trials.return_value = trials
     trial_queue = MagicMock()
@@ -226,6 +229,7 @@ def test_ask_sync_trial_queue() -> None:
     study_id = uuid.uuid4().hex
     trials = [TrialProto(trial_id=uuid.uuid4().hex)]
     sampler.last_update_time = sampler_timestamp
+    sampler.joint_sample.return_value = JointSampleResult(parameters={}, system_attrs={})
     storage.get_current_timestamp.return_value = storage_timestamp
     storage.get_trials.return_value = trials
     trial_queue = MagicMock()
@@ -255,6 +259,7 @@ def test_ask_calls_joint_sample() -> None:
     study_id = uuid.uuid4().hex
     trials = [TrialProto(trial_id=uuid.uuid4().hex)]
     sampler.last_update_time = sampler_timestamp
+    sampler.joint_sample.return_value = JointSampleResult(parameters={}, system_attrs={})
     storage.get_current_timestamp.return_value = storage_timestamp
     storage.get_trials.return_value = trials
     trial_queue = MagicMock()
@@ -287,10 +292,13 @@ def test_run_trial_uses_joint_sample() -> None:
     queue = MagicMock()
     objective.return_value = 0.1
     sampler.last_update_time = None
-    sampler.joint_sample.return_value = {
-        "foo": ParameterValue(int_value=1),
-        "bar": ParameterValue(double_value=2.0),
-    }
+    sampler.joint_sample.return_value = JointSampleResult(
+        parameters={
+            "foo": ParameterValue(int_value=1),
+            "bar": ParameterValue(double_value=2.0),
+        },
+        system_attrs={},
+    )
     storage.get_current_timestamp.return_value = None
     storage.get_trials.return_value = []
     queue.get_trial.return_value = None
@@ -318,7 +326,7 @@ def test_run_trial_uses_waiting_trial() -> None:
     queue = MagicMock()
     objective.return_value = 0.1
     sampler.last_update_time = None
-    sampler.joint_sample.return_value = {}
+    sampler.joint_sample.return_value = JointSampleResult(parameters={}, system_attrs={})
     storage.get_current_timestamp.return_value = None
     storage.get_trials.return_value = []
     trial_id = uuid.uuid4().hex
@@ -357,7 +365,7 @@ def test_run_trial_return_value_handling(values: Any, state: "TrialProto.StateVa
     storage = MagicMock()
     queue = MagicMock()
     sampler.last_update_time = None
-    sampler.joint_sample.return_value = {}
+    sampler.joint_sample.return_value = JointSampleResult(parameters={}, system_attrs={})
     storage.get_current_timestamp.return_value = None
     storage.get_trials.return_value = []
     objective.return_value = values
@@ -384,7 +392,7 @@ def test_run_trial_sets_pruned_state() -> None:
     storage = MagicMock()
     queue = MagicMock()
     sampler.last_update_time = None
-    sampler.joint_sample.return_value = {}
+    sampler.joint_sample.return_value = JointSampleResult(parameters={}, system_attrs={})
     storage.get_current_timestamp.return_value = None
     storage.get_trials.return_value = []
     objective.side_effect = PrunedException
@@ -411,7 +419,7 @@ def test_run_trial_catch_and_sets_failed_state() -> None:
     storage = MagicMock()
     queue = MagicMock()
     sampler.last_update_time = None
-    sampler.joint_sample.return_value = {}
+    sampler.joint_sample.return_value = JointSampleResult(parameters={}, system_attrs={})
     storage.get_current_timestamp.return_value = None
     storage.get_trials.return_value = []
     objective.side_effect = RuntimeError
@@ -438,7 +446,7 @@ def test_run_trial_does_not_catch() -> None:
     storage = MagicMock()
     queue = MagicMock()
     sampler.last_update_time = None
-    sampler.joint_sample.return_value = {}
+    sampler.joint_sample.return_value = JointSampleResult(parameters={}, system_attrs={})
     storage.get_current_timestamp.return_value = None
     storage.get_trials.return_value = []
     objective.side_effect = RuntimeError

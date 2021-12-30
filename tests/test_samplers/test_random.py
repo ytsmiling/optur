@@ -58,6 +58,6 @@ def test_random_sampler_joint_sample_respects_fixed_parameters() -> None:
         "foo": ParameterValue(int_value=3),
         "bar": ParameterValue(double_value=2.4),
     }
-    parameters = sampler.joint_sample(fixed_parameters=fixed_parameters)
+    parameters, _ = sampler.joint_sample(fixed_parameters=fixed_parameters)
     assert set(parameters.keys()) == {"foo", "bar"}
     assert all(parameters[key] == fixed_parameters[key] for key in {"foo", "bar"})

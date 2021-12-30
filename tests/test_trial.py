@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, call
 from optur.proto.search_space_pb2 import Distribution, ParameterValue
 from optur.proto.study_pb2 import Parameter, StudyInfo
 from optur.proto.study_pb2 import Trial as TrialProto
+from optur.samplers.sampler import JointSampleResult
 from optur.trial import Trial
 
 
@@ -83,6 +84,7 @@ def test_reset_method_resets_suggested_parameters() -> None:
     storage = MagicMock()
     distribution = Distribution(int_distribution=Distribution.IntDistribution(low=1, high=3))
     original_value = ParameterValue(int_value=2)
+    sampler.joint_sample.return_value = JointSampleResult(parameters={}, system_attrs={})
     sampler.sample.return_value = original_value
     trial = Trial(
         trial_proto=TrialProto(),
@@ -101,7 +103,7 @@ def test_reset_method_resets_suggested_parameters() -> None:
 def test_reset_method_does_not_reset_fixed_parameters() -> None:
     sampler = MagicMock()
     storage = MagicMock()
-    sampler.joint_sample.return_value = {}
+    sampler.joint_sample.return_value = JointSampleResult(parameters={}, system_attrs={})
     distribution = Distribution(int_distribution=Distribution.IntDistribution(low=1, high=3))
     original_value = ParameterValue(int_value=2)
     trial = Trial(
@@ -122,6 +124,7 @@ def test_hard_reset_does_reset_fixed_parameters() -> None:
     storage = MagicMock()
     distribution = Distribution(int_distribution=Distribution.IntDistribution(low=1, high=3))
     original_value = ParameterValue(int_value=2)
+    sampler.joint_sample.return_value = JointSampleResult(parameters={}, system_attrs={})
     trial = Trial(
         trial_proto=TrialProto(parameters={"foo": Parameter(value=original_value)}),
         study_info=StudyInfo(),
@@ -138,6 +141,7 @@ def test_hard_reset_does_reset_fixed_parameters() -> None:
 def test_reset_method_calls_joint_sample() -> None:
     sampler = MagicMock()
     storage = MagicMock()
+    sampler.joint_sample.return_value = JointSampleResult(parameters={}, system_attrs={})
     trial = Trial(
         trial_proto=TrialProto(),
         study_info=StudyInfo(),
@@ -152,6 +156,7 @@ def test_reset_method_calls_joint_sample() -> None:
 def test_reset_does_not_sync_sampler() -> None:
     sampler = MagicMock()
     storage = MagicMock()
+    sampler.joint_sample.return_value = JointSampleResult(parameters={}, system_attrs={})
     trial = Trial(
         trial_proto=TrialProto(),
         study_info=StudyInfo(),
@@ -166,6 +171,7 @@ def test_reset_does_not_sync_sampler() -> None:
 def test_hard_reset_does_sync_sampler() -> None:
     sampler = MagicMock()
     storage = MagicMock()
+    sampler.joint_sample.return_value = JointSampleResult(parameters={}, system_attrs={})
     trial = Trial(
         trial_proto=TrialProto(),
         study_info=StudyInfo(),
@@ -180,6 +186,7 @@ def test_hard_reset_does_sync_sampler() -> None:
 def test_reset_with_reload_sync_sampler() -> None:
     sampler = MagicMock()
     storage = MagicMock()
+    sampler.joint_sample.return_value = JointSampleResult(parameters={}, system_attrs={})
     trial = Trial(
         trial_proto=TrialProto(),
         study_info=StudyInfo(),

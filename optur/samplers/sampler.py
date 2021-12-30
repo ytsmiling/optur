@@ -40,7 +40,7 @@ class Sampler(abc.ABC):
     def joint_sample(
         self,
         fixed_parameters: Optional[Dict[str, ParameterValue]] = None,
-    ) -> Dict[str, ParameterValue]:
+    ) -> JointSampleResult:
         """Perform joint-sampling for the trial.
 
         When ``fixed_parameters`` is not :obj:`None`, the return value must includes them.
@@ -56,7 +56,10 @@ class Sampler(abc.ABC):
         It is up to trials whether they use the result of the joint-sampling or not.
         """
 
-        return fixed_parameters.copy() if fixed_parameters is not None else {}
+        return JointSampleResult(
+            parameters=fixed_parameters.copy() if fixed_parameters is not None else {},
+            system_attrs={},
+        )
 
     @abc.abstractclassmethod
     def sample(self, distribution: Distribution) -> ParameterValue:
