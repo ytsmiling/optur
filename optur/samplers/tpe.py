@@ -50,8 +50,6 @@ class TPESampler(Sampler):
         half_idx = len(sorted_trials) // 2
         _less_half_trials = sorted_trials[:half_idx]  # D_l
         _greater_half_trials = sorted_trials[half_idx:]  # D_g
-        assert _less_half_trials  # TODO(tsuzuku)
-        assert _greater_half_trials  # TODO(tsuzuku)
         # TODO(tsuzuku): Calculate weights.
         kde_l = _UnivariateKDE(
             search_space=search_space, trials=_less_half_trials, weights=np.ones(())
@@ -66,9 +64,7 @@ class TPESampler(Sampler):
         log_pdf_g = kde_g.log_pdf(samples)
         best_sample_idx = np.argmax(log_pdf_l - log_pdf_g)
         best_sample = {name: sample[name][best_sample_idx] for name, sample in samples.items()}
-        # TODO(tsuzuku): Convert the ``best_sample`` to the return type.
-        assert best_sample is not None
-        raise NotImplementedError()
+        return kde_l.sample_to_value(best_sample)
 
     def sample(self, distribution: Distribution) -> ParameterValue:
         return self._fallback_sampler.sample(distribution=distribution)
@@ -94,6 +90,12 @@ class _UnivariateKDE:
                 n_distribution=n_distribution,
             )
             for name, distribution in search_space.distributions.items()
+        }
+
+    def sample_to_value(self, sample: Dict[str, Any]) -> Dict[str, ParameterValue]:
+        return {
+            name: self._distributions[name].sample_to_value(value)
+            for name, value in sample.items()
         }
 
     def sample(
@@ -122,6 +124,10 @@ class _MixturedDistributionBase(abc.ABC):
     def sample(self, active_indices: "npt.NDArray[np.int_]") -> "npt.NDArray[Any]":
         pass
 
+    @abc.abstractclassmethod
+    def sample_to_value(self, sample: Any) -> ParameterValue:
+        pass
+
     # (n_sample,) -> (n_sample, n_distribution)
     @abc.abstractclassmethod
     def log_pdf(self, x: "npt.NDArray[Any]") -> "npt.NDArray[np.float64]":
@@ -137,6 +143,9 @@ class _AitchisonAitken(_MixturedDistributionBase):
         eps: float = 1e-6,
     ) -> None:
         pass
+
+    def sample_to_value(self, sample: Any) -> ParameterValue:
+        raise NotImplementedError()
 
     def sample(self, active_indices: "npt.NDArray[np.int_]") -> "npt.NDArray[np.int_]":
         raise NotImplementedError()
@@ -225,6 +234,9 @@ class _TruncatedLogisticMixturedDistribution(_MixturedDistributionBase):
             self.normalization_constant, self.eps
         )
         return ret
+
+    def sample_to_value(self, sample: Any) -> ParameterValue:
+        raise NotImplementedError()
 
 
 class _MixturedDistribution(_MixturedDistributionBase):
@@ -345,3 +357,10 @@ class _MixturedDistribution(_MixturedDistributionBase):
                 x = np.log(x)
             return self._kernel.log_pdf(x)
         raise NotImplementedError()
+
+    def sample_to_value(self, sample: Any) -> ParameterValue:
+        if self._distribution.HasField("int_distribution"):
+            return ParameterValue(int_value=sample)
+        elif self._distribution.HasField("float_distribution"):
+            return ParameterValue(double_value=sample)
+        return self._kernel.sample_to_value(sample)
