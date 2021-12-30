@@ -129,7 +129,6 @@ class _AitchisonAitken(_MixturedDistributionBase):
         self,
         n_choice: int,
         selections: "npt.NDArray[np.int_]",
-        weights: "npt.NDArray[np.float64]",
         eps: float = 1e-6,
     ) -> None:
         pass
@@ -159,8 +158,6 @@ class _TruncatedLogisticMixturedDistribution(_MixturedDistributionBase):
             Means of Logistic distributions.
         scale:
             Standardized variances of Logistic distributions.
-        weights:
-            Weight of each Logistic distribution.
         eps:
             A small constant for numerical stability.
     """
@@ -171,16 +168,13 @@ class _TruncatedLogisticMixturedDistribution(_MixturedDistributionBase):
         high: float,
         loc: "npt.NDArray[np.float64]",
         scale: "npt.NDArray[np.float64]",
-        weights: "npt.NDArray[np.float64]",
         eps: float = 1e-6,
     ) -> None:
-        assert weights.ndim == 1
-        assert weights.shape == loc.shape == weights.shape
+        assert loc.shape == scale.shape
         self.low = low
         self.high = high
         self.loc = loc
         self.scale = scale
-        self.weights = weights
         self.eps = eps
         self.normalization_constant = np.sum(
             self.unnormalized_cdf(np.asarray([high])) - self.unnormalized_cdf(np.asarray([low]))
@@ -210,12 +204,11 @@ class _TruncatedLogisticMixturedDistribution(_MixturedDistributionBase):
         return ret
 
     def unnormalized_cdf(self, x: "npt.NDArray[np.float64]") -> "npt.NDArray[np.float64]":
-        x = x[None]
-        loc = self.loc[..., None]
-        scale = self.scale[..., None]
-        weights = self.weights[..., None]
-        ret: "npt.NDArray[np.float64]" = np.sum(
-            weights / (1 + np.exp((x - loc) / np.maximum(scale, self.eps))), axis=0
+        x = x[..., None]
+        loc = self.loc[None]
+        scale = self.scale[None]
+        ret: "npt.NDArray[np.float64]" = (
+            1.0 / (1 + np.exp((x - loc) / np.maximum(scale, self.eps)))
         )
         return ret
 
@@ -259,7 +252,6 @@ class _MixturedDistribution(_MixturedDistributionBase):
                 valid=valid_examples,
                 n_observation=n_observation,
                 n_dimension=n_distribution,
-                weights=weights,
             )
         elif distribution.HasField("float_distribution"):
             float_d = distribution.float_distribution
@@ -279,7 +271,6 @@ class _MixturedDistribution(_MixturedDistributionBase):
                 valid=valid_examples,
                 n_observation=n_observation,
                 n_dimension=n_distribution,
-                weights=weights,
             )
         elif distribution.HasField("categorical_distribution"):
             raise NotImplementedError(f"Unsupported distribution: {distribution}")
@@ -297,7 +288,6 @@ class _MixturedDistribution(_MixturedDistributionBase):
         valid: "npt.NDArray[np.bool_]",
         n_observation: int,
         n_dimension: int,
-        weights: "npt.NDArray[np.float64]",
     ) -> _MixturedDistributionBase:
         if log_scale:
             high = math.log(high)
@@ -314,7 +304,6 @@ class _MixturedDistribution(_MixturedDistributionBase):
             high=high,
             loc=mus,
             scale=scales,
-            weights=weights,
         )
 
     def sample(self, active_indices: "npt.NDArray[np.int_]") -> "npt.NDArray[Any]":
@@ -339,4 +328,10 @@ class _MixturedDistribution(_MixturedDistributionBase):
         raise NotImplementedError()
 
     def log_pdf(self, x: "npt.NDArray[Any]") -> "npt.NDArray[np.float64]":
-        pass
+        if self._distribution.HasField("int_distribution"):
+            int_d = self._distribution.int_distribution
+            x = x.astype(np.float64)
+            if int_d.log_scale:
+                x = np.log(x)
+            return self._kernel.log_pdf(x)
+        raise NotImplementedError()

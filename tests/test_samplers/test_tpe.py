@@ -25,14 +25,38 @@ def test_int_distribution_samples_valid_values(log_scale: bool) -> None:
                     "foo": Parameter(value=ParameterValue(int_value=random.randint(10, 30)))
                 }
             )
-            for _ in range(100)
+            for _ in range(97)
         ],
         n_distribution=1,
-        weights=np.ones(100) * 0.01,
+        weights=np.ones(97) / 97.0,
     )
-    active_indices = np.asarray(range(1, 100, 2))
+    active_indices = np.asarray(range(1, 97, 2))
     samples = dist.sample(active_indices=active_indices)
     assert samples.dtype == np.dtype("int64")
     assert len(samples) == len(active_indices)
     assert (1 <= samples).all()
     assert (samples <= 100).all()
+
+
+@pytest.mark.parametrize("log_scale", [True, False])
+def test_int_distribution_calculates_valid_log_pdf(log_scale: bool) -> None:
+    dist = _MixturedDistribution(
+        name="foo",
+        distribution=int_distribution(low=1, high=100, log_scale=log_scale),
+        trials=[
+            Trial(
+                parameters={
+                    "foo": Parameter(value=ParameterValue(int_value=random.randint(10, 30)))
+                }
+            )
+            for _ in range(97)
+        ],
+        n_distribution=1,
+        weights=np.ones(97) / 97.0,
+    )
+    active_indices = np.asarray(range(1, 97, 2))
+    samples = dist.sample(active_indices=active_indices)
+    log_pdf = dist.log_pdf(samples)
+    assert log_pdf.dtype == np.dtype("float64")
+    assert log_pdf.shape == (len(samples), 97)
+    assert (np.exp(log_pdf) <= 1.0).all()
