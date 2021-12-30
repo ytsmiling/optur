@@ -53,14 +53,21 @@ class TPESampler(Sampler):
         assert _less_half_trials  # TODO(tsuzuku)
         assert _greater_half_trials  # TODO(tsuzuku)
         # TODO(tsuzuku): Calculate weights.
-        kde_l: _UnivariateKDE = _UnivariateKDE(
+        kde_l = _UnivariateKDE(
             search_space=search_space, trials=_less_half_trials, weights=np.ones(())
+        )
+        kde_g = _UnivariateKDE(
+            search_space=search_space, trials=_greater_half_trials, weights=np.ones(())
         )
         samples = kde_l.sample(
             fixed_parameters=fixed_parameters or {}, k=self._tpe_config.n_ei_candidates
         )
-        assert samples  # TODO(tsuzuku)
-        # TODO(tsuzuku): Calculate log_probs and compare them.
+        log_pdf_l = kde_l.log_pdf(samples)
+        log_pdf_g = kde_g.log_pdf(samples)
+        best_sample_idx = np.argmax(log_pdf_l - log_pdf_g)
+        best_sample = {name: sample[name][best_sample_idx] for name, sample in samples.items()}
+        # TODO(tsuzuku): Convert the ``best_sample`` to the return type.
+        assert best_sample is not None
         raise NotImplementedError()
 
     def sample(self, distribution: Distribution) -> ParameterValue:
