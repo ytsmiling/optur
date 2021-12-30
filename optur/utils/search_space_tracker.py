@@ -44,9 +44,6 @@ class SearchSpaceTracker:
     def sync(self, trials: Sequence[Trial]) -> None:
         """Update the inferred search space.
 
-        This function ignores trials that are incompatible with the search space
-        used in the init method.
-
         Raises:
             InCompatibleSearchSpaceError:
                 When some trials conflict with the inferred search space.

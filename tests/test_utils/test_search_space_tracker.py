@@ -625,10 +625,8 @@ def test_search_space_tracker_merges_fixed_distributions() -> None:
     search_space_tracker = SearchSpaceTracker(
         search_space=SearchSpace(
             distributions={
-                "foo": Distribution(
-                    fixed_distribution=Distribution.FixedDistribution(
-                        values=[ParameterValue(int_value=2), ParameterValue(string_value="bar")],
-                    )
+                "foo": fixed_distribution(
+                    values=[ParameterValue(int_value=2), ParameterValue(string_value="bar")],
                 )
             }
         )
@@ -729,10 +727,8 @@ def test_search_space_tracker_updates_with_new_parameters() -> None:
     search_space_tracker = SearchSpaceTracker(
         search_space=SearchSpace(
             distributions={
-                "foo": Distribution(
-                    fixed_distribution=Distribution.FixedDistribution(
-                        values=[ParameterValue(int_value=2), ParameterValue(string_value="bar")],
-                    )
+                "foo": fixed_distribution(
+                    values=[ParameterValue(int_value=2), ParameterValue(string_value="bar")],
                 )
             }
         )
@@ -774,10 +770,8 @@ def test_search_space_tracker_promotes_fixed_distribution_to_int_distribution() 
     search_space_tracker = SearchSpaceTracker(
         search_space=SearchSpace(
             distributions={
-                "foo": Distribution(
-                    fixed_distribution=Distribution.FixedDistribution(
-                        values=[ParameterValue(int_value=1), ParameterValue(int_value=3)],
-                    )
+                "foo": fixed_distribution(
+                    values=[ParameterValue(int_value=1), ParameterValue(int_value=3)],
                 )
             }
         )
@@ -806,13 +800,11 @@ def test_search_space_tracker_promotes_fixed_distribution_to_float_distribution(
     search_space_tracker = SearchSpaceTracker(
         search_space=SearchSpace(
             distributions={
-                "foo": Distribution(
-                    fixed_distribution=Distribution.FixedDistribution(
-                        values=[
-                            ParameterValue(double_value=0.1),
-                            ParameterValue(double_value=1.3),
-                        ],
-                    )
+                "foo": fixed_distribution(
+                    values=[
+                        ParameterValue(double_value=0.1),
+                        ParameterValue(double_value=1.3),
+                    ],
                 )
             }
         )
@@ -838,8 +830,45 @@ def test_search_space_tracker_promotes_fixed_distribution_to_float_distribution(
 
 
 def test_search_space_tracker_raises_on_distribution_conflicts() -> None:
-    pass
-
-
-def test_search_space_tracker_filters_incompatible_trials() -> None:
-    pass
+    search_space_tracker = SearchSpaceTracker(
+        search_space=SearchSpace(
+            distributions={
+                "foo": float_distribution(low=0.01, high=2.5),
+            }
+        )
+    )
+    with pytest.raises(InCompatibleSearchSpaceError):
+        search_space_tracker.sync(
+            [Trial(parameters={"foo": Parameter(value=ParameterValue(double_value=3.1))})]
+        )
+    search_space_tracker = SearchSpaceTracker(
+        search_space=SearchSpace(
+            distributions={
+                "foo": float_distribution(low=0.01, high=2.5),
+            }
+        )
+    )
+    with pytest.raises(InCompatibleSearchSpaceError):
+        search_space_tracker.sync(
+            [Trial(parameters={"foo": Parameter(value=ParameterValue(int_value=2))})]
+        )
+    search_space_tracker = SearchSpaceTracker(
+        search_space=SearchSpace(
+            distributions={
+                "foo": float_distribution(low=0.01, high=2.5),
+            }
+        )
+    )
+    with pytest.raises(InCompatibleSearchSpaceError):
+        search_space_tracker.sync(
+            [
+                Trial(
+                    parameters={
+                        "foo": Parameter(
+                            value=ParameterValue(double_value=2.1),
+                            distribution=float_distribution(low=0.0, high=5.0),
+                        )
+                    }
+                )
+            ]
+        )
