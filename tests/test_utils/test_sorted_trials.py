@@ -137,3 +137,17 @@ def test_sorted_trials_filter_trials() -> None:
     trials2 = list(sorted(trials[:30] + trials[50:], key=lambda t: uuid.UUID(hex=t.trial_id).int))
     sorted_trials.sync(trials=trials)
     assert sorted_trials.to_list() == trials2
+
+
+def test_sorted_trials_incrementally_sort_all_trials() -> None:
+    sorted_trials = SortedTrials(
+        trial_filter=lambda t: True,
+        trial_key_generator=lambda t: uuid.UUID(hex=t.trial_id).int,
+        trial_comparator=None,
+    )
+    trials = [Trial(trial_id=uuid.uuid4().hex) for _ in range(100)]
+    for i in range(10):
+        sorted_trials.sync(trials=trials[i * 9 : (i + 1) * 10])
+        assert sorted_trials.to_list() == list(
+            sorted(trials[: (i + 1) * 10], key=lambda t: uuid.UUID(hex=t.trial_id).int)
+        )
