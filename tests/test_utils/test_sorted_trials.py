@@ -1,7 +1,12 @@
 import math
+import uuid
 
 from optur.proto.study_pb2 import ObjectiveValue, Target, Trial
-from optur.utils.sorted_trials import TrialKeyGenerator, TrialQualityFilter
+from optur.utils.sorted_trials import (
+    SortedTrials,
+    TrialKeyGenerator,
+    TrialQualityFilter,
+)
 
 
 def test_trial_quality_filter_remove_unknown() -> None:
@@ -108,3 +113,27 @@ def test_trial_key_generator_returns_the_return_value_when_completed() -> None:
         ),
         0.8,
     )
+
+
+def test_sorted_trials_sort_all_trials() -> None:
+    sorted_trials = SortedTrials(
+        trial_filter=lambda t: True,
+        trial_key_generator=lambda t: uuid.UUID(hex=t.trial_id).int,
+        trial_comparator=None,
+    )
+    trials = [Trial(trial_id=uuid.uuid4().hex) for _ in range(100)]
+    trials2 = list(sorted(trials, key=lambda t: uuid.UUID(hex=t.trial_id).int))
+    sorted_trials.sync(trials=trials)
+    assert sorted_trials.to_list() == trials2
+
+
+def test_sorted_trials_filter_trials() -> None:
+    trials = [Trial(trial_id=uuid.uuid4().hex) for _ in range(100)]
+    sorted_trials = SortedTrials(
+        trial_filter=lambda t: t.trial_id not in {x.trial_id for x in trials[30:50]},
+        trial_key_generator=lambda t: uuid.UUID(hex=t.trial_id).int,
+        trial_comparator=None,
+    )
+    trials2 = list(sorted(trials[:30] + trials[50:], key=lambda t: uuid.UUID(hex=t.trial_id).int))
+    sorted_trials.sync(trials=trials)
+    assert sorted_trials.to_list() == trials2

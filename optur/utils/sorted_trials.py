@@ -47,6 +47,7 @@ class TrialKeyGenerator:
 
 # LQ, not LE.
 # Fail < Partially Failed < Pruned < (Partially Complete, Complete)
+# TODO(tsuzuku): This class is not tested yet.
 class TrialComparator:
     LQ_STATE = {
         (Trial.State.FAILED, Trial.State.PARTIALLY_FAILED),
