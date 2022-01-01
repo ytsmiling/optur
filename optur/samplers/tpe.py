@@ -71,6 +71,8 @@ class TPESampler(Sampler):
         half_idx = len(sorted_trials) // 2
         _less_half_trials = sorted_trials[:half_idx]
         _greater_half_trials = sorted_trials[half_idx:]
+        if not _less_half_trials or not _greater_half_trials:
+            return JointSampleResult(parameters={}, system_attrs={})
         kde_l = _UnivariateKDE(  # D_l
             search_space=search_space,
             trials=_less_half_trials,
