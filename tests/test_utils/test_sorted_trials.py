@@ -147,7 +147,8 @@ def test_sorted_trials_incrementally_sort_all_trials() -> None:
     )
     trials = [Trial(trial_id=uuid.uuid4().hex) for _ in range(100)]
     for i in range(10):
-        sorted_trials.sync(trials=trials[i * 9 : (i + 1) * 10])
+        left, right = i * 9, (i + 1) * 10
+        sorted_trials.sync(trials=trials[left:right])
         assert sorted_trials.to_list() == list(
-            sorted(trials[: (i + 1) * 10], key=lambda t: uuid.UUID(hex=t.trial_id).int)
+            sorted(trials[:right], key=lambda t: uuid.UUID(hex=t.trial_id).int)
         )
