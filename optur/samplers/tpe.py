@@ -30,6 +30,7 @@ class TPESampler(Sampler):
     def __init__(self, sampler_config: SamplerConfig, study_info: StudyInfo) -> None:
         super().__init__(sampler_config=sampler_config)
         assert sampler_config.HasField("tpe")
+        assert sampler_config.tpe.n_ei_candidates > 0
         self._study_info = study_info
         self._tpe_config = sampler_config.tpe
         self._fallback_sampler = RandomSampler(SamplerConfig(random=RandomSamplerConfig()))
@@ -86,7 +87,7 @@ class TPESampler(Sampler):
         log_pdf_l = kde_l.log_pdf(samples)
         log_pdf_g = kde_g.log_pdf(samples)
         best_sample_idx = np.argmax(log_pdf_l - log_pdf_g)
-        best_sample = {name: sample[name][best_sample_idx] for name, sample in samples.items()}
+        best_sample = {name: sample[best_sample_idx] for name, sample in samples.items()}
         return JointSampleResult(
             parameters=kde_l.sample_to_value(best_sample),
             system_attrs={
@@ -102,9 +103,9 @@ class TPESampler(Sampler):
     def _calculate_sample_weights(self, trials: Sequence[Trial]) -> "npt.NDArray[np.float64]":
         weights: "npt.NDArray[np.float64]" = np.asarray(
             [
-                trial.system_attrs[_N_RERFERENCED_TRIALS_KEY].int_value
+                trial.system_attrs[_N_RERFERENCED_TRIALS_KEY].int_value + 1
                 if _N_RERFERENCED_TRIALS_KEY in trial.system_attrs
-                else 0
+                else 1
                 for trial in trials
             ],
             dtype=np.float64,
@@ -122,6 +123,8 @@ class _UnivariateKDE:
         trials: Sequence[TrialProto],
         weights: "npt.NDArray[np.float64]",
     ) -> None:
+        assert trials
+        assert weights.shape == (len(trials),), str(weights.shape) + ":" + str(len(trials))
         self._search_space = search_space
         n_distribution = len(search_space.distributions)
         self.weights = weights

@@ -40,7 +40,7 @@ def test_univariate_kde_samples_valid_samples(int_log_scale: bool, float_log_sca
                     "bar": Parameter(value=ParameterValue(int_value=random.randint(3, 5))),
                 }
             )
-            for _ in range(100)
+            for _ in range(99)
         ],
         weights=weights / weights.sum(),
     )
