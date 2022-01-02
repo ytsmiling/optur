@@ -129,6 +129,22 @@ class Distribution(google___protobuf___message___Message):
     class FixedDistribution(google___protobuf___message___Message):
         DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
         @property
+        def value(self) -> type___ParameterValue: ...
+        def __init__(
+            self,
+            *,
+            value: typing___Optional[type___ParameterValue] = None,
+        ) -> None: ...
+        def HasField(
+            self, field_name: typing_extensions___Literal["value", b"value"]
+        ) -> builtin___bool: ...
+        def ClearField(
+            self, field_name: typing_extensions___Literal["value", b"value"]
+        ) -> None: ...
+    type___FixedDistribution = FixedDistribution
+    class UnknownDistribution(google___protobuf___message___Message):
+        DESCRIPTOR: google___protobuf___descriptor___Descriptor = ...
+        @property
         def values(
             self,
         ) -> google___protobuf___internal___containers___RepeatedCompositeFieldContainer[
@@ -142,7 +158,9 @@ class Distribution(google___protobuf___message___Message):
         def ClearField(
             self, field_name: typing_extensions___Literal["values", b"values"]
         ) -> None: ...
-    type___FixedDistribution = FixedDistribution
+    type___UnknownDistribution = UnknownDistribution
+    @property
+    def unknown_distribution(self) -> type___Distribution.UnknownDistribution: ...
     @property
     def float_distribution(self) -> type___Distribution.FloatDistribution: ...
     @property
@@ -154,6 +172,7 @@ class Distribution(google___protobuf___message___Message):
     def __init__(
         self,
         *,
+        unknown_distribution: typing___Optional[type___Distribution.UnknownDistribution] = None,
         float_distribution: typing___Optional[type___Distribution.FloatDistribution] = None,
         int_distribution: typing___Optional[type___Distribution.IntDistribution] = None,
         categorical_distribution: typing___Optional[
@@ -174,6 +193,8 @@ class Distribution(google___protobuf___message___Message):
             b"float_distribution",
             "int_distribution",
             b"int_distribution",
+            "unknown_distribution",
+            b"unknown_distribution",
         ],
     ) -> builtin___bool: ...
     def ClearField(
@@ -189,12 +210,18 @@ class Distribution(google___protobuf___message___Message):
             b"float_distribution",
             "int_distribution",
             b"int_distribution",
+            "unknown_distribution",
+            b"unknown_distribution",
         ],
     ) -> None: ...
     def WhichOneof(
         self, oneof_group: typing_extensions___Literal["distribution", b"distribution"]
     ) -> typing_extensions___Literal[
-        "float_distribution", "int_distribution", "categorical_distribution", "fixed_distribution"
+        "unknown_distribution",
+        "float_distribution",
+        "int_distribution",
+        "categorical_distribution",
+        "fixed_distribution",
     ]: ...
 
 type___Distribution = Distribution

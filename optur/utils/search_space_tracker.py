@@ -54,7 +54,7 @@ class SearchSpaceTracker:
                     pdist = param.distribution
                 else:
                     pdist = Distribution(
-                        fixed_distribution=Distribution.FixedDistribution(values=[param.value])
+                        unknown_distribution=Distribution.UnknownDistribution(values=[param.value])
                     )
                 if name in self._current_search_space.distributions:
                     cur_dist = self._current_search_space.distributions[name]
@@ -72,6 +72,8 @@ class SearchSpaceTracker:
 
 def does_distribution_contain_value(distribution: Distribution, value: ParameterValue) -> bool:
     """Check whether the value can be drawn from the distribution."""
+    if distribution.HasField("unknown_distribution"):
+        return True
     if distribution.HasField("int_distribution"):
         if not value.HasField("int_value"):
             return False
@@ -91,12 +93,17 @@ def does_distribution_contain_value(distribution: Distribution, value: Parameter
     if distribution.HasField("categorical_distribution"):
         return any(value == v for v in distribution.categorical_distribution.choices)
     if distribution.HasField("fixed_distribution"):
-        return any(value == v for v in distribution.fixed_distribution.values)
+        # For mypy checks, we assign the return value to an explicitly typed variable.
+        ret: bool = value == distribution.fixed_distribution.value
+        return ret
     raise NotImplementedError("")
 
 
 def are_identical_distributions(a: Distribution, b: Distribution) -> bool:
     """Check whether the two distributions are identical."""
+    if a.HasField("unknown_distribution") or b.HasField("unknown_distribution"):
+        # This is similar wth ``nan`` != ``nan``.
+        return False
     if a == b:
         # In most usecase, a == b.
         return True
@@ -105,12 +112,6 @@ def are_identical_distributions(a: Distribution, b: Distribution) -> bool:
         # even if they are identical.
         values1 = a.categorical_distribution.choices
         values2 = b.categorical_distribution.choices
-        if len(values1) == len(values2) and all(any(v1 == v2 for v2 in values2) for v1 in values1):
-            return True
-    if a.HasField("fixed_distribution") and b.HasField("fixed_distribution"):
-        # The same with categorical distribution.
-        values1 = a.fixed_distribution.values
-        values2 = b.fixed_distribution.values
         if len(values1) == len(values2) and all(any(v1 == v2 for v2 in values2) for v1 in values1):
             return True
     return False
@@ -127,18 +128,24 @@ def merge_distributions(
     Otherwise, check whether the two distributions are identical.
     When the two distributions are incompatible, `InCompatibleSearchSpaceError` will be raised.
     """
-    if a.HasField("fixed_distribution"):
-        if b.HasField("fixed_distribution"):
-            values = [v for v in a.fixed_distribution.values]
-            for new_v in b.fixed_distribution.values:
+    if a.HasField("unknown_distribution"):
+        if b.HasField("unknown_distribution"):
+            values = [v for v in a.unknown_distribution.values]
+            for new_v in b.unknown_distribution.values:
                 if not any(new_v == v for v in values):
                     values.append(new_v)
-            return Distribution(fixed_distribution=Distribution.FixedDistribution(values=values))
-        if all(does_distribution_contain_value(b, value) for value in a.fixed_distribution.values):
+            return Distribution(
+                unknown_distribution=Distribution.UnknownDistribution(values=values)
+            )
+        if all(
+            does_distribution_contain_value(b, value) for value in a.unknown_distribution.values
+        ):
             return b
         raise InCompatibleSearchSpaceError("")
-    if b.HasField("fixed_distribution"):
-        if all(does_distribution_contain_value(a, value) for value in b.fixed_distribution.values):
+    if b.HasField("unknown_distribution"):
+        if all(
+            does_distribution_contain_value(a, value) for value in b.unknown_distribution.values
+        ):
             return a
     if are_identical_distributions(a, b):
         return a

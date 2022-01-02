@@ -32,8 +32,12 @@ def categorical_distribution(choices: Sequence[ParameterValue]) -> Distribution:
     )
 
 
-def fixed_distribution(values: Sequence[ParameterValue]) -> Distribution:
-    return Distribution(fixed_distribution=Distribution.FixedDistribution(values=values))
+def fixed_distribution(value: ParameterValue) -> Distribution:
+    return Distribution(fixed_distribution=Distribution.FixedDistribution(value=value))
+
+
+def unknown_distribution(values: Sequence[ParameterValue]) -> Distribution:
+    return Distribution(unknown_distribution=Distribution.UnknownDistribution(values=values))
 
 
 def test_int_distribution_comparison() -> None:
@@ -157,40 +161,40 @@ def test_categorical_distribution_comparison() -> None:
     )
 
 
-def test_fixed_distribution_comparison() -> None:
+def test_unknown_distribution_comparison() -> None:
     assert are_identical_distributions(
-        a=fixed_distribution(values=[ParameterValue(int_value=1)]),
-        b=fixed_distribution(values=[ParameterValue(int_value=1)]),
+        a=unknown_distribution(values=[ParameterValue(int_value=1)]),
+        b=unknown_distribution(values=[ParameterValue(int_value=1)]),
     )
     assert not are_identical_distributions(
-        a=fixed_distribution(values=[ParameterValue(int_value=1)]),
-        b=fixed_distribution(values=[ParameterValue(int_value=2)]),
+        a=unknown_distribution(values=[ParameterValue(int_value=1)]),
+        b=unknown_distribution(values=[ParameterValue(int_value=2)]),
     )
     assert are_identical_distributions(
-        a=fixed_distribution(values=[ParameterValue(double_value=1.0)]),
-        b=fixed_distribution(values=[ParameterValue(double_value=1.0)]),
+        a=unknown_distribution(values=[ParameterValue(double_value=1.0)]),
+        b=unknown_distribution(values=[ParameterValue(double_value=1.0)]),
     )
     assert not are_identical_distributions(
-        a=fixed_distribution(values=[ParameterValue(double_value=1.0)]),
-        b=fixed_distribution(values=[ParameterValue(double_value=2.0)]),
+        a=unknown_distribution(values=[ParameterValue(double_value=1.0)]),
+        b=unknown_distribution(values=[ParameterValue(double_value=2.0)]),
     )
     assert are_identical_distributions(
-        a=fixed_distribution(values=[ParameterValue(string_value="foo")]),
-        b=fixed_distribution(values=[ParameterValue(string_value="foo")]),
+        a=unknown_distribution(values=[ParameterValue(string_value="foo")]),
+        b=unknown_distribution(values=[ParameterValue(string_value="foo")]),
     )
     assert not are_identical_distributions(
-        a=fixed_distribution(values=[ParameterValue(string_value="foo")]),
-        b=fixed_distribution(values=[ParameterValue(string_value="bar")]),
+        a=unknown_distribution(values=[ParameterValue(string_value="foo")]),
+        b=unknown_distribution(values=[ParameterValue(string_value="bar")]),
     )
     assert are_identical_distributions(
-        a=fixed_distribution(
+        a=unknown_distribution(
             values=[
                 ParameterValue(int_value=1),
                 ParameterValue(double_value=2.0),
                 ParameterValue(string_value="foo"),
             ]
         ),
-        b=fixed_distribution(
+        b=unknown_distribution(
             values=[
                 ParameterValue(int_value=1),
                 ParameterValue(double_value=2.0),
@@ -199,14 +203,14 @@ def test_fixed_distribution_comparison() -> None:
         ),
     )
     assert are_identical_distributions(
-        a=fixed_distribution(
+        a=unknown_distribution(
             values=[
                 ParameterValue(int_value=1),
                 ParameterValue(double_value=2.0),
                 ParameterValue(string_value="foo"),
             ]
         ),
-        b=fixed_distribution(
+        b=unknown_distribution(
             values=[
                 ParameterValue(double_value=2.0),
                 ParameterValue(int_value=1),
@@ -341,9 +345,9 @@ def test_categorical_distribution_contains_check() -> None:
     )
 
 
-def test_fixed_distribution_contains_check() -> None:
+def test_unknown_distribution_contains_check() -> None:
     assert does_distribution_contain_value(
-        distribution=fixed_distribution(
+        distribution=unknown_distribution(
             values=[
                 ParameterValue(int_value=1),
                 ParameterValue(double_value=2.0),
@@ -353,7 +357,7 @@ def test_fixed_distribution_contains_check() -> None:
         value=ParameterValue(int_value=1),
     )
     assert does_distribution_contain_value(
-        distribution=fixed_distribution(
+        distribution=unknown_distribution(
             values=[
                 ParameterValue(int_value=1),
                 ParameterValue(double_value=2.0),
@@ -363,7 +367,7 @@ def test_fixed_distribution_contains_check() -> None:
         value=ParameterValue(double_value=2.0),
     )
     assert does_distribution_contain_value(
-        distribution=fixed_distribution(
+        distribution=unknown_distribution(
             values=[
                 ParameterValue(int_value=1),
                 ParameterValue(double_value=2.0),
@@ -373,7 +377,7 @@ def test_fixed_distribution_contains_check() -> None:
         value=ParameterValue(string_value="foo"),
     )
     assert not does_distribution_contain_value(
-        distribution=fixed_distribution(
+        distribution=unknown_distribution(
             values=[
                 ParameterValue(int_value=1),
                 ParameterValue(double_value=2.0),
@@ -383,7 +387,7 @@ def test_fixed_distribution_contains_check() -> None:
         value=ParameterValue(int_value=2),
     )
     assert not does_distribution_contain_value(
-        distribution=fixed_distribution(
+        distribution=unknown_distribution(
             values=[
                 ParameterValue(int_value=1),
                 ParameterValue(double_value=2.0),
@@ -393,7 +397,7 @@ def test_fixed_distribution_contains_check() -> None:
         value=ParameterValue(double_value=1.0),
     )
     assert not does_distribution_contain_value(
-        distribution=fixed_distribution(
+        distribution=unknown_distribution(
             values=[
                 ParameterValue(int_value=1),
                 ParameterValue(double_value=2.0),
@@ -412,14 +416,14 @@ def test_merge_int_distributions() -> None:
     assert are_identical_distributions(
         merge_distributions(
             a=int_distribution(low=1, high=3),
-            b=fixed_distribution(values=[ParameterValue(int_value=1)]),
+            b=unknown_distribution(values=[ParameterValue(int_value=1)]),
         ),
         int_distribution(low=1, high=3),
     )
     assert are_identical_distributions(
         merge_distributions(
             a=int_distribution(low=1, high=3),
-            b=fixed_distribution(
+            b=unknown_distribution(
                 values=[ParameterValue(int_value=1), ParameterValue(int_value=2)]
             ),
         ),
@@ -428,17 +432,17 @@ def test_merge_int_distributions() -> None:
     with pytest.raises(InCompatibleSearchSpaceError):
         merge_distributions(
             a=int_distribution(low=1, high=3),
-            b=fixed_distribution(values=[ParameterValue(int_value=0)]),
+            b=unknown_distribution(values=[ParameterValue(int_value=0)]),
         )
     with pytest.raises(InCompatibleSearchSpaceError):
         merge_distributions(
             a=int_distribution(low=1, high=3),
-            b=fixed_distribution(values=[ParameterValue(double_value=2.0)]),
+            b=unknown_distribution(values=[ParameterValue(double_value=2.0)]),
         )
     with pytest.raises(InCompatibleSearchSpaceError):
         merge_distributions(
             a=int_distribution(low=1, high=3),
-            b=fixed_distribution(
+            b=unknown_distribution(
                 values=[ParameterValue(int_value=2), ParameterValue(int_value=4)]
             ),
         )
@@ -467,14 +471,14 @@ def test_merge_float_distributions() -> None:
     assert are_identical_distributions(
         merge_distributions(
             a=float_distribution(low=1.0, high=3.0),
-            b=fixed_distribution(values=[ParameterValue(double_value=1.0)]),
+            b=unknown_distribution(values=[ParameterValue(double_value=1.0)]),
         ),
         float_distribution(low=1.0, high=3.0),
     )
     assert are_identical_distributions(
         merge_distributions(
             a=float_distribution(low=1.0, high=3.0),
-            b=fixed_distribution(
+            b=unknown_distribution(
                 values=[ParameterValue(double_value=1.0), ParameterValue(double_value=2.0)]
             ),
         ),
@@ -483,17 +487,17 @@ def test_merge_float_distributions() -> None:
     with pytest.raises(InCompatibleSearchSpaceError):
         merge_distributions(
             a=float_distribution(low=1.0, high=3.0),
-            b=fixed_distribution(values=[ParameterValue(double_value=0.0)]),
+            b=unknown_distribution(values=[ParameterValue(double_value=0.0)]),
         )
     with pytest.raises(InCompatibleSearchSpaceError):
         merge_distributions(
             a=float_distribution(low=1.0, high=3.0),
-            b=fixed_distribution(values=[ParameterValue(int_value=2)]),
+            b=unknown_distribution(values=[ParameterValue(int_value=2)]),
         )
     with pytest.raises(InCompatibleSearchSpaceError):
         merge_distributions(
             a=float_distribution(low=1.0, high=3.0),
-            b=fixed_distribution(
+            b=unknown_distribution(
                 values=[ParameterValue(double_value=2.0), ParameterValue(double_value=4.0)]
             ),
         )
@@ -548,7 +552,7 @@ def test_merge_categorical_distributions() -> None:
             a=categorical_distribution(
                 choices=[ParameterValue(int_value=1), ParameterValue(double_value=2.0)]
             ),
-            b=fixed_distribution(values=[ParameterValue(int_value=1)]),
+            b=unknown_distribution(values=[ParameterValue(int_value=1)]),
         ),
         b=categorical_distribution(
             choices=[ParameterValue(int_value=1), ParameterValue(double_value=2.0)]
@@ -568,32 +572,32 @@ def test_merge_categorical_distributions() -> None:
             a=categorical_distribution(
                 choices=[ParameterValue(int_value=1), ParameterValue(double_value=2.0)]
             ),
-            b=fixed_distribution(values=[ParameterValue(int_value=2)]),
+            b=unknown_distribution(values=[ParameterValue(int_value=2)]),
         )
 
 
-def test_merge_fixed_distributions() -> None:
+def test_merge_unknown_distributions() -> None:
     assert are_identical_distributions(
         a=merge_distributions(
-            a=fixed_distribution(
+            a=unknown_distribution(
                 values=[ParameterValue(int_value=1), ParameterValue(int_value=2)]
             ),
-            b=fixed_distribution(
+            b=unknown_distribution(
                 values=[ParameterValue(int_value=1), ParameterValue(int_value=2)]
             ),
         ),
-        b=fixed_distribution(values=[ParameterValue(int_value=1), ParameterValue(int_value=2)]),
+        b=unknown_distribution(values=[ParameterValue(int_value=1), ParameterValue(int_value=2)]),
     )
     assert are_identical_distributions(
         a=merge_distributions(
-            a=fixed_distribution(
+            a=unknown_distribution(
                 values=[ParameterValue(int_value=1), ParameterValue(int_value=2)]
             ),
-            b=fixed_distribution(
+            b=unknown_distribution(
                 values=[ParameterValue(int_value=1), ParameterValue(int_value=3)]
             ),
         ),
-        b=fixed_distribution(
+        b=unknown_distribution(
             values=[
                 ParameterValue(int_value=1),
                 ParameterValue(int_value=2),
@@ -603,14 +607,14 @@ def test_merge_fixed_distributions() -> None:
     )
     assert are_identical_distributions(
         a=merge_distributions(
-            a=fixed_distribution(
+            a=unknown_distribution(
                 values=[ParameterValue(int_value=1), ParameterValue(int_value=2)]
             ),
-            b=fixed_distribution(
+            b=unknown_distribution(
                 values=[ParameterValue(double_value=1.0), ParameterValue(string_value="foo")]
             ),
         ),
-        b=fixed_distribution(
+        b=unknown_distribution(
             values=[
                 ParameterValue(int_value=1),
                 ParameterValue(int_value=2),
@@ -621,11 +625,16 @@ def test_merge_fixed_distributions() -> None:
     )
 
 
-def test_search_space_tracker_merges_fixed_distributions() -> None:
+def test_merge_fixed_distributions() -> None:
+    # TODO(tsuzuku): Implement this.
+    pass
+
+
+def test_search_space_tracker_merges_unknown_distributions() -> None:
     search_space_tracker = SearchSpaceTracker(
         search_space=SearchSpace(
             distributions={
-                "foo": fixed_distribution(
+                "foo": unknown_distribution(
                     values=[ParameterValue(int_value=2), ParameterValue(string_value="bar")],
                 )
             }
@@ -635,7 +644,7 @@ def test_search_space_tracker_merges_fixed_distributions() -> None:
         a=search_space_tracker.current_search_space,
         b=SearchSpace(
             distributions={
-                "foo": fixed_distribution(
+                "foo": unknown_distribution(
                     values=[ParameterValue(int_value=2), ParameterValue(string_value="bar")],
                 )
             }
@@ -648,7 +657,7 @@ def test_search_space_tracker_merges_fixed_distributions() -> None:
         a=search_space_tracker.current_search_space,
         b=SearchSpace(
             distributions={
-                "foo": fixed_distribution(
+                "foo": unknown_distribution(
                     values=[
                         ParameterValue(int_value=2),
                         ParameterValue(string_value="bar"),
@@ -664,7 +673,9 @@ def test_search_space_tracker_merges_fixed_distributions() -> None:
                 parameters={
                     "foo": Parameter(
                         value=ParameterValue(double_value=0.3),
-                        distribution=fixed_distribution(values=[ParameterValue(double_value=0.3)]),
+                        distribution=unknown_distribution(
+                            values=[ParameterValue(double_value=0.3)]
+                        ),
                     )
                 }
             )
@@ -674,7 +685,7 @@ def test_search_space_tracker_merges_fixed_distributions() -> None:
         a=search_space_tracker.current_search_space,
         b=SearchSpace(
             distributions={
-                "foo": fixed_distribution(
+                "foo": unknown_distribution(
                     values=[
                         ParameterValue(int_value=2),
                         ParameterValue(string_value="bar"),
@@ -727,7 +738,7 @@ def test_search_space_tracker_updates_with_new_parameters() -> None:
     search_space_tracker = SearchSpaceTracker(
         search_space=SearchSpace(
             distributions={
-                "foo": fixed_distribution(
+                "foo": unknown_distribution(
                     values=[ParameterValue(int_value=2), ParameterValue(string_value="bar")],
                 )
             }
@@ -737,7 +748,7 @@ def test_search_space_tracker_updates_with_new_parameters() -> None:
         a=search_space_tracker.current_search_space,
         b=SearchSpace(
             distributions={
-                "foo": fixed_distribution(
+                "foo": unknown_distribution(
                     values=[ParameterValue(int_value=2), ParameterValue(string_value="bar")],
                 )
             }
@@ -750,13 +761,13 @@ def test_search_space_tracker_updates_with_new_parameters() -> None:
         a=search_space_tracker.current_search_space,
         b=SearchSpace(
             distributions={
-                "foo": fixed_distribution(
+                "foo": unknown_distribution(
                     values=[
                         ParameterValue(int_value=2),
                         ParameterValue(string_value="bar"),
                     ],
                 ),
-                "bar": fixed_distribution(
+                "bar": unknown_distribution(
                     values=[
                         ParameterValue(double_value=0.2),
                     ],
@@ -766,11 +777,11 @@ def test_search_space_tracker_updates_with_new_parameters() -> None:
     )
 
 
-def test_search_space_tracker_promotes_fixed_distribution_to_int_distribution() -> None:
+def test_search_space_tracker_promotes_unknown_distribution_to_int_distribution() -> None:
     search_space_tracker = SearchSpaceTracker(
         search_space=SearchSpace(
             distributions={
-                "foo": fixed_distribution(
+                "foo": unknown_distribution(
                     values=[ParameterValue(int_value=1), ParameterValue(int_value=3)],
                 )
             }
@@ -796,11 +807,11 @@ def test_search_space_tracker_promotes_fixed_distribution_to_int_distribution() 
     )
 
 
-def test_search_space_tracker_promotes_fixed_distribution_to_float_distribution() -> None:
+def test_search_space_tracker_promotes_unknown_distribution_to_float_distribution() -> None:
     search_space_tracker = SearchSpaceTracker(
         search_space=SearchSpace(
             distributions={
-                "foo": fixed_distribution(
+                "foo": unknown_distribution(
                     values=[
                         ParameterValue(double_value=0.1),
                         ParameterValue(double_value=1.3),
