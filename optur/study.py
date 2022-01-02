@@ -9,7 +9,7 @@ from google.protobuf.timestamp_pb2 import Timestamp
 
 from optur.errors import PrunedException
 from optur.proto.sampler_pb2 import SamplerConfig
-from optur.proto.study_pb2 import ObjectiveValue, StudyInfo
+from optur.proto.study_pb2 import ObjectiveValue, StudyInfo, Target
 from optur.proto.study_pb2 import Trial as TrialProto
 from optur.proto.study_pb2 import WorkerID
 from optur.samplers import Sampler, create_sampler
@@ -100,8 +100,12 @@ def create_study(
     sampler: Sampler,
     study_name: Optional[str] = None,
     client_id: Optional[str] = None,
+    directions: Optional[Sequence[str]] = None,
 ) -> Study:
-    study_info = StudyInfo(study_id=uuid.uuid4().hex, study_name=study_name)
+    targets = None
+    if directions is None:
+        targets = [Target(direction=Target.Direction.MINIMIZE)]
+    study_info = StudyInfo(study_id=uuid.uuid4().hex, study_name=study_name, targets=targets)
     storage.write_study(study=study_info)
     return Study(
         study_info=study_info,
@@ -268,6 +272,9 @@ def _run_trials(
     # sampler algorithms in optur, but still, we want to ensure that samplers
     # see the same cache in all `joint_sample` and `sample` calls for the same trial.
     sampler = create_sampler(sampler_config=sampler_config)
+    sampler.init(
+        search_space=None, targets=study_info.targets
+    )  # TODO(tsuzuku): Set the search space.
     # We also need to create _TrialQueue per thread/process becasue it's associated
     # with worker-id.
     trial_queue = _TrialQueue([TrialProto.State.WAITING], worker_id=worker_id)

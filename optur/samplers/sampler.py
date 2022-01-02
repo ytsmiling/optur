@@ -5,7 +5,7 @@ from google.protobuf.timestamp_pb2 import Timestamp
 
 from optur.proto.sampler_pb2 import SamplerConfig
 from optur.proto.search_space_pb2 import Distribution, ParameterValue, SearchSpace
-from optur.proto.study_pb2 import AttributeValue
+from optur.proto.study_pb2 import AttributeValue, Target
 from optur.proto.study_pb2 import Trial as TrialProto
 
 
@@ -27,7 +27,7 @@ class Sampler(abc.ABC):
         self._last_update_time = timestamp
 
     @abc.abstractclassmethod
-    def set_search_space(self, search_space: Optional[SearchSpace]) -> None:
+    def init(self, search_space: Optional[SearchSpace], targets: Sequence[Target]) -> None:
         pass
 
     def to_sampler_config(self) -> SamplerConfig:

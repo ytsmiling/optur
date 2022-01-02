@@ -1,8 +1,9 @@
 import random
-from typing import Optional
+from typing import Optional, Sequence
 
 from optur.proto.sampler_pb2 import SamplerConfig
 from optur.proto.search_space_pb2 import Distribution, ParameterValue, SearchSpace
+from optur.proto.study_pb2 import Target
 from optur.samplers.sampler import Sampler
 
 
@@ -11,7 +12,7 @@ class RandomSampler(Sampler):
         assert sampler_config.HasField("random")
         super().__init__(sampler_config=sampler_config)
 
-    def set_search_space(self, search_space: Optional[SearchSpace]) -> None:
+    def init(self, search_space: Optional[SearchSpace], targets: Sequence[Target]) -> None:
         pass
 
     def sample(self, distribution: Distribution) -> ParameterValue:

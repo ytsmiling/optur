@@ -11,7 +11,7 @@ except ImportError:
 
 from optur.proto.sampler_pb2 import RandomSamplerConfig, SamplerConfig
 from optur.proto.search_space_pb2 import Distribution, ParameterValue, SearchSpace
-from optur.proto.study_pb2 import AttributeValue, StudyInfo
+from optur.proto.study_pb2 import AttributeValue, Target
 from optur.proto.study_pb2 import Trial
 from optur.proto.study_pb2 import Trial as TrialProto
 from optur.samplers.random import RandomSampler
@@ -27,34 +27,31 @@ _N_RERFERENCED_TRIALS_KEY = "smpl.tpe.n"
 
 
 class TPESampler(Sampler):
-    def __init__(self, sampler_config: SamplerConfig, study_info: StudyInfo) -> None:
+    def __init__(self, sampler_config: SamplerConfig) -> None:
         super().__init__(sampler_config=sampler_config)
         assert sampler_config.HasField("tpe")
         assert sampler_config.tpe.n_ei_candidates > 0
-        self._study_info = study_info
         self._tpe_config = sampler_config.tpe
         self._fallback_sampler = RandomSampler(SamplerConfig(random=RandomSamplerConfig()))
-        self._search_space_tracker = SearchSpaceTracker(search_space=None)
-        self._sorted_trials = SortedTrials(
-            trial_filter=TrialQualityFilter(filter_unknown=True),
-            trial_key_generator=TrialKeyGenerator(study_info.targets),
-            trial_comparator=None,
-        )
+        self._search_space_tracker: Optional[SearchSpaceTracker] = None
+        self._sorted_trials: Optional[SortedTrials] = None
 
-    def set_search_space(self, search_space: Optional[SearchSpace]) -> None:
+    def init(self, search_space: Optional[SearchSpace], targets: Sequence[Target]) -> None:
         # We need to clear all caches because a set of "valid" past trials changes
         # by this operation.
         self._fallback_sampler = RandomSampler(SamplerConfig(random=RandomSamplerConfig()))
         self._search_space_tracker = SearchSpaceTracker(search_space=search_space)
         self._sorted_trials = SortedTrials(
             trial_filter=TrialQualityFilter(filter_unknown=True),
-            trial_key_generator=TrialKeyGenerator(self._study_info.targets),
+            trial_key_generator=TrialKeyGenerator(targets),
             trial_comparator=None,
         )
         # We need all past trials in the next sync because we cleared the cache.
         self.update_timestamp(timestamp=None)
 
     def sync(self, trials: Sequence[TrialProto]) -> None:
+        assert self._sorted_trials is not None
+        assert self._search_space_tracker is not None
         self._fallback_sampler.sync(trials=trials)
         self._sorted_trials.sync(trials=trials)
         self._search_space_tracker.sync(trials=trials)
@@ -63,6 +60,8 @@ class TPESampler(Sampler):
         self,
         fixed_parameters: Optional[Dict[str, ParameterValue]] = None,
     ) -> JointSampleResult:
+        assert self._sorted_trials is not None
+        assert self._search_space_tracker is not None
         sorted_trials = self._sorted_trials.to_list()
         if len(sorted_trials) < self._tpe_config.n_startup_trials:
             return JointSampleResult(parameters={}, system_attrs={})

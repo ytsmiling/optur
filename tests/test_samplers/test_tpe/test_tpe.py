@@ -1,8 +1,8 @@
 import random
 
 from optur.proto.sampler_pb2 import SamplerConfig, TPESamplerConfig
-from optur.proto.search_space_pb2 import Distribution, ParameterValue
-from optur.proto.study_pb2 import ObjectiveValue, Parameter, StudyInfo, Target, Trial
+from optur.proto.search_space_pb2 import Distribution, ParameterValue, SearchSpace
+from optur.proto.study_pb2 import ObjectiveValue, Parameter, Target, Trial
 from optur.samplers.tpe import TPESampler
 
 
@@ -28,16 +28,15 @@ def test_tpe_sampler_joint_sample_respects_int_range() -> None:
         sampler_config=SamplerConfig(
             tpe=TPESamplerConfig(n_ei_candidates=14),
         ),
-        study_info=StudyInfo(
-            targets=[Target(direction=Target.Direction.MINIMIZE)],
-            # TODO(tsuzuku): Support search_space in study.
-            # search_space=SearchSpace(
-            #     distributions={
-            #         "foo": int_distribution(low=2, high=12),
-            #         "bar": float_distribution(low=-2.3, high=3.4),
-            #     }
-            # ),
+    )
+    sampler.init(
+        search_space=SearchSpace(
+            distributions={
+                "foo": int_distribution(low=2, high=12),
+                "bar": float_distribution(low=-2.3, high=3.4),
+            }
         ),
+        targets=[Target(direction=Target.Direction.MINIMIZE)],
     )
     sampler.sync(
         [
