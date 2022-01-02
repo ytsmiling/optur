@@ -137,6 +137,7 @@ class _UnivariateKDE:
                 n_distribution=n_distribution,
             )
             for name, distribution in search_space.distributions.items()
+            if not distribution.HasField("unknown_distribution")
         }
 
     def sample_to_value(self, sample: Dict[str, Any]) -> Dict[str, ParameterValue]:
@@ -149,7 +150,7 @@ class _UnivariateKDE:
         self, fixed_parameters: Dict[str, ParameterValue], k: int
     ) -> Dict[str, "npt.NDArray[Any]"]:
         ret: Dict[str, "npt.NDArray[Any]"] = {}
-        for name in self._search_space.distributions:
+        for name in self._distributions:
             if name in fixed_parameters:
                 raise NotImplementedError()
             active = np.argmax(np.random.multinomial(1, self.weights, size=(k,)), axis=-1)
