@@ -101,9 +101,6 @@ def does_distribution_contain_value(distribution: Distribution, value: Parameter
 
 def are_identical_distributions(a: Distribution, b: Distribution) -> bool:
     """Check whether the two distributions are identical."""
-    if a.HasField("unknown_distribution") or b.HasField("unknown_distribution"):
-        # This is similar wth ``nan`` != ``nan``.
-        return False
     if a == b:
         # In most usecase, a == b.
         return True
@@ -112,6 +109,12 @@ def are_identical_distributions(a: Distribution, b: Distribution) -> bool:
         # even if they are identical.
         values1 = a.categorical_distribution.choices
         values2 = b.categorical_distribution.choices
+        if len(values1) == len(values2) and all(any(v1 == v2 for v2 in values2) for v1 in values1):
+            return True
+    if a.HasField("unknown_distribution") or b.HasField("unknown_distribution"):
+        # The same with categorcal distribution.
+        values1 = a.unknown_distribution.values
+        values2 = b.unknown_distribution.values
         if len(values1) == len(values2) and all(any(v1 == v2 for v2 in values2) for v1 in values1):
             return True
     return False

@@ -346,6 +346,7 @@ def test_categorical_distribution_contains_check() -> None:
 
 
 def test_unknown_distribution_contains_check() -> None:
+    # UnknownDistribution contains Any.
     assert does_distribution_contain_value(
         distribution=unknown_distribution(
             values=[
@@ -376,7 +377,7 @@ def test_unknown_distribution_contains_check() -> None:
         ),
         value=ParameterValue(string_value="foo"),
     )
-    assert not does_distribution_contain_value(
+    assert does_distribution_contain_value(
         distribution=unknown_distribution(
             values=[
                 ParameterValue(int_value=1),
@@ -386,7 +387,7 @@ def test_unknown_distribution_contains_check() -> None:
         ),
         value=ParameterValue(int_value=2),
     )
-    assert not does_distribution_contain_value(
+    assert does_distribution_contain_value(
         distribution=unknown_distribution(
             values=[
                 ParameterValue(int_value=1),
@@ -396,7 +397,7 @@ def test_unknown_distribution_contains_check() -> None:
         ),
         value=ParameterValue(double_value=1.0),
     )
-    assert not does_distribution_contain_value(
+    assert does_distribution_contain_value(
         distribution=unknown_distribution(
             values=[
                 ParameterValue(int_value=1),
