@@ -11,7 +11,7 @@ from optur.storages.backends.backend import StorageBackend
 
 def _retry(func: Callable[..., Any]) -> Any:
     def wrapped_func(self: "MySQLBackend", *args: Any, **kwargs: Any) -> Any:
-        import pymysql  # type: ignore
+        import pymysql
 
         s = 0.1
         retry_limit = self.retry_limit
@@ -43,7 +43,7 @@ class MySQLBackend(StorageBackend):
         super().__init__()
         try:
             import pymysql
-            import pymysql.cursors  # type: ignore
+            import pymysql.cursors
         except ImportError:
             # TODO(tsuzuku)
             raise
