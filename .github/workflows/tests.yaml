@@ -15,7 +15,7 @@ jobs:
       - name: install
         run: |
           python -m pip install -U pip
-          pip install --progress-bar off -U "pytest>=6.2.5" protobuf numpy
+          pip install --progress-bar off -U "pytest>=6.2.5" pytest-timeout protobuf numpy
       - name: test
         run: PYTHONPATH=. pytest . -k "not mysql"
   test-mysql:
@@ -43,7 +43,7 @@ jobs:
       - name: install
         run: |
           python -m pip install -U pip
-          pip install --progress-bar off -U "pytest>=6.2.5" protobuf numpy pymysql
+          pip install --progress-bar off -U "pytest>=6.2.5" pytest-timeout protobuf numpy pymysql
       - name: test
         run: PYTHONPATH=. pytest . -k "mysql"
         env:

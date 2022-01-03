@@ -10,6 +10,7 @@ from optur.storages.backends.mysql import MySQLBackend
 
 
 @pytest.mark.mysql
+@pytest.mark.timeout(5)
 def test_init() -> None:
     backend = MySQLBackend(
         user=os.environ["MYSQL_USER"],
@@ -22,6 +23,7 @@ def test_init() -> None:
 
 
 @pytest.mark.mysql
+@pytest.mark.timeout(5)
 def test_get_current_timestamp_is_ordered() -> None:
     backend = MySQLBackend(
         user=os.environ["MYSQL_USER"],
@@ -38,6 +40,7 @@ def test_get_current_timestamp_is_ordered() -> None:
 
 
 @pytest.mark.mysql
+@pytest.mark.timeout(5)
 def test_read_all_study() -> None:
     backend = MySQLBackend(
         user=os.environ["MYSQL_USER"],
@@ -74,6 +77,7 @@ def test_read_all_study() -> None:
 
 
 @pytest.mark.mysql
+@pytest.mark.timeout(5)
 def test_incremental_read_study() -> None:
     backend = MySQLBackend(
         user=os.environ["MYSQL_USER"],
@@ -110,6 +114,7 @@ def test_incremental_read_study() -> None:
 
 
 @pytest.mark.mysql
+@pytest.mark.timeout(5)
 def test_read_write_trial() -> None:
     backend = MySQLBackend(
         user=os.environ["MYSQL_USER"],
@@ -134,6 +139,7 @@ def test_read_write_trial() -> None:
 
 
 @pytest.mark.mysql
+@pytest.mark.timeout(5)
 def test_write_trial_with_non_existent_study() -> None:
     backend = MySQLBackend(
         user=os.environ["MYSQL_USER"],
@@ -157,6 +163,7 @@ def test_write_trial_with_non_existent_study() -> None:
 
 
 @pytest.mark.mysql
+@pytest.mark.timeout(5)
 def test_read_non_existent_trial() -> None:
     backend = MySQLBackend(
         user=os.environ["MYSQL_USER"],
@@ -181,6 +188,7 @@ def test_read_non_existent_trial() -> None:
 
 
 @pytest.mark.mysql
+@pytest.mark.timeout(5)
 def test_read_trials_without_timestamp() -> None:
     backend = MySQLBackend(
         user=os.environ["MYSQL_USER"],
@@ -211,6 +219,7 @@ def test_read_trials_without_timestamp() -> None:
 
 
 @pytest.mark.mysql
+@pytest.mark.timeout(5)
 def test_read_trial_with_timestamp() -> None:
     backend = MySQLBackend(
         user=os.environ["MYSQL_USER"],
