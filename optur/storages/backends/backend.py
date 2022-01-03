@@ -11,7 +11,7 @@ from optur.proto.study_pb2 import Trial as TrialProto
 # Storage backends are not required to be process-safe.
 class StorageBackend(abc.ABC):
     @abc.abstractclassmethod
-    def get_current_timestamp(self) -> Timestamp:
+    def get_current_timestamp(self) -> Optional[Timestamp]:
         """Get current server-timestamp.
 
         For incrementally loading trials and studies, some server methods

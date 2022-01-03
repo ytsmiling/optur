@@ -10,7 +10,7 @@ from optur.storages.backends.backend import StorageBackend
 
 class StorageClient(abc.ABC):
     @abc.abstractclassmethod
-    def get_current_timestamp(self) -> Timestamp:
+    def get_current_timestamp(self) -> Optional[Timestamp]:
         """Get current server-timestamp.
 
         For incrementally loading trials and studies, some server methods
@@ -138,7 +138,7 @@ class Storage(StorageClient):
         super().__init__()
         self._backend = backend
 
-    def get_current_timestamp(self) -> Timestamp:
+    def get_current_timestamp(self) -> Optional[Timestamp]:
         return self._backend.get_current_timestamp()
 
     def get_studies(self, timestamp: Optional[Timestamp] = None) -> List[StudyInfo]:
