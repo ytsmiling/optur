@@ -171,13 +171,13 @@ class MySQLBackend(StorageBackend):
             self._connection.begin()
             query = f"""
             INSERT INTO study VALUES('{study.study_id}', CURRENT_TIMESTAMP(6))
-            ON DUPLICATED KEY UPDATE timestamp = CURRENT_TIMESTAMP(6);
+            ON DUPLICATE KEY UPDATE timestamp = CURRENT_TIMESTAMP(6);
             """
             cursor.execute(query=query)
             hex_data = study.SerializeToString().hex()
             query = f"""
-            INSERT INTO study_info VALUES('{study.study_id}', x'{hex_data}');
-            ON DUPLICATED KEY UPDATE info = x'{hex_data}';
+            INSERT INTO study_info VALUES('{study.study_id}', x'{hex_data}')
+            ON DUPLICATE KEY UPDATE info = VALUES(info);
             """
             cursor.execute(query=query)
             self._connection.commit()
@@ -188,12 +188,12 @@ class MySQLBackend(StorageBackend):
             self._connection.begin()
             query = f"""
             INSERT INTO trial VALUES('{trial.trial_id}', '{trial.study_id}', CURRENT_TIMESTAMP(6))
-            ON DUPLICATED KEY UPDATE study_id = VALUES(study_id), timestamp = CURRENT_TIMESTAMP(6);
+            ON DUPLICATE KEY UPDATE study_id = VALUES(study_id), timestamp = CURRENT_TIMESTAMP(6);
             """
             cursor.execute(query=query)
             query = f"""
             INSERT INTO trial_data VALUES('{trial.trial_id}', x'{trial.SerializeToString().hex()}')
-            ON DUPLICATED KEY UPDATE data = x'{trial.SerializeToString().hex()}';
+            ON DUPLICATE KEY UPDATE data = x'{trial.SerializeToString().hex()}';
             """
             cursor.execute(query=query)
             self._connection.commit()
