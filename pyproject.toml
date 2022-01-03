@@ -26,3 +26,8 @@ strict = true
 [tool.flake8]
 max-line-length = 99
 exclude = "optur/proto"
+
+[tool.pytest.ini_options]
+markers = [
+  "mysql: mark a test that it uses MySQL."
+]
