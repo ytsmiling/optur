@@ -65,10 +65,10 @@ class MySQLBackend(StorageBackend):
     @_retry
     def drop_all(self) -> None:
         with self._connection.cursor() as cursor:
-            cursor.execute(query="DROP TABLE trial_data;")
-            cursor.execute(query="DROP TABLE trial;")
-            cursor.execute(query="DROP TABLE study_info;")
-            cursor.execute(query="DROP TABLE study;")
+            cursor.execute(query="DELETE FROM trial_data;")
+            cursor.execute(query="DELETE FROM trial;")
+            cursor.execute(query="DELETE FROM study_info;")
+            cursor.execute(query="DELETE FROM study;")
 
     @_retry
     def init(self) -> None:
@@ -119,9 +119,10 @@ class MySQLBackend(StorageBackend):
             if timestamp is None:
                 query = """SELECT info FROM study_info;"""
             else:
+                ms = timestamp.ToMilliseconds()
                 query = f"""SELECT info FROM study_info INNER JOIN (
                     SELECT study_id FROM study
-                    WHERE timestamp >= {timestamp.ToDatetime().strftime("%Y-%m-%d %H:%M:%S.%f")}
+                    WHERE timestamp >= FROM_UNIXTIME({ms}/1000)
                 ) as ts ON study_info.study_id = ts.study_id;
                 """
             cursor.execute(query=query)
@@ -136,19 +137,20 @@ class MySQLBackend(StorageBackend):
             if timestamp is None:
                 query = """SELECT data from trial_data;"""
             else:
-                ts = timestamp.ToDatetime().strftime("%Y-%m-%d %H:%M:%S.%f")
+                ms = timestamp.ToMilliseconds()
                 query = f"""SELECT data from trial_data INNER JOIN (
-                    SELECT trial_id FROM trial WHERE timestamp >= {ts}
+                    SELECT trial_id FROM trial WHERE timestamp >= FROM_UNIXTIME({ms}/1000)
                 ) as tt ON tt.trial_id = trial_data.trial_id;"""
         else:
             if timestamp is None:
                 query = f"""SELECT data from trial_data INNER JOIN (
-                    SELECT trial_id FROM trial WHERE study_id = {study_id}
+                    SELECT trial_id FROM trial WHERE study_id = '{study_id}'
                 ) as tt ON tt.trial_id = trial_data.trial_id;"""
             else:
-                ts = timestamp.ToDatetime().strftime("%Y-%m-%d %H:%M:%S.%f")
+                ms = timestamp.ToMilliseconds()
                 query = f"""SELECT data from trial_data INNER JOIN (
-                    SELECT trial_id FROM trial WHERE study_id = {study_id} AND timestamp >= {ts}
+                    SELECT trial_id FROM trial
+                    WHERE study_id = '{study_id}' AND timestamp >= FROM_UNIXTIME({ms}/1000)
                 ) as tt ON tt.trial_id = trial_data.trial_id;"""
         with self._connection.cursor() as cursor:
             cursor.execute(query=query)
@@ -157,7 +159,7 @@ class MySQLBackend(StorageBackend):
 
     @_retry
     def get_trial(self, trial_id: str, study_id: Optional[str] = None) -> TrialProto:
-        query = f"""SELECT data FROM trial_data WHERE trial_id = {trial_id};"""
+        query = f"""SELECT data FROM trial_data WHERE trial_id = '{trial_id}';"""
         with self._connection.cursor() as cursor:
             cursor.execute(query=query)
             data = cursor.fetchall()
@@ -184,16 +186,20 @@ class MySQLBackend(StorageBackend):
 
     @_retry
     def write_trial(self, trial: TrialProto) -> None:
+        import pymysql
+
         with self._connection.cursor() as cursor:
             self._connection.begin()
             query = f"""
             INSERT INTO trial VALUES('{trial.trial_id}', '{trial.study_id}', CURRENT_TIMESTAMP(6))
             ON DUPLICATE KEY UPDATE study_id = VALUES(study_id), timestamp = CURRENT_TIMESTAMP(6);
             """
-            cursor.execute(query=query)
+            try:
+                cursor.execute(query=query)
+            except pymysql.err.IntegrityError:
+                raise NotFoundError("")  # TODO(tsuzuku)
             query = f"""
             INSERT INTO trial_data VALUES('{trial.trial_id}', x'{trial.SerializeToString().hex()}')
             ON DUPLICATE KEY UPDATE data = x'{trial.SerializeToString().hex()}';
             """
             cursor.execute(query=query)
-            self._connection.commit()

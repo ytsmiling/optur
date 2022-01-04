@@ -51,7 +51,6 @@ def test_read_all_study() -> None:
     )
     backend.init()
     backend.drop_all()
-    backend.init()
     studies = [
         StudyInfo(
             study_id=uuid.uuid4().hex,
@@ -88,7 +87,6 @@ def test_incremental_read_study() -> None:
     )
     backend.init()
     backend.drop_all()
-    backend.init()
     studies = [
         StudyInfo(
             study_id=uuid.uuid4().hex,
@@ -125,7 +123,6 @@ def test_read_write_trial() -> None:
     )
     backend.init()
     backend.drop_all()
-    backend.init()
     study = StudyInfo(study_id=uuid.uuid4().hex)
     trial = Trial(
         trial_id=uuid.uuid4().hex,
@@ -150,7 +147,6 @@ def test_write_trial_with_non_existent_study() -> None:
     )
     backend.init()
     backend.drop_all()
-    backend.init()
     study = StudyInfo(study_id=uuid.uuid4().hex)
     trial = Trial(
         trial_id=uuid.uuid4().hex,
@@ -174,7 +170,6 @@ def test_read_non_existent_trial() -> None:
     )
     backend.init()
     backend.drop_all()
-    backend.init()
     study = StudyInfo(study_id=uuid.uuid4().hex)
     trial = Trial(
         trial_id=uuid.uuid4().hex,
@@ -199,7 +194,6 @@ def test_read_trials_without_timestamp() -> None:
     )
     backend.init()
     backend.drop_all()
-    backend.init()
     study1 = StudyInfo(study_id=uuid.uuid4().hex)
     study2 = StudyInfo(study_id=uuid.uuid4().hex)
     trials1 = [Trial(trial_id=uuid.uuid4().hex, study_id=study1.study_id) for _ in range(6)]
@@ -230,7 +224,6 @@ def test_read_trial_with_timestamp() -> None:
     )
     backend.init()
     backend.drop_all()
-    backend.init()
     study1 = StudyInfo(study_id=uuid.uuid4().hex)
     study2 = StudyInfo(study_id=uuid.uuid4().hex)
     trials1 = [Trial(trial_id=uuid.uuid4().hex, study_id=study1.study_id) for _ in range(7)]
