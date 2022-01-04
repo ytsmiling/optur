@@ -1,8 +1,11 @@
 import abc
-from typing import List, Optional
+from multiprocessing import Pipe, Queue
+from multiprocessing.connection import Connection
+from typing import Dict, List, Optional
 
 from google.protobuf.timestamp_pb2 import Timestamp
 
+from optur.proto import storage_pb2
 from optur.proto.study_pb2 import StudyInfo
 from optur.proto.study_pb2 import Trial as TrialProto
 from optur.storages.backends.backend import StorageBackend
@@ -137,6 +140,8 @@ class Storage(StorageClient):
     def __init__(self, backend: StorageBackend) -> None:
         super().__init__()
         self._backend = backend
+        self._cmd_queue: "Queue[bytes]" = Queue()
+        self._write_conns: Dict[int, Connection] = {}
 
     def get_current_timestamp(self) -> Optional[Timestamp]:
         return self._backend.get_current_timestamp()
@@ -158,5 +163,167 @@ class Storage(StorageClient):
     def write_trial(self, trial: TrialProto) -> None:
         return self._backend.write_trial(trial=trial)
 
-    def create_client(self) -> StorageClient:
-        raise NotImplementedError()
+    def create_client(self, thread_id: int) -> StorageClient:
+        parent_conn, child_conn = Pipe()
+        self._write_conns[thread_id] = parent_conn
+        return StorageClientImpl(
+            cmd_queue=self._cmd_queue,
+            result_conn=child_conn,
+            thread_id=thread_id,
+        )
+
+    def stop(self) -> None:
+        self._cmd_queue.put(storage_pb2.Request(stop=True).SerializeToString())
+
+    def run(self) -> None:
+        while True:
+            request = storage_pb2.Request.FromString(self._cmd_queue.get())
+            if request.HasField("stop"):
+                return
+            elif request.HasField("get_current_timestamp"):
+                timestamp = self.get_current_timestamp()
+                ret = storage_pb2.Reply(
+                    get_current_timestamp=storage_pb2.GetCurrentTimestampReply(
+                        timestamp=timestamp,
+                    )
+                )
+                self._write_conns[request.thread_id].send(ret.SerializeToString())
+            elif request.HasField("get_studies"):
+                timestamp = (
+                    request.get_studies.timestamp
+                    if request.get_studies.HasField("timestamp")
+                    else None
+                )
+                ret = storage_pb2.Reply(
+                    get_studies=storage_pb2.GetStudiesReply(
+                        studies=self.get_studies(timestamp=timestamp),
+                    )
+                )
+                self._write_conns[request.thread_id].send(ret.SerializeToString())
+            elif request.HasField("get_trials"):
+                timestamp = (
+                    request.get_trials.timestamp
+                    if request.get_trials.HasField("timestamp")
+                    else None
+                )
+                study_id = (
+                    request.get_trials.study_id.string_value
+                    if request.get_trials.HasField("study_id")
+                    else None
+                )
+                ret = storage_pb2.Reply(
+                    get_trials=storage_pb2.GetTrialsReply(
+                        trials=self.get_trials(study_id=study_id, timestamp=timestamp)
+                    )
+                )
+                self._write_conns[request.thread_id].send(ret.SerializeToString())
+            elif request.HasField("get_trial"):
+                study_id = (
+                    request.get_trial.study_id.string_value
+                    if request.get_trial.HasField("study_id")
+                    else None
+                )
+                ret = storage_pb2.Reply(
+                    get_trial=storage_pb2.GetTrialReply(
+                        trial=self.get_trial(
+                            trial_id=request.get_trial.trial_id,
+                            study_id=study_id,
+                        )
+                    )
+                )
+                self._write_conns[request.thread_id].send(ret.SerializeToString())
+            elif request.HasField("write_study"):
+                self.write_study(study=request.write_study.study_info)
+                ret = storage_pb2.Reply(write_study=storage_pb2.WriteStudyReply())
+                self._write_conns[request.thread_id].send(ret.SerializeToString())
+            elif request.HasField("write_trial"):
+                self.write_trial(trial=request.write_trial.trial)
+                ret = storage_pb2.Reply(write_trial=storage_pb2.WriteTrialReply())
+                self._write_conns[request.thread_id].send(ret.SerializeToString())
+            else:
+                raise NotImplementedError("")
+
+
+class StorageClientImpl(StorageClient):
+    def __init__(self, cmd_queue: "Queue[bytes]", result_conn: Connection, thread_id: int) -> None:
+        self._cmd_queue = cmd_queue
+        self._result_cnn = result_conn
+        self._thread_id = thread_id
+
+    def get_current_timestamp(self) -> Optional[Timestamp]:
+        self._cmd_queue.put(
+            storage_pb2.Request(
+                get_current_timestamp=storage_pb2.GetCurrentTimestampRequest(),
+                thread_id=self._thread_id,
+            ).SerializeToString()
+        )
+        data = storage_pb2.Reply.FromString(self._result_cnn.recv())
+        assert data.HasField("get_current_timestamp")
+        return data.get_current_timestamp.timestamp
+
+    def get_studies(self, timestamp: Optional[Timestamp] = None) -> List[StudyInfo]:
+        self._cmd_queue.put(
+            storage_pb2.Request(
+                thread_id=self._thread_id,
+                get_studies=storage_pb2.GetStudiesRequest(
+                    timestamp=timestamp,
+                ),
+            ).SerializeToString()
+        )
+        data = storage_pb2.Reply.FromString(self._result_cnn.recv())
+        assert data.HasField("get_studies")
+        return list(data.get_studies.studies)
+
+    def get_trials(
+        self, study_id: Optional[str] = None, timestamp: Optional[Timestamp] = None
+    ) -> List[TrialProto]:
+        self._cmd_queue.put(
+            storage_pb2.Request(
+                thread_id=self._thread_id,
+                get_trials=storage_pb2.GetTrialsRequest(
+                    study_id=storage_pb2.OptionalID(string_value=study_id),
+                    timestamp=timestamp,
+                ),
+            ).SerializeToString()
+        )
+        data = storage_pb2.Reply.FromString(self._result_cnn.recv())
+        assert data.HasField("get_trials")
+        return list(data.get_trials.trials)
+
+    def get_trial(self, trial_id: str, study_id: Optional[str] = None) -> TrialProto:
+        self._cmd_queue.put(
+            storage_pb2.Request(
+                thread_id=self._thread_id,
+                get_trial=storage_pb2.GetTrialRequest(
+                    trial_id=trial_id,
+                    study_id=storage_pb2.OptionalID(string_value=study_id),
+                ),
+            ).SerializeToString()
+        )
+        data = storage_pb2.Reply.FromString(self._result_cnn.recv())
+        assert data.HasField("get_trial")
+        return data.get_trial.trial
+
+    def write_study(self, study: StudyInfo) -> None:
+        self._cmd_queue.put(
+            storage_pb2.Request(
+                thread_id=self._thread_id,
+                write_study=storage_pb2.WriteStudyRequest(
+                    study_info=study,
+                ),
+            ).SerializeToString()
+        )
+        data = storage_pb2.Reply.FromString(self._result_cnn.recv())
+        assert data.HasField("write_study")
+
+    def write_trial(self, trial: TrialProto) -> None:
+        self._cmd_queue.put(
+            storage_pb2.Request(
+                thread_id=self._thread_id,
+                write_trial=storage_pb2.WriteTrialRequest(
+                    trial=trial,
+                ),
+            ).SerializeToString()
+        )
+        data = storage_pb2.Reply.FromString(self._result_cnn.recv())
+        assert data.HasField("write_trial")

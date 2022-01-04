@@ -3,6 +3,7 @@ import itertools
 import math
 import uuid
 from collections.abc import Sequence as SequenceType
+from threading import Thread
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Type, Union
 
 from google.protobuf.timestamp_pb2 import Timestamp
@@ -223,11 +224,17 @@ def _optimize(
         # Storage instance cannot be shared by multiple threads
         # or processes. See :class:`~optur.storage.Storage`'s
         # classdoc for more details.
-        clients = [(idx + 1, storage.create_client()) for idx in range(n_jobs)]
+        clients = [(idx + 1, storage.create_client(thread_id=idx + 1)) for idx in range(n_jobs)]
     else:
         # Avoid using storage's clients to reduce runtime overhead.
         # TODO(tsuzuku): Benchmark.
         clients = [(0, storage)]
+    if n_jobs > 1:
+        thread: Optional[Thread] = Thread(target=storage.run)
+        assert thread is not None
+        thread.start()
+    else:
+        thread = None
     with concurrent.futures.ThreadPoolExecutor(max_workers=n_jobs) as executor:
         futures: List[concurrent.futures.Future[Any]] = []
         for thread_id, client in clients:
@@ -250,6 +257,10 @@ def _optimize(
         except concurrent.futures.TimeoutError:
             # TODO(tsuzuku): Log a timeout message.
             pass
+        if n_jobs > 1:
+            storage.stop()
+            assert thread is not None
+            thread.join()
 
 
 def _run_trials(
@@ -262,7 +273,6 @@ def _run_trials(
     catch: Tuple[Type[Exception], ...],
     callbacks: Optional[Sequence[Callable[[Trial], None]]],
 ) -> None:
-    print("foo", flush=True)
     # We need to create sampler instances per thread because
     # they are neither thread-safe nor process-safe.
     # Additionally, if we share sampler instances among workers,

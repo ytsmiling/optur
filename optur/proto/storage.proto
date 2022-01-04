@@ -1,0 +1,72 @@
+syntax = "proto3";
+
+package optur.storage;
+
+import "google/protobuf/timestamp.proto";
+import "optur/proto/study.proto";
+
+
+message Request {
+    oneof request {
+        GetCurrentTimestampRequest get_current_timestamp = 1;
+        GetStudiesRequest get_studies = 2;
+        GetTrialsRequest get_trials = 3;
+        GetTrialRequest get_trial = 4;
+        WriteStudyRequest write_study = 5;
+        WriteTrialRequest write_trial = 6;
+        bool stop = 8;
+    }
+    int64 thread_id = 7;
+}
+message Reply {
+    oneof reply {
+        GetCurrentTimestampReply get_current_timestamp = 1;
+        GetStudiesReply get_studies = 2;
+        GetTrialsReply get_trials = 3;
+        GetTrialReply get_trial = 4;
+        WriteStudyReply write_study = 5;
+        WriteTrialReply write_trial = 6;
+    }
+}
+
+message GetCurrentTimestampRequest {}
+message GetCurrentTimestampReply {
+    google.protobuf.Timestamp timestamp = 1;
+}
+
+message GetStudiesRequest {
+    google.protobuf.Timestamp timestamp = 1;
+}
+message GetStudiesReply {
+    repeated optur.StudyInfo studies = 1;
+}
+
+message GetTrialsRequest {
+    OptionalID study_id = 1;
+    google.protobuf.Timestamp timestamp = 2;
+}
+message GetTrialsReply {
+    repeated optur.Trial trials = 1;
+}
+
+message GetTrialRequest {
+    string trial_id = 1;
+    OptionalID study_id = 2;
+}
+message GetTrialReply {
+    optur.Trial trial = 1;
+}
+
+message WriteStudyRequest {
+    optur.StudyInfo study_info = 1;
+}
+message WriteStudyReply {}
+
+message WriteTrialRequest {
+    optur.Trial trial = 1;
+}
+message WriteTrialReply {}
+
+message OptionalID {
+    string string_value = 1;
+}
