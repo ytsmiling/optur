@@ -498,6 +498,7 @@ def test_optimize_single_worker_sanity_check() -> None:
         n_jobs=1,
         catch=(),
         callbacks=(),
+        use_multiprocess=False,
     )
     if len(objective.call_args_list) != 7:
         if not objective.call_args_list:

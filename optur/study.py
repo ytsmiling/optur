@@ -74,6 +74,7 @@ class Study:
         n_jobs: int = 1,
         catch: Tuple[Type[Exception], ...] = (),
         callbacks: Optional[List[Callable[[Trial], None]]] = None,
+        use_multiprocess: bool = False,
     ) -> None:
         _optimize(
             objective=objective,
@@ -86,6 +87,7 @@ class Study:
             n_jobs=n_jobs,
             catch=catch,
             callbacks=callbacks,
+            use_multiprocess=use_multiprocess,
         )
 
     def add_trial(self, trial: TrialProto) -> None:
@@ -219,6 +221,7 @@ def _optimize(
     n_jobs: int,
     catch: Tuple[Type[Exception], ...],
     callbacks: Optional[Sequence[Callable[[Trial], None]]],
+    use_multiprocess: bool,
 ) -> None:
     if n_jobs > 1:
         # Storage instance cannot be shared by multiple threads
@@ -230,12 +233,17 @@ def _optimize(
         # TODO(tsuzuku): Benchmark.
         clients = [(0, storage)]
     if n_jobs > 1:
-        thread: Optional[Thread] = Thread(target=storage.run)
+        thread: Optional[Thread] = Thread(target=storage.run, daemon=True)
         assert thread is not None
         thread.start()
     else:
         thread = None
-    with concurrent.futures.ThreadPoolExecutor(max_workers=n_jobs) as executor:
+    executor_class = (
+        concurrent.futures.ProcessPoolExecutor
+        if use_multiprocess
+        else concurrent.futures.ThreadPoolExecutor
+    )
+    with executor_class(max_workers=n_jobs) as executor:
         futures: List[concurrent.futures.Future[Any]] = []
         for thread_id, client in clients:
             # Prefer submit over map for readability.
