@@ -18,7 +18,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     syntax="proto3",
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
-    serialized_pb=b'\n\x1eoptur/proto/search_space.proto\x12\x05optur"^\n\x0eParameterValue\x12\x13\n\tint_value\x18\x01 \x01(\x03H\x00\x12\x16\n\x0c\x64ouble_value\x18\x02 \x01(\x01H\x00\x12\x16\n\x0cstring_value\x18\x03 \x01(\tH\x00\x42\x07\n\x05value"\xc3\x05\n\x0c\x44istribution\x12G\n\x14unknown_distribution\x18\x01 \x01(\x0b\x32\'.optur.Distribution.UnknownDistributionH\x00\x12\x43\n\x12\x66loat_distribution\x18\x02 \x01(\x0b\x32%.optur.Distribution.FloatDistributionH\x00\x12?\n\x10int_distribution\x18\x03 \x01(\x0b\x32#.optur.Distribution.IntDistributionH\x00\x12O\n\x18\x63\x61tegorical_distribution\x18\x04 \x01(\x0b\x32+.optur.Distribution.CategoricalDistributionH\x00\x12\x43\n\x12\x66ixed_distribution\x18\x05 \x01(\x0b\x32%.optur.Distribution.FixedDistributionH\x00\x1a\x41\n\x11\x46loatDistribution\x12\x0b\n\x03low\x18\x01 \x01(\x02\x12\x0c\n\x04high\x18\x02 \x01(\x02\x12\x11\n\tlog_scale\x18\x03 \x01(\x08\x1a?\n\x0fIntDistribution\x12\x0b\n\x03low\x18\x01 \x01(\x03\x12\x0c\n\x04high\x18\x02 \x01(\x03\x12\x11\n\tlog_scale\x18\x03 \x01(\x08\x1a\x41\n\x17\x43\x61tegoricalDistribution\x12&\n\x07\x63hoices\x18\x01 \x03(\x0b\x32\x15.optur.ParameterValue\x1a\x39\n\x11\x46ixedDistribution\x12$\n\x05value\x18\x01 \x01(\x0b\x32\x15.optur.ParameterValue\x1a<\n\x13UnknownDistribution\x12%\n\x06values\x18\x01 \x03(\x0b\x32\x15.optur.ParameterValueB\x0e\n\x0c\x64istribution"\x96\x01\n\x0bSearchSpace\x12<\n\rdistributions\x18\x01 \x03(\x0b\x32%.optur.SearchSpace.DistributionsEntry\x1aI\n\x12\x44istributionsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12"\n\x05value\x18\x02 \x01(\x0b\x32\x13.optur.Distribution:\x02\x38\x01"\x8f\x01\n\x0bObservation\x12\x36\n\nparameters\x18\x01 \x03(\x0b\x32".optur.Observation.ParametersEntry\x1aH\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12$\n\x05value\x18\x02 \x01(\x0b\x32\x15.optur.ParameterValue:\x02\x38\x01\x62\x06proto3',
+    serialized_pb=b'\n\x1eoptur/proto/search_space.proto\x12\x05optur"^\n\x0eParameterValue\x12\x13\n\tint_value\x18\x01 \x01(\x03H\x00\x12\x16\n\x0c\x64ouble_value\x18\x02 \x01(\x01H\x00\x12\x16\n\x0cstring_value\x18\x03 \x01(\tH\x00\x42\x07\n\x05value"\xc3\x05\n\x0c\x44istribution\x12G\n\x14unknown_distribution\x18\x01 \x01(\x0b\x32\'.optur.Distribution.UnknownDistributionH\x00\x12\x43\n\x12\x66loat_distribution\x18\x02 \x01(\x0b\x32%.optur.Distribution.FloatDistributionH\x00\x12?\n\x10int_distribution\x18\x03 \x01(\x0b\x32#.optur.Distribution.IntDistributionH\x00\x12O\n\x18\x63\x61tegorical_distribution\x18\x04 \x01(\x0b\x32+.optur.Distribution.CategoricalDistributionH\x00\x12\x43\n\x12\x66ixed_distribution\x18\x05 \x01(\x0b\x32%.optur.Distribution.FixedDistributionH\x00\x1a\x41\n\x11\x46loatDistribution\x12\x0b\n\x03low\x18\x01 \x01(\x01\x12\x0c\n\x04high\x18\x02 \x01(\x01\x12\x11\n\tlog_scale\x18\x03 \x01(\x08\x1a?\n\x0fIntDistribution\x12\x0b\n\x03low\x18\x01 \x01(\x03\x12\x0c\n\x04high\x18\x02 \x01(\x03\x12\x11\n\tlog_scale\x18\x03 \x01(\x08\x1a\x41\n\x17\x43\x61tegoricalDistribution\x12&\n\x07\x63hoices\x18\x01 \x03(\x0b\x32\x15.optur.ParameterValue\x1a\x39\n\x11\x46ixedDistribution\x12$\n\x05value\x18\x01 \x01(\x0b\x32\x15.optur.ParameterValue\x1a<\n\x13UnknownDistribution\x12%\n\x06values\x18\x01 \x03(\x0b\x32\x15.optur.ParameterValueB\x0e\n\x0c\x64istribution"\x96\x01\n\x0bSearchSpace\x12<\n\rdistributions\x18\x01 \x03(\x0b\x32%.optur.SearchSpace.DistributionsEntry\x1aI\n\x12\x44istributionsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12"\n\x05value\x18\x02 \x01(\x0b\x32\x13.optur.Distribution:\x02\x38\x01"\x8f\x01\n\x0bObservation\x12\x36\n\nparameters\x18\x01 \x03(\x0b\x32".optur.Observation.ParametersEntry\x1aH\n\x0fParametersEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12$\n\x05value\x18\x02 \x01(\x0b\x32\x15.optur.ParameterValue:\x02\x38\x01\x62\x06proto3',
 )
 
 
@@ -123,8 +123,8 @@ _DISTRIBUTION_FLOATDISTRIBUTION = _descriptor.Descriptor(
             full_name="optur.Distribution.FloatDistribution.low",
             index=0,
             number=1,
-            type=2,
-            cpp_type=6,
+            type=1,
+            cpp_type=5,
             label=1,
             has_default_value=False,
             default_value=float(0),
@@ -142,8 +142,8 @@ _DISTRIBUTION_FLOATDISTRIBUTION = _descriptor.Descriptor(
             full_name="optur.Distribution.FloatDistribution.high",
             index=1,
             number=2,
-            type=2,
-            cpp_type=6,
+            type=1,
+            cpp_type=5,
             label=1,
             has_default_value=False,
             default_value=float(0),

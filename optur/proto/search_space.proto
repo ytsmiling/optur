@@ -14,8 +14,8 @@ message ParameterValue {
 
 message Distribution {
     message FloatDistribution {
-        float low = 1;
-        float high = 2;
+        double low = 1;
+        double high = 2;
         bool log_scale = 3;
     }
 
