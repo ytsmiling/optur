@@ -28,27 +28,28 @@ impl Sampler for RandomSampler {
     ) -> optur::ParameterValue {
         match distribution.distribution {
             Some(optur::distribution::Distribution::UnknownDistribution(_)) => {
-                return optur::ParameterValue { value: None }
+                optur::ParameterValue { value: None }
             }
             Some(optur::distribution::Distribution::IntDistribution(int_d)) => {
-                return optur::ParameterValue {
+                optur::ParameterValue {
                     value: Some(optur::parameter_value::Value::IntValue(
                         rng.gen_range(int_d.low..int_d.high + 1),
                     )),
                 }
             }
             Some(optur::distribution::Distribution::FloatDistribution(float_d)) => {
-                return optur::ParameterValue {
+                optur::ParameterValue {
                     value: Some(optur::parameter_value::Value::DoubleValue(
                         rng.gen::<f64>() * (float_d.high - float_d.low) + float_d.low,
                     )),
                 }
             }
-            Some(optur::distribution::Distribution::CategoricalDistribution(_cat_d)) => {
-                panic!()
+            Some(optur::distribution::Distribution::CategoricalDistribution(cat_d)) => {
+                let idx = rng.gen_range(0..cat_d.choices.len());
+                cat_d.choices[idx].clone()
             }
             Some(optur::distribution::Distribution::FixedDistribution(fix_d)) => {
-                return match fix_d.value {
+                match fix_d.value {
                     Some(v) => v,
                     None => {
                         panic!()
