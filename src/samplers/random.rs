@@ -76,7 +76,7 @@ mod tests {
 
     #[test]
     fn init_works() {
-        let sampler = RandomSampler::new();
+        let mut sampler = RandomSampler::new();
         let search_space = optur::SearchSpace::default();
         let targets = Vec::<optur::Target>::new();
         sampler.init(search_space, targets);
@@ -84,7 +84,14 @@ mod tests {
 
     #[test]
     fn sync_works() {
-        let sampler = RandomSampler::new();
+        let mut sampler = RandomSampler::new();
         sampler.sync(Vec::<optur::Trial>::new());
+    }
+
+    #[test]
+    fn joint_sample_works() {
+        let sampler = RandomSampler::new();
+        let mut rng = rand::thread_rng();
+        sampler.joint_sample(optur::Observation::default(), &mut rng);
     }
 }
