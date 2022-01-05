@@ -16,17 +16,17 @@ impl Sampler for RandomSampler {
     fn sync(&mut self, _trials: Vec<optur::Trial>) {}
     fn joint_sample<R: Rng + ?Sized>(
         &self,
-        _fixed: optur::Observation,
+        _fixed: &optur::Observation,
         _rng: &mut R,
     ) -> optur::Observation {
         optur::Observation::default()
     }
     fn sample<R: Rng + ?Sized>(
         &self,
-        distribution: optur::Distribution,
+        distribution: &optur::Distribution,
         rng: &mut R,
     ) -> optur::ParameterValue {
-        match distribution.distribution {
+        match &distribution.distribution {
             Some(optur::distribution::Distribution::UnknownDistribution(_)) => {
                 optur::ParameterValue { value: None }
             }
@@ -49,8 +49,8 @@ impl Sampler for RandomSampler {
                 cat_d.choices[idx].clone()
             }
             Some(optur::distribution::Distribution::FixedDistribution(fix_d)) => {
-                match fix_d.value {
-                    Some(v) => v,
+                match &fix_d.value {
+                    Some(v) => v.clone(),
                     None => {
                         panic!()
                     }
@@ -72,7 +72,6 @@ impl Default for RandomSampler {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rand::SeedableRng;
 
     #[test]
     fn init_works() {
@@ -92,6 +91,33 @@ mod tests {
     fn joint_sample_works() {
         let sampler = RandomSampler::new();
         let mut rng = rand::thread_rng();
-        sampler.joint_sample(optur::Observation::default(), &mut rng);
+        let fixed = optur::Observation::default();
+        sampler.joint_sample(&fixed, &mut rng);
+    }
+
+    #[test]
+    fn sample_int_works() {
+        let sampler = RandomSampler::new();
+        let mut rng = rand::thread_rng();
+        let dist = optur::Distribution {
+            distribution: Some(optur::distribution::Distribution::IntDistribution(
+                optur::distribution::IntDistribution {
+                    low: 1,
+                    high: 5,
+                    log_scale: false,
+                },
+            )),
+        };
+        for _i in 0..100 {
+            let v = sampler.sample(&dist, &mut rng);
+            match v.value {
+                Some(optur::parameter_value::Value::IntValue(i)) => {
+                    assert!(1 <= i && i <= 5)
+                }
+                _ => {
+                    assert!(false)
+                }
+            }
+        }
     }
 }

@@ -11,14 +11,14 @@ pub trait Sampler {
     /// Suggest parameters from an estimated search space.
     fn joint_sample<R: Rng + ?Sized>(
         &self,
-        fixed: optur::Observation,
+        fixed: &optur::Observation,
         rng: &mut R,
     ) -> optur::Observation;
 
     /// Suggest a parameter from the given distribution.
     fn sample<R: Rng + ?Sized>(
         &self,
-        distribution: optur::Distribution,
+        distribution: &optur::Distribution,
         rng: &mut R,
     ) -> optur::ParameterValue;
 }
