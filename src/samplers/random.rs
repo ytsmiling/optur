@@ -120,4 +120,64 @@ mod tests {
             }
         }
     }
+
+    #[test]
+    fn sample_float_works() {
+        let sampler = RandomSampler::new();
+        let mut rng = rand::thread_rng();
+        let dist = optur::Distribution {
+            distribution: Some(optur::distribution::Distribution::FloatDistribution(
+                optur::distribution::FloatDistribution {
+                    low: 1.0,
+                    high: 5.0,
+                    log_scale: false,
+                },
+            )),
+        };
+        for _i in 0..100 {
+            let v = sampler.sample(&dist, &mut rng);
+            match v.value {
+                Some(optur::parameter_value::Value::DoubleValue(i)) => {
+                    assert!(1.0 <= i && i <= 5.0)
+                }
+                _ => {
+                    assert!(false)
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn sample_categorical_works() {
+        let sampler = RandomSampler::new();
+        let mut rng = rand::thread_rng();
+        let dist = optur::Distribution {
+            distribution: Some(optur::distribution::Distribution::CategoricalDistribution(
+                optur::distribution::CategoricalDistribution {
+                    choices: vec![
+                        optur::ParameterValue {
+                            value: Some(optur::parameter_value::Value::IntValue(2)),
+                        },
+                        optur::ParameterValue {
+                            value: Some(optur::parameter_value::Value::DoubleValue(0.2)),
+                        },
+                    ],
+                },
+            )),
+        };
+        for _i in 0..100 {
+            let v = sampler.sample(&dist, &mut rng);
+            match v.value {
+                Some(optur::parameter_value::Value::IntValue(i)) => {
+                    assert!(i == 2)
+                }
+                Some(optur::parameter_value::Value::DoubleValue(i)) => {
+                    assert!(i == 0.2)
+                }
+                _ => {
+                    assert!(false)
+                }
+            }
+        }
+    }
 }
