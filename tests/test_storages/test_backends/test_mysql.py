@@ -238,5 +238,5 @@ def test_read_trial_with_timestamp() -> None:
     for trial in trials1[2:]:
         backend.write_trial(trial=trial)
     loaded_trials = backend.get_trials(study_id=study1.study_id, timestamp=timestamp)
-    assert len(loaded_trials) == 5
+    assert len(loaded_trials) == 6
     assert set(t.trial_id for t in loaded_trials) == set(t.trial_id for t in trials1[2:])
