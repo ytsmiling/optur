@@ -40,19 +40,67 @@ fn is_equal_parameter_set(a: &Vec<optur::ParameterValue>, b: &Vec<optur::Paramet
     convert_to_hash_set(a) == convert_to_hash_set(b)
 }
 
+fn extend_parameter_set(a: &mut Vec<optur::ParameterValue>, b: &Vec<optur::ParameterValue>) {
+    let mut int_set = HashSet::<&i64>::new();
+    let mut double_set = HashSet::<[u8; 8]>::new();
+    let mut string_set = HashSet::<&String>::new();
+    for p in a.iter() {
+        match &p.value {
+            Some(optur::parameter_value::Value::IntValue(v)) => {
+                int_set.insert(v);
+            }
+            Some(optur::parameter_value::Value::DoubleValue(v)) => {
+                // TODO(tsuzuku): Check that v is not `nan` or `inf`.
+                double_set.insert(v.to_ne_bytes());
+            }
+            Some(optur::parameter_value::Value::StringValue(v)) => {
+                string_set.insert(v);
+            }
+            None => {
+                panic!();
+            }
+        }
+    }
+    let mut value_to_extend = Vec::<&optur::ParameterValue>::new();
+    for p in b.iter() {
+        match &p.value {
+            Some(optur::parameter_value::Value::IntValue(v)) => {
+                if !int_set.contains(v) {
+                    value_to_extend.push(p)
+                }
+            }
+            Some(optur::parameter_value::Value::DoubleValue(v)) => {
+                // TODO(tsuzuku): Check that v is not `nan` or `inf`.
+                if !double_set.contains(&v.to_ne_bytes()) {
+                    value_to_extend.push(p)
+                }
+            }
+            Some(optur::parameter_value::Value::StringValue(v)) => {
+                if !string_set.contains(v) {
+                    value_to_extend.push(p)
+                }
+            }
+            None => {
+                panic!();
+            }
+        }
+    }
+    for v in value_to_extend {
+        a.push(v.clone());
+    }
+}
+
 impl SearchSpaceTracker {
     fn sync(&mut self, trials: &Vec<optur::Trial>) {
         for trial in trials.iter() {
             for (name, parameter) in &trial.parameters {
                 if self.search_space.distributions.contains_key(name) {
-                    let old_dist = &self.search_space.distributions[name];
+                    let mut old_dist = self.search_space.distributions.get_mut(name).unwrap();
                     match &parameter.distribution {
                         Some(dist) => {
-                            match (dist.distribution.as_ref(), old_dist.distribution.as_ref()) {
-                                (Some(UnknownDistribution(_)), Some(UnknownDistribution(_))) => {
-                                    self.search_space
-                                        .distributions
-                                        .insert(name.to_string(), dist.clone());
+                            match (dist.distribution.as_ref(), old_dist.distribution.as_mut()) {
+                                (Some(UnknownDistribution(nd)), Some(UnknownDistribution(od))) => {
+                                    extend_parameter_set(&mut od.values, &nd.values);
                                 }
                                 (Some(UnknownDistribution(_)), b) => {}
                                 (a, Some(UnknownDistribution(_))) => {}
@@ -63,15 +111,16 @@ impl SearchSpaceTracker {
                                     assert!(is_equal_parameter_set(&a.choices, &b.choices));
                                 }
                                 (a, b) => {
-                                    assert!(a == b);
+                                    assert!(a.unwrap() == b.unwrap());
                                 }
                             }
                         }
                         None => {
-                            match self.search_space.distributions[name].distribution.as_ref() {
-                                Some(UnknownDistribution(_)) => {
-                                    panic!()
-                                } // TODO(tsuzuku): Update.
+                            match old_dist.distribution.as_mut() {
+                                Some(UnknownDistribution(od)) => {
+                                    let v = vec![parameter.value.as_ref().unwrap().clone()];
+                                    extend_parameter_set(&mut od.values, &v);
+                                }
                                 Some(_) => {
                                     panic!()
                                 } // TODO(tsuzuku): Check the value in the dist.
@@ -84,7 +133,7 @@ impl SearchSpaceTracker {
                 } else {
                     self.search_space.distributions.insert(
                         name.to_string(),
-                        unknown_distribution(parameter.value.as_ref().unwrap().clone()),
+                        unknown_distribution(vec![parameter.value.as_ref().unwrap().clone()]),
                     );
                 }
             }

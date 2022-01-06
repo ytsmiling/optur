@@ -40,12 +40,10 @@ pub fn fixed_distribution(value: optur::ParameterValue) -> optur::Distribution {
     }
 }
 
-pub fn unknown_distribution(value: optur::ParameterValue) -> optur::Distribution {
+pub fn unknown_distribution(values: Vec<optur::ParameterValue>) -> optur::Distribution {
     optur::Distribution {
         distribution: Some(optur::distribution::Distribution::UnknownDistribution(
-            optur::distribution::UnknownDistribution {
-                values: vec![value],
-            },
+            optur::distribution::UnknownDistribution { values },
         )),
     }
 }
