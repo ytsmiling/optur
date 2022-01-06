@@ -359,7 +359,7 @@ def test_run_trial_uses_waiting_trial() -> None:
         ([math.nan, 0.2], TrialProto.State.PARTIALLY_FAILED),
     ],
 )
-def test_run_trial_return_value_handling(values: Any, state: "TrialProto.StateValue") -> None:
+def test_run_trial_return_value_handling(values: Any, state: "TrialProto.State.ValueType") -> None:
     objective = MagicMock()
     sampler = MagicMock()
     storage = MagicMock()

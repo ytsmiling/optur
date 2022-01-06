@@ -40,7 +40,7 @@ class Study:
         self._last_update_time = Timestamp(seconds=0, nanos=0)
         self._trial_queue = _TrialQueue(
             states=(TrialProto.State.WAITING,),
-            worker_id=WorkerID(client_id=client_id, thread_id=0),
+            worker_id=WorkerID(client_id=self._client_id, thread_id=0),
         )
 
     def ask(self) -> Trial:
@@ -108,7 +108,7 @@ def create_study(
     targets = None
     if directions is None:
         targets = [Target(direction=Target.Direction.MINIMIZE)]
-    study_info = StudyInfo(study_id=uuid.uuid4().hex, study_name=study_name, targets=targets)
+    study_info = StudyInfo(study_id=uuid.uuid4().hex, study_name=study_name or "", targets=targets)
     storage.write_study(study=study_info)
     return Study(
         study_info=study_info,
@@ -121,7 +121,9 @@ def create_study(
 class _TrialQueue:
     """Trial queue for managing WAITING trials."""
 
-    def __init__(self, states: "Sequence[TrialProto.StateValue]", worker_id: WorkerID) -> None:
+    def __init__(
+        self, states: "Sequence[TrialProto.State.ValueType]", worker_id: WorkerID
+    ) -> None:
         self._trials: Dict[str, TrialProto] = {}
         self._timestamp: Optional[Timestamp] = None
         self._states = states
@@ -150,7 +152,7 @@ class _TrialQueue:
                 if self._is_target_trial(trial):
                     self._trials[trial.trial_id] = trial
 
-    def get_trial(self, state: "TrialProto.StateValue") -> Optional[TrialProto]:
+    def get_trial(self, state: "TrialProto.State.ValueType") -> Optional[TrialProto]:
         for trial in self._trials.values():
             if trial.last_known_state == state:
                 del self._trials[trial.trial_id]
@@ -365,7 +367,7 @@ def _value_to_objective_value(value: float) -> ObjectiveValue:
 
 def _infer_trial_state_from_objective_values(
     values: Sequence[ObjectiveValue],
-) -> "TrialProto.StateValue":
+) -> "TrialProto.State.ValueType":
     if not values:
         return TrialProto.State.UNKNOWN
     if all(value.status == ObjectiveValue.Status.VALID for value in values):

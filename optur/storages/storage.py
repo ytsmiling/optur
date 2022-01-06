@@ -209,6 +209,7 @@ class Storage(StorageClient):
                 study_id = (
                     request.get_trials.study_id.string_value
                     if request.get_trials.HasField("study_id")
+                    and request.get_trial.study_id.HasField("string_value")
                     else None
                 )
                 ret = storage_pb2.Reply(
@@ -221,6 +222,7 @@ class Storage(StorageClient):
                 study_id = (
                     request.get_trial.study_id.string_value
                     if request.get_trial.HasField("study_id")
+                    and request.get_trial.study_id.HasField("string_value")
                     else None
                 )
                 ret = storage_pb2.Reply(
@@ -281,7 +283,9 @@ class StorageClientImpl(StorageClient):
             storage_pb2.Request(
                 thread_id=self._thread_id,
                 get_trials=storage_pb2.GetTrialsRequest(
-                    study_id=storage_pb2.OptionalID(string_value=study_id),
+                    study_id=storage_pb2.OptionalID(string_value=study_id)
+                    if study_id is not None
+                    else None,
                     timestamp=timestamp,
                 ),
             ).SerializeToString()
@@ -296,7 +300,9 @@ class StorageClientImpl(StorageClient):
                 thread_id=self._thread_id,
                 get_trial=storage_pb2.GetTrialRequest(
                     trial_id=trial_id,
-                    study_id=storage_pb2.OptionalID(string_value=study_id),
+                    study_id=storage_pb2.OptionalID(string_value=study_id)
+                    if study_id is not None
+                    else None,
                 ),
             ).SerializeToString()
         )
