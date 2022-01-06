@@ -12,10 +12,14 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: 3.7
+      - name: install protoc
+        uses: arduino/setup-protoc@v1
       - name: install
         run: |
           python -m pip install -U pip
           pip install --progress-bar off -U "pytest>=6.2.5" pytest-timeout protobuf numpy
+      - name: compile proto
+        run: protoc optur/proto/*.proto --python_out=.
       - name: test
         run: PYTHONPATH=. pytest . -k "not mysql"
   test-mysql:
@@ -40,10 +44,14 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: 3.7
+      - name: install protoc
+        uses: arduino/setup-protoc@v1
       - name: install
         run: |
           python -m pip install -U pip
           pip install --progress-bar off -U "pytest>=6.2.5" pytest-timeout protobuf numpy pymysql
+      - name: compile proto
+        run: protoc optur/proto/*.proto --python_out=.
       - name: test
         run: PYTHONPATH=. pytest . -k "mysql"
         env:
