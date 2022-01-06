@@ -14,29 +14,25 @@ impl SearchSpaceTracker {
         for trial in trials.iter() {
             for (name, parameter) in &trial.parameters {
                 if self.search_space.distributions.contains_key(name) {
-                    let new_dist = match &parameter.distribution {
+                    let old_dist = &self.search_space.distributions[name];
+                    match &parameter.distribution {
                         Some(dist) => {
-                            match (
-                                dist.distribution.as_ref(),
-                                self.search_space.distributions[name].distribution.as_ref(),
-                            ) {
+                            match (dist.distribution.as_ref(), old_dist.distribution.as_ref()) {
                                 (Some(UnknownDistribution(_)), Some(UnknownDistribution(_))) => {
-                                    dist.clone()
+                                    self.search_space
+                                        .distributions
+                                        .insert(name.to_string(), dist.clone());
                                 }
-                                (Some(UnknownDistribution(_)), b) => {
-                                    self.search_space.distributions[name].clone()
-                                }
-                                (a, Some(UnknownDistribution(_))) => dist.clone(),
+                                (Some(UnknownDistribution(_)), b) => {}
+                                (a, Some(UnknownDistribution(_))) => {}
                                 (
                                     Some(CategoricalDistribution(a)),
                                     Some(CategoricalDistribution(b)),
                                 ) => {
                                     assert!(a == b); // TODO(tsuzuku): Compare the set of choices.
-                                    dist.clone()
                                 }
                                 (a, b) => {
                                     assert!(a == b);
-                                    dist.clone()
                                 }
                             }
                         }
@@ -54,9 +50,6 @@ impl SearchSpaceTracker {
                             }
                         }
                     };
-                    self.search_space
-                        .distributions
-                        .insert(name.to_string(), new_dist);
                 } else {
                     self.search_space.distributions.insert(
                         name.to_string(),
