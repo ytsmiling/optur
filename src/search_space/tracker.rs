@@ -1,4 +1,5 @@
 use crate::proto::optur;
+use crate::search_space::distribution::unknown_distribution;
 use std::option::Option::{None, Some};
 
 struct SearchSpaceTracker {
@@ -18,16 +19,7 @@ impl SearchSpaceTracker {
                 } else {
                     self.search_space.distributions.insert(
                         name.to_string(),
-                        // TODO(tsuzuku): Create a helper function.
-                        optur::Distribution {
-                            distribution: Some(
-                                optur::distribution::Distribution::UnknownDistribution(
-                                    optur::distribution::UnknownDistribution {
-                                        values: vec![parameter.value.as_ref().unwrap().clone()],
-                                    },
-                                ),
-                            ),
-                        },
+                        unknown_distribution(parameter.value.as_ref().unwrap().clone()),
                     );
                 }
             }
