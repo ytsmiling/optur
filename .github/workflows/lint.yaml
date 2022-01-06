@@ -22,6 +22,7 @@ jobs:
         run: |
           protoc optur/proto/*.proto --python_out=. --mypy_out=.
           black optur/proto
+          isort optur/proto
       - name: black
         run: black . --check --diff
       - name: isort

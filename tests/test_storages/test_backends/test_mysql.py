@@ -230,13 +230,14 @@ def test_read_trial_with_timestamp() -> None:
     trials2 = [Trial(trial_id=uuid.uuid4().hex, study_id=study2.study_id) for _ in range(6)]
     backend.write_study(study=study1)
     backend.write_study(study=study2)
-    for trial in trials1[:2]:
+    for trial in trials1[:3]:
         backend.write_trial(trial=trial)
     timestamp = backend.get_current_timestamp()
     for trial in trials2:
         backend.write_trial(trial=trial)
-    for trial in trials1[2:]:
+    for trial in trials1[3:]:
         backend.write_trial(trial=trial)
     loaded_trials = backend.get_trials(study_id=study1.study_id, timestamp=timestamp)
-    assert len(loaded_trials) == 6
-    assert set(t.trial_id for t in loaded_trials) == set(t.trial_id for t in trials1[2:])
+    assert 4 <= len(loaded_trials) < 7
+    left_idx = -len(loaded_trials)
+    assert set(t.trial_id for t in loaded_trials) == set(t.trial_id for t in trials1[left_idx:])
