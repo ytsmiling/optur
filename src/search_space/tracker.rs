@@ -21,20 +21,22 @@ impl SearchSpaceTracker {
                                 self.search_space.distributions[name].distribution.as_ref(),
                             ) {
                                 (Some(UnknownDistribution(_)), Some(UnknownDistribution(_))) => {
-                                    dist.distribution.as_ref() // TODO(tsuzuku): Merge the two unknowns.
+                                    dist.clone()
                                 }
-                                (Some(UnknownDistribution(_)), b) => b,
-                                (a, Some(UnknownDistribution(_))) => a,
+                                (Some(UnknownDistribution(_)), b) => {
+                                    self.search_space.distributions[name].clone()
+                                }
+                                (a, Some(UnknownDistribution(_))) => dist.clone(),
                                 (
                                     Some(CategoricalDistribution(a)),
                                     Some(CategoricalDistribution(b)),
                                 ) => {
                                     assert!(a == b); // TODO(tsuzuku): Compare the set of choices.
-                                    dist.distribution.as_ref()
+                                    dist.clone()
                                 }
                                 (a, b) => {
                                     assert!(a == b);
-                                    a
+                                    dist.clone()
                                 }
                             }
                         }
@@ -52,13 +54,9 @@ impl SearchSpaceTracker {
                             }
                         }
                     };
-                    let new_dist = new_dist.unwrap().clone();
-                    self.search_space.distributions.insert(
-                        name.to_string(),
-                        optur::Distribution {
-                            distribution: Some(new_dist),
-                        },
-                    );
+                    self.search_space
+                        .distributions
+                        .insert(name.to_string(), new_dist);
                 } else {
                     self.search_space.distributions.insert(
                         name.to_string(),
