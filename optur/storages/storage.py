@@ -209,7 +209,6 @@ class Storage(StorageClient):
                 study_id = (
                     request.get_trials.study_id.string_value
                     if request.get_trials.HasField("study_id")
-                    and request.get_trial.study_id.HasField("string_value")
                     else None
                 )
                 ret = storage_pb2.Reply(
@@ -222,7 +221,6 @@ class Storage(StorageClient):
                 study_id = (
                     request.get_trial.study_id.string_value
                     if request.get_trial.HasField("study_id")
-                    and request.get_trial.study_id.HasField("string_value")
                     else None
                 )
                 ret = storage_pb2.Reply(

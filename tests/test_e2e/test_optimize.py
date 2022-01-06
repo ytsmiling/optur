@@ -1,3 +1,5 @@
+import pytest
+
 import optur
 
 
@@ -12,6 +14,7 @@ def test_optimize() -> None:
     study.optimize(objective=_objective, n_trials=100)
 
 
+@pytest.mark.timeout(5)
 def test_multithread_parallel_optimize() -> None:
     sampler = optur.samplers.create_random_sampler()
     storage = optur.storages.create_inmemory_storage()
@@ -24,6 +27,7 @@ def test_multithread_parallel_optimize() -> None:
 
 
 # The objective function must be picklable.
+@pytest.mark.timeout(5)
 def _multiprocess_objective(trial: optur.Trial) -> float:
     return sum((trial.suggest_float(f"f{i}", 0, 1) for i in range(10)), 0.0)
 
