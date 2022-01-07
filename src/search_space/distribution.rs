@@ -47,3 +47,29 @@ pub fn unknown_distribution(values: Vec<optur::ParameterValue>) -> optur::Distri
         )),
     }
 }
+
+pub fn contains(distribution: &optur::Distribution, parameter: &optur::ParameterValue) -> bool {
+    match (
+        &distribution.distribution.as_ref(),
+        &parameter.value.as_ref(),
+    ) {
+        (Some(optur::distribution::Distribution::UnknownDistribution(dist)), _) => {
+            panic!(); // Undefined.
+        }
+        (
+            Some(optur::distribution::Distribution::IntDistribution(dist)),
+            Some(optur::parameter_value::Value::IntValue(i)),
+        ) => dist.low <= *i && *i <= dist.high,
+        (
+            Some(optur::distribution::Distribution::FloatDistribution(dist)),
+            Some(optur::parameter_value::Value::DoubleValue(i)),
+        ) => dist.low <= *i && *i <= dist.high,
+        (Some(optur::distribution::Distribution::CategoricalDistribution(dist)), Some(p)) => {
+            dist.choices.iter().any(|c| &c.value.as_ref().unwrap() == p)
+        }
+        (Some(optur::distribution::Distribution::FixedDistribution(dist)), Some(p)) => {
+            &dist.value.as_ref().unwrap().value.as_ref().unwrap() == p
+        }
+        _ => false,
+    }
+}
