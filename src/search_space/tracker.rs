@@ -2,7 +2,7 @@ use crate::proto::optur;
 use crate::proto::optur::distribution::Distribution::{
     CategoricalDistribution, UnknownDistribution,
 };
-use crate::search_space::distribution::unknown_distribution;
+use crate::search_space::distribution::{contains, unknown_distribution};
 use std::collections::HashSet;
 use std::option::Option::{None, Some};
 
@@ -102,8 +102,12 @@ impl SearchSpaceTracker {
                                 (Some(UnknownDistribution(nd)), Some(UnknownDistribution(od))) => {
                                     extend_parameter_set(&mut od.values, &nd.values);
                                 }
-                                (Some(UnknownDistribution(_)), b) => {}
-                                (a, Some(UnknownDistribution(_))) => {}
+                                (Some(UnknownDistribution(nd)), _) => {
+                                    assert!(nd.values.iter().any(|c| contains(&old_dist, &c)));
+                                }
+                                (_, Some(UnknownDistribution(od))) => {
+                                    assert!(od.values.iter().any(|c| contains(&dist, &c)));
+                                }
                                 (
                                     Some(CategoricalDistribution(a)),
                                     Some(CategoricalDistribution(b)),
@@ -115,20 +119,18 @@ impl SearchSpaceTracker {
                                 }
                             }
                         }
-                        None => {
-                            match old_dist.distribution.as_mut() {
-                                Some(UnknownDistribution(od)) => {
-                                    let v = vec![parameter.value.as_ref().unwrap().clone()];
-                                    extend_parameter_set(&mut od.values, &v);
-                                }
-                                Some(_) => {
-                                    panic!()
-                                } // TODO(tsuzuku): Check the value in the dist.
-                                None => {
-                                    panic!()
-                                }
+                        None => match old_dist.distribution.as_mut() {
+                            Some(UnknownDistribution(od)) => {
+                                let v = vec![parameter.value.as_ref().unwrap().clone()];
+                                extend_parameter_set(&mut od.values, &v);
                             }
-                        }
+                            Some(dist) => {
+                                assert!(contains(&old_dist, &parameter.value.as_ref().unwrap()))
+                            }
+                            None => {
+                                panic!()
+                            }
+                        },
                     };
                 } else {
                     self.search_space.distributions.insert(
