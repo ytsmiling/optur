@@ -6,7 +6,7 @@ pub trait Sampler {
     fn init(&mut self, search_space: optur::SearchSpace, targets: Vec<optur::Target>);
 
     /// Read trials and update the internal caches.
-    fn sync(&mut self, trials: Vec<optur::Trial>);
+    fn sync(&mut self, trials: &Vec<optur::Trial>);
 
     /// Suggest parameters from an estimated search space.
     fn joint_sample<R: Rng + ?Sized>(

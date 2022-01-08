@@ -1,4 +1,4 @@
-mod logit;
+pub mod logit;
 
 use crate::proto::optur;
 use crate::samplers::tpe::kernel::logit::LogitKernels;

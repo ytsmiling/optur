@@ -13,7 +13,7 @@ impl RandomSampler {
 
 impl Sampler for RandomSampler {
     fn init(&mut self, _search_space: optur::SearchSpace, _targets: Vec<optur::Target>) {}
-    fn sync(&mut self, _trials: Vec<optur::Trial>) {}
+    fn sync(&mut self, _trials: &Vec<optur::Trial>) {}
     fn joint_sample<R: Rng + ?Sized>(
         &self,
         _fixed: &optur::Observation,

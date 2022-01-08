@@ -6,7 +6,7 @@ use crate::search_space::distribution::{contains, unknown_distribution};
 use std::collections::HashSet;
 use std::option::Option::{None, Some};
 
-struct SearchSpaceTracker {
+pub struct SearchSpaceTracker {
     search_space: optur::SearchSpace,
 }
 
@@ -91,7 +91,13 @@ fn extend_parameter_set(a: &mut Vec<optur::ParameterValue>, b: &Vec<optur::Param
 }
 
 impl SearchSpaceTracker {
-    fn sync(&mut self, trials: &Vec<optur::Trial>) {
+    pub fn default() -> SearchSpaceTracker {
+        SearchSpaceTracker {
+            search_space: optur::SearchSpace::default(),
+        }
+    }
+
+    pub fn sync(&mut self, trials: &Vec<optur::Trial>) {
         for trial in trials.iter() {
             for (name, parameter) in &trial.parameters {
                 if self.search_space.distributions.contains_key(name) {
