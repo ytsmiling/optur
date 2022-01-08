@@ -48,6 +48,24 @@ pub fn unknown_distribution(values: Vec<optur::ParameterValue>) -> optur::Distri
     }
 }
 
+pub fn int_value(value: i64) -> optur::ParameterValue {
+    optur::ParameterValue {
+        value: Some(optur::parameter_value::Value::IntValue(value)),
+    }
+}
+
+pub fn double_value(value: f64) -> optur::ParameterValue {
+    optur::ParameterValue {
+        value: Some(optur::parameter_value::Value::DoubleValue(value)),
+    }
+}
+
+pub fn string_value(value: String) -> optur::ParameterValue {
+    optur::ParameterValue {
+        value: Some(optur::parameter_value::Value::StringValue(value)),
+    }
+}
+
 pub fn contains(distribution: &optur::Distribution, parameter: &optur::ParameterValue) -> bool {
     match (
         &distribution.distribution.as_ref(),
