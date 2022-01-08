@@ -6,16 +6,13 @@ use rand::distributions::WeightedIndex;
 use rand::Rng;
 use std::collections::HashMap;
 use std::option::Option::{None, Some};
+mod kde;
 mod kernel;
-use kernel::logit::LogitKernels;
-use kernel::UnivariateKernel;
 
 pub struct TPESampler {
     fallback_sampler: RandomSampler,
     search_space_tracker: SearchSpaceTracker,
-    trial_id_to_idx: HashMap<String, usize>,
-    int_kernels: HashMap<String, LogitKernels>,
-    double_kernels: HashMap<String, LogitKernels>,
+    kde: kde::univariate::UnivariateKDE,
 }
 
 impl TPESampler {
@@ -27,18 +24,13 @@ impl TPESampler {
 impl Sampler for TPESampler {
     fn init(&mut self, search_space: optur::SearchSpace, targets: Vec<optur::Target>) {
         self.fallback_sampler.init(search_space, targets);
+        self.search_space_tracker = SearchSpaceTracker::default();
+        self.kde = kde::univariate::UnivariateKDE::default();
     }
     fn sync(&mut self, trials: &Vec<optur::Trial>) {
         self.fallback_sampler.sync(trials);
-        for trial in trials {
-            if self.trial_id_to_idx.contains_key(&trial.trial_id) {
-                // Update.
-            } else {
-                // Insert.
-                let idx = self.trial_id_to_idx.len()
-                self.trial_id_to_idx.insert(trial.trial_id.clone(), self.trial_id_to_idx.len());
-            }
-        }
+        self.search_space_tracker.sync(trials);
+        self.kde.sync(trials);
     }
     fn joint_sample<R: Rng + ?Sized>(
         &self,
@@ -65,9 +57,7 @@ impl Default for TPESampler {
         Self {
             fallback_sampler: RandomSampler::default(),
             search_space_tracker: SearchSpaceTracker::default(),
-            trial_id_to_idx: HashMap::new(),
-            int_kernels: HashMap::new(),
-            double_kernels: HashMap::new(),
+            kde: kde::univariate::UnivariateKDE::default(),
         }
     }
 }
